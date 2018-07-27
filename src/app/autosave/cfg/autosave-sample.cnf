@@ -1,0 +1,37 @@
+## -----------------------------------------------------
+## Linux Scripts.
+## Autosave App Configuration file.
+##
+## @category    Linux Scripts
+## @package     Autosave
+## @version     20170904
+## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## -----------------------------------------------------
+
+## -----------------------------------------------------
+## App Directories
+## -----------------------------------------------------
+# Directory holds data to proceed
+m_APP_AUTOSAVE_DIR_CACHE=/home/<user>/out/autosave/cache
+# Directory holds data to transfert
+m_APP_AUTOSAVE_DIR_UPLOAD=/home/<user>/out/autosave/upload
+
+## -----------------------------------------------------
+## Files
+## -----------------------------------------------------
+m_LOGWATCH_FILE="$m_APP_AUTOSAVE_DIR_CACHE/$m_DATE/logwatch-$m_DATE.txt"
+
+## -----------------------------------------------------
+## Ftp
+## -----------------------------------------------------
+m_FTP_SRV="<server.domain.net>"
+m_FTP_USR="<user>"
+m_FTP_PWD="<***>"
+
+## -----------------------------------------------------
+## Trace
+## -----------------------------------------------------
+separateLine
+notice "App configuration: AutoSave"
+checkDir "\tCache directory:\t${m_APP_AUTOSAVE_DIR_CACHE}" $m_APP_AUTOSAVE_DIR_CACHE
+checkDir "\tUpload directory:\t${m_APP_AUTOSAVE_DIR_UPLOAD}" $m_APP_AUTOSAVE_DIR_UPLOAD
