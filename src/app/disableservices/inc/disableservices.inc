@@ -4,6 +4,6 @@
 ##
 ## @category  Linux Scripts
 ## @package   Services
-## @version   20170904
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version   20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------

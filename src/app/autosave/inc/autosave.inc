@@ -4,8 +4,8 @@
 ##
 ## @category    Linux Scripts
 ## @package     Autosave
-## @version     20170727
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version     20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
 # Copies files over using FTP.

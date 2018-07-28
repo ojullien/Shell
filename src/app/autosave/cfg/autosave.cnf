@@ -4,9 +4,14 @@
 ##
 ## @category    Linux Scripts
 ## @package     Autosave
-## @version     20170904
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version     20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
+
+# Remove these lines once you have configured this file
+echo "The app/autosave/cfg/autosave.cnf file is not configured !!!"
+error "The app/autosave/cfg/autosave.cnf file is not configured !!!"
+exit 3
 
 ## -----------------------------------------------------
 ## App Directories

@@ -6,8 +6,8 @@
 ##
 ## @category  Linux Scripts
 ## @package   Scripts
-## @version   20170904
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version   20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
 set -u;
@@ -59,19 +59,6 @@ waitUser
 ## -----------------------------------------------------------------------------
 separateLine
 syncFile
-
-## -----------------------------------------------------------------------------
-## Databases: cold backups
-## -----------------------------------------------------------------------------
-#compressFile "${m_DIR_CACHE}/${m_DATE}/mysql-cold" "/var/lib/mysql"
-
-## -----------------------------------------------------------------------------
-## Sites: save logs, clean logs and sessions
-## -----------------------------------------------------------------------------
-#compressFile "${m_DIR_CACHE}/${m_DATE}/pbraiders-log" "/var/www/pbraiders/data/logs"
-#compressFile "${m_DIR_CACHE}/${m_DATE}/pbraiders-db" "/var/www/pbraiders/data/db"
-#cleanDirectory "/var/www/pbraiders/data/logs"
-#cleanDirectory "/var/www/pbraiders/data/sessions"
 
 ## -----------------------------------------------------------------------------
 ## Logwatch

@@ -16,9 +16,7 @@ Personal Shell scripting projects.
 Require a Debian/Ubuntu version of linux.
 
 1. [Download a release](https://github.com/ojullien/Shell/releases) or clone this repository to install this project.
-2. For each apps in app folder check out the configuration files located in app/\<app_name\>/cfg/.
-   1. Rename \<app_name\>-sample.cnf to <app_name>.cnf
-   2. Edit \<app_name\>.cnf
+2. For each apps in app folder check out and edit the configuration files located in app/\<app_name\>/cfg/.
 3. Run the app you want. In the Shell (root) folder run `./<app_name>.sh`
 
 All the main app scripts can take the following options:
@@ -42,7 +40,12 @@ All the main app scripts can take the following options:
 
 - Applications
   - [app/](https://github.com/ojullien/Shell/blob/master/src/app) contains the main core files (functions, configurations, ...) for each apps.
-  - [install.sh](https://github.com/ojullien/Shell/blob/master/src/install.sh) Configure a fresh debian/ubuntu installation. (ssh is already installed and configured)
+  - [autosave.sh](https://github.com/ojullien/Shell/blob/master/src/autosave.sh) Builds a timestamped compressed archive with system logs, web logs and databases data, and send it to a ftp server. Clean the system log after that.
+  - [clean.sh](https://github.com/ojullien/Shell/blob/master/src/clean.sh) Cleans the /var/log folder.
+  - [createdomain.sh](https://github.com/ojullien/Shell/blob/master/src/createdomain.sh) Creates an apache user/group and a home directory in /var/www.
+  - [disableservices.sh](https://github.com/ojullien/Shell/blob/master/src/disableservices.sh) Disables unwanted services.
+  - [fillwithzeros.sh](https://github.com/ojullien/Shell/blob/master/src/fillwithzeros.sh) Fills disks with zero for compression (virtualization) and shutdown the server.
+  - [install.sh](https://github.com/ojullien/Shell/blob/master/src/install.sh) Configures a fresh debian/ubuntu installation. (ssh is already installed and configured)
     - Initial update and upgrade
       - update source.list,
       - update system
@@ -53,7 +56,9 @@ All the main app scripts can take the following options:
     - Install system packages (dkms, build-essential, util-linux, deborphan, localepurge, hdparm, smartmontools, ...)
     - Install and configure app packages (vim, fail2ban, ftp, mlocate, chkrootkit, logwatch, ...)
     - Optimize SSD
-  - [autosave.sh](https://github.com/ojullien/Shell/blob/master/src/autosave.sh) Configure a fresh debian/ubuntu installation.
+  - [savesite.sh](https://github.com/ojullien/Shell/blob/master/src/savesite.sh) Saves a www site.
+  - [savesystemconf.sh](https://github.com/ojullien/Shell/blob/master/src/savesystemconf.sh) Saves a system configuration (located in /etc).
+  - [update-system.sh](https://github.com/ojullien/Shell/blob/master/src/update-system.sh) Updates the system.
 
 ## Documentation
 

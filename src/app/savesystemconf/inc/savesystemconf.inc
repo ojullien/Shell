@@ -4,13 +4,13 @@
 ##
 ## @category  Linux Scripts
 ## @package   saveSystemConf
-## @version   20170813
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version   20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
 saveConf () {
-    if [ $# -eq 0 ] || [ -z "$1" ]; then
-        error "Usage: saveConf <directory>"
+    if [ $# -lt 2 ] || [ -z "$1" ] || [ -z "$2" ]; then
+        error "Usage: saveConf <conf directory> <save directory>"
         exit 1
     fi
 
@@ -18,13 +18,13 @@ saveConf () {
     [ ! -d "/etc/$1" ] && error "ERROR: Directory /etc/$1 does not exist!" && return 1
 
     # Destination does not exist
-    [ ! -d "/home/ojullien/out" ] && error "ERROR: Directory /home/ojullien/out does not exist!" && return 1
+    [ ! -d "$2" ] && error "ERROR: Directory $2 does not exist!" && return 1
 
     # Change directory
     cd /etc
 
     # Saving
-    m_Save="/home/ojullien/out/$(uname -n)-$1-$(/bin/date +"%Y%m%d").tar.bz2"
+    m_Save="$2/$(uname -n)-$1-$(/bin/date +"%Y%m%d").tar.bz2"
     tar cjf $m_Save $1
     iReturn=$?
     if [ 0 -eq $iReturn ]; then

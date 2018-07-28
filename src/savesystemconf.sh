@@ -6,8 +6,8 @@
 ##
 ## @category  Linux Scripts
 ## @package   Scripts
-## @version   20170813
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version   20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
 set -u;
@@ -33,7 +33,7 @@ set -u;
 
 until [ -z "${1+defined}" ]  # Until all parameters used up . . .
 do
-    saveConf $1
+    saveConf $1 $m_SAVECONF_SAVEFOLDER
     iReturn=$?
     if [ 0 -ne $iReturn ]; then
         exit $iReturn

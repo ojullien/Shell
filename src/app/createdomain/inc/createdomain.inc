@@ -4,8 +4,8 @@
 ##
 ## @category  Linux Scripts
 ## @package   createDomain
-## @version   20170831
-## @copyright (©) 2017, Olivier Jullien <https://github.com/ojullien>
+## @version   20180728
+## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
 createGroup () {
