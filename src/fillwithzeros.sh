@@ -15,18 +15,18 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc"
-. "./sys/inc/filesystem.inc"
-. "./sys/inc/option.inc"
-. "./app/clean/inc/clean.inc"
-. "./sys/inc/service.inc"
+. "./sys/inc/string.inc.sh"
+. "./sys/inc/filesystem.inc.sh"
+. "./sys/inc/option.inc.sh"
+. "./app/clean/inc/clean.inc.sh"
+. "./sys/inc/service.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cnf"
-. "./sys/cfg/root.cnf"
-. "./app/clean/cfg/clean.cnf"
+. "./sys/cfg/main.cfg.sh"
+. "./sys/cfg/root.cfg.sh"
+. "./app/clean/cfg/clean.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start

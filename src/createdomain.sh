@@ -15,16 +15,16 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc"
-. "./sys/inc/filesystem.inc"
-. "./app/createdomain/inc/createdomain.inc"
+. "./sys/inc/string.inc.sh"
+. "./sys/inc/filesystem.inc.sh"
+. "./app/createdomain/inc/createdomain.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./app/createdomain/cfg/createdomain.cnf"
-. "./sys/cfg/main.cnf"
-. "./sys/cfg/root.cnf"
+. "./app/createdomain/cfg/createdomain.cfg.sh"
+. "./sys/cfg/main.cfg.sh"
+. "./sys/cfg/root.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Must have an argument

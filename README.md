@@ -30,24 +30,24 @@ All the main app scripts can take the following options:
 - Core framework
   - [sys/cfg/](https://github.com/ojullien/Shell/blob/master/src/sys/cfg) contains main configuration files.
   - [sys/inc/](https://github.com/ojullien/Shell/blob/master/src/sys/inc) contains scripts that offer useful functions:
-    - [apt.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/apt.inc): package manager (dpkg, apt, aptitude)
-    - [filesystem.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/filesystem.inc): file system functions.
-    - [option.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/option.inc): command line options functions.
-    - [string.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/string.inc): string functions.
-    - [service.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/service.inc): service manager (use systemV.inc or systemD.inc)
-    - [systemD.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/systemD.inc): System V service manager.
-    - [systemV.inc](https://github.com/ojullien/Shell/blob/master/src/sys/cfg/systemV.inc): systemd service manager.
+    - apt.inc.sh: package manager (dpkg, apt, aptitude)
+    - filesystem.inc.sh: file system functions.
+    - option.inc.sh: command line options functions.
+    - string.inc.sh: string functions.
+    - service.inc.sh: service manager (use systemV.inc.sh or systemD.inc.sh)
+    - systemD.inc.sh: System V service manager.
+    - systemV.inc.sh: systemd service manager.
 
 - Applications
   - [app/](https://github.com/ojullien/Shell/blob/master/src/app) contains the main core files (functions, configurations, ...) for each apps.
-  - [autosave.sh](https://github.com/ojullien/Shell/blob/master/src/autosave.sh) Builds a timestamped compressed archive with system logs, web logs and databases data, and send it to a ftp server. Clean the system log after that.
-  - [clean.sh](https://github.com/ojullien/Shell/blob/master/src/clean.sh) Cleans the /var/log folder.
-  - [createdomain.sh](https://github.com/ojullien/Shell/blob/master/src/createdomain.sh) Creates an apache user/group and a home directory in /var/www.
-  - [disableservices.sh](https://github.com/ojullien/Shell/blob/master/src/disableservices.sh) Disables unwanted services.
-  - [fillwithzeros.sh](https://github.com/ojullien/Shell/blob/master/src/fillwithzeros.sh) Fills disks with zero for compression (virtualization) and shutdown the server.
-  - [install.sh](https://github.com/ojullien/Shell/blob/master/src/install.sh) Configures a fresh debian/ubuntu installation. (ssh is already installed and configured)
+  - autosave.sh: Builds a timestamped compressed archive with system logs, web logs and databases data, and send it to a ftp server. Clean the system log after that.
+  - clean.sh: Cleans the /var/log folder.
+  - createdomain.sh: Creates an apache user/group and a home directory in /var/www.
+  - disableservices.sh: Disables unwanted services.
+  - fillwithzeros.sh: Fills disks with zero for compression (virtualization) and shutdown the server.
+  - install.sh: Configures a fresh debian/ubuntu installation. (ssh is already installed and configured)
     - Initial update and upgrade
-      - update source.list,
+      - update source.list
       - update system
       - upgrade system
     - Install or modify bashrc files
@@ -56,9 +56,9 @@ All the main app scripts can take the following options:
     - Install system packages (dkms, build-essential, util-linux, deborphan, localepurge, hdparm, smartmontools, ...)
     - Install and configure app packages (vim, fail2ban, ftp, mlocate, chkrootkit, logwatch, ...)
     - Optimize SSD
-  - [savesite.sh](https://github.com/ojullien/Shell/blob/master/src/savesite.sh) Saves a www site.
-  - [savesystemconf.sh](https://github.com/ojullien/Shell/blob/master/src/savesystemconf.sh) Saves a system configuration (located in /etc).
-  - [update-system.sh](https://github.com/ojullien/Shell/blob/master/src/update-system.sh) Updates the system.
+  - savesite.sh: Saves a www site.
+  - savesystemconf.sh: Saves a system configuration (located in /etc).
+  - update-system.sh: Updates the system.
 
 ## Documentation
 

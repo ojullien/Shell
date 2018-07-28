@@ -9,8 +9,8 @@
 ## -----------------------------------------------------
 
 # Remove these lines once you have configured this file
-echo "The app/autosave/cfg/autosave.cnf file is not configured !!!"
-error "The app/autosave/cfg/autosave.cnf file is not configured !!!"
+echo "The app/autosave/cfg/autosave.cfg.sh file is not configured !!!"
+error "The app/autosave/cfg/autosave.cfg.sh file is not configured !!!"
 exit 3
 
 ## -----------------------------------------------------

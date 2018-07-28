@@ -15,16 +15,16 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc"
-. "./sys/inc/filesystem.inc"
-. "./app/savesite/inc/savesite.inc"
+. "./sys/inc/string.inc.sh"
+. "./sys/inc/filesystem.inc.sh"
+. "./app/savesite/inc/savesite.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./app/savesite/cfg/savesite.cnf"
-. "./sys/cfg/main.cnf"
-. "./sys/cfg/root.cnf"
+. "./app/savesite/cfg/savesite.cfg.sh"
+. "./sys/cfg/main.cfg.sh"
+. "./sys/cfg/root.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Must have an argument

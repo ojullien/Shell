@@ -15,18 +15,18 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc"
-. "./sys/inc/filesystem.inc"
-. "./sys/inc/option.inc"
-. "./sys/inc/apt.inc"
-. "./sys/inc/service.inc"
+. "./sys/inc/string.inc.sh"
+. "./sys/inc/filesystem.inc.sh"
+. "./sys/inc/option.inc.sh"
+. "./sys/inc/apt.inc.sh"
+. "./sys/inc/service.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cnf"
-. "./sys/cfg/root.cnf"
-. "./app/disableservices/cfg/disableservices.cnf"
+. "./sys/cfg/main.cfg.sh"
+. "./sys/cfg/root.cfg.sh"
+. "./app/disableservices/cfg/disableservices.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start

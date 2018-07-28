@@ -13,8 +13,8 @@ m_OPTION_LOG=0
 m_OPTION_WAIT=0
 
 # Remove these lines once you have configured this file
-echo "The app/savesystemconf/cfg/savesystemconf.cnf file is not configured !!!"
-error "The app/savesystemconf/cfg/savesystemconf.cnf file is not configured !!!"
+echo "The app/savesystemconf/cfg/savesystemconf.cfg.sh file is not configured !!!"
+error "The app/savesystemconf/cfg/savesystemconf.cfg.sh file is not configured !!!"
 exit 3
 
 ## -----------------------------------------------------

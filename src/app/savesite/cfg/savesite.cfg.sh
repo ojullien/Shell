@@ -13,8 +13,8 @@ m_OPTION_LOG=0
 m_OPTION_WAIT=0
 
 # Remove these lines once you have configured this file
-echo "The app/savesite/cfg/savesite.cnf file is not configured !!!"
-error "The app/savesite/cfg/savesite.cnf file is not configured !!!"
+echo "The app/savesite/cfg/savesite.cfg.sh file is not configured !!!"
+error "The app/savesite/cfg/savesite.cfg.sh file is not configured !!!"
 exit 3
 
 ## -----------------------------------------------------

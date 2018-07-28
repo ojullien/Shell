@@ -2,9 +2,9 @@
 ## Linux Scripts.
 ## String functions
 ##
-## @category  Linux Scripts
-## @package   Includes
-## @version   20180728
+## @category Linux Scripts
+## @package Includes
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
@@ -19,9 +19,9 @@ COLORRESET="$(/usr/bin/tput -Txterm sgr0)"
 ## Write functions
 ## -----------------------------------------------------
 
-writeToLog () {
-    if [ -n "$1" ] && [ $m_OPTION_LOG -eq 1 ]; then
-        echo $@ >> "${m_LOGFILE}"
+Log::writeToLog() {
+    if [[ -n "$1" ]] && ((m_OPTION_LOG)); then
+        echo "$@" >> "${m_LOGFILE}"
     fi
     return 0
 }
@@ -30,23 +30,23 @@ writeToLog () {
 ## Display functions
 ## -----------------------------------------------------
 
-displayError () {
-    if [ -n "$1" ] && [ $m_OPTION_DISPLAY -eq 1 ]; then
-        echo ${COLORRED}$@${COLORRESET}
+Console::displayError() {
+    if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
+        echo "${COLORRED}$*${COLORRESET}" >&2
     fi
     return 0
 }
 
-displaySuccess () {
-    if [ -n "$1" ] && [ $m_OPTION_DISPLAY -eq 1 ]; then
-        echo ${COLORGREEN}$@${COLORRESET}
+Console::displaySuccess() {
+    if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
+        echo "${COLORGREEN}$*${COLORRESET}"
     fi
     return 0
 }
 
-display () {
-    if [ -n "$1" ] && [ $m_OPTION_DISPLAY -eq 1 ]; then
-        echo $@
+Console::display() {
+    if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
+        echo "$@"
     fi
     return 0
 }
@@ -55,26 +55,26 @@ display () {
 ## Log functions
 ## -----------------------------------------------------
 
-error () {
-    if [ -n "$1" ]; then
-        writeToLog $@
-        displayError $@
+String::error() {
+    if [[ -n "${1}" ]]; then
+        Log::writeToLog "$@"
+        Console::displayError "$@"
     fi
     return 0
 }
 
-notice () {
-    if [ -n "$1" ]; then
-        writeToLog $@
-        display $@
+String::notice() {
+    if [[ -n "${1}" ]]; then
+        Log::writeToLog "$@"
+        Console::display "$@"
     fi
     return 0
 }
 
-success () {
-    if [ -n "$1" ]; then
-        writeToLog $@
-        displaySuccess $@
+String::success() {
+    if [[ -n "${1}" ]]; then
+        Log::writeToLog "$@"
+        Console::displaySuccess "$@"
     fi
     return 0
 }
@@ -83,13 +83,13 @@ success () {
 ## Clear screen
 ## -----------------------------------------------------
 
-clearScreen () {
-    [ $m_OPTION_DISPLAY -eq 0 ] || clear
+Console::clearScreen() {
+    ((m_OPTION_WAIT)) || clear
     return 0
 }
 
-separateLine() {
-    notice "---------------------------------------------------------------------------"
+String::separateLine() {
+    String::notice "---------------------------------------------------------------------------"
     return 0
 }
 
@@ -97,12 +97,12 @@ separateLine() {
 ## Wait
 ## -----------------------------------------------------
 
-waitUser () {
-    if [ $m_OPTION_WAIT -eq 1 ]; then
-        display "Press [ENTER] to continue."
-        read input
+Console::waitUser() {
+    local sBuffer
+    if ((m_OPTION_WAIT)); then
+        read -s -r -e -p "Press [ENTER] to continue." -n 1 sBuffer
     else
-        input=0
+        sBuffer=0
     fi
-    return $input
+    return $sBuffer
 }

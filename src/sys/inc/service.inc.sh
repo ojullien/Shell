@@ -9,12 +9,12 @@
 ## -----------------------------------------------------
 
 if [ -e "/bin/systemctl" ]; then
-	. "./sys/inc/systemD.inc"
+	. "./sys/inc/systemD.inc.sh"
 else
-	. "./sys/inc/systemV.inc"
+	. "./sys/inc/systemV.inc.sh"
 fi
 
-disableServices () {
+disableServices() {
     separateLine
     notice "Disable services"
     if [ -n "$1" ]; then
@@ -32,7 +32,7 @@ disableServices () {
     return 0
 }
 
-stopServices () {
+stopServices() {
     separateLine
     notice "Stop services"
     if [ -n "$1" ]; then
@@ -49,7 +49,7 @@ stopServices () {
     return 0
 }
 
-startServices () {
+startServices() {
     separateLine
     notice "Start services"
     if [ -n "$1" ]; then
