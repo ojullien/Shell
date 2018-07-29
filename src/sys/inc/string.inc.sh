@@ -11,9 +11,9 @@
 ## -----------------------------------------------------
 ## Defines colors
 ## -----------------------------------------------------
-COLORRED="$(/usr/bin/tput -Txterm setaf 1)"
-COLORGREEN="$(/usr/bin/tput -Txterm setaf 2)"
-COLORRESET="$(/usr/bin/tput -Txterm sgr0)"
+readonly COLORRED="$(tput -Txterm setaf 1)"
+readonly COLORGREEN="$(tput -Txterm setaf 2)"
+readonly COLORRESET="$(tput -Txterm sgr0)"
 
 ## -----------------------------------------------------
 ## Write functions
@@ -21,7 +21,7 @@ COLORRESET="$(/usr/bin/tput -Txterm sgr0)"
 
 Log::writeToLog() {
     if [[ -n "$1" ]] && ((m_OPTION_LOG)); then
-        echo "$@" >> "${m_LOGFILE}"
+        echo -e "$@" >> "${m_LOGFILE}"
     fi
     return 0
 }
@@ -32,21 +32,21 @@ Log::writeToLog() {
 
 Console::displayError() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo "${COLORRED}$*${COLORRESET}" >&2
+        echo -e "${COLORRED}$*${COLORRESET}" >&2
     fi
     return 0
 }
 
 Console::displaySuccess() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo "${COLORGREEN}$*${COLORRESET}"
+        echo -e "${COLORGREEN}$*${COLORRESET}"
     fi
     return 0
 }
 
 Console::display() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo "$@"
+        echo -e "$@"
     fi
     return 0
 }
@@ -56,7 +56,7 @@ Console::display() {
 ## -----------------------------------------------------
 
 String::error() {
-    if [[ -n "${1}" ]]; then
+    if [[ -n "$1" ]]; then
         Log::writeToLog "$@"
         Console::displayError "$@"
     fi
@@ -64,7 +64,7 @@ String::error() {
 }
 
 String::notice() {
-    if [[ -n "${1}" ]]; then
+    if [[ -n "$1" ]]; then
         Log::writeToLog "$@"
         Console::display "$@"
     fi
@@ -72,7 +72,7 @@ String::notice() {
 }
 
 String::success() {
-    if [[ -n "${1}" ]]; then
+    if [[ -n "$1" ]]; then
         Log::writeToLog "$@"
         Console::displaySuccess "$@"
     fi
