@@ -1,8 +1,8 @@
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Author: 
+" Author:
 "       Olivier Jullien
 "
-" Version: 
+" Version:
 "       1.0 - 18-sep-2014
 "
 "
@@ -48,7 +48,7 @@ set whichwrap+=<,>,h,l
 " Ignore case when searching
 set ignorecase
 
-" When searching try to be smart about cases 
+" When searching try to be smart about cases
 set smartcase
 
 " Highlight search results

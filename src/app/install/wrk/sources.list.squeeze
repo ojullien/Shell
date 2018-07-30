@@ -1,7 +1,7 @@
 ## -----------------------------------------------------------------------------
 ## squeeze
 ## apt-get install debian-archive-keyring
-## ----------------------------------------------------------------------------- 
+## -----------------------------------------------------------------------------
 
 deb http://archive.debian.org/debian/ squeeze main non-free contrib
 deb-src http://archive.debian.org/debian/ squeeze main non-free contrib
