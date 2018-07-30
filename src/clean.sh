@@ -4,56 +4,61 @@
 ## Linux Scripts.
 ## Clean logs.
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180728
+## @category Linux Scripts
+## @package Scripts
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
+
+## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./sys/inc/option.inc.sh"
-. "./sys/inc/service.inc.sh"
-. "./app/clean/inc/clean.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_SYS_INC}/service.inc.sh"
+. "${m_DIR_APP}/clean/inc/clean.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
-. "./app/clean/cfg/clean.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Today is: `/bin/date -R`"
-notice "The PID for `/usr/bin/basename $0` process is: $$"
-waitUser
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
-disableServices $m_CLEAN_SERVICES_DISABLE
-stopServices $m_CLEAN_SERVICES_STOP
-waitUser
+Services::disableServices ${m_CLEAN_SERVICES_DISABLE}
+Services::stopServices ${m_CLEAN_SERVICES_STOP}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean logs
 ## -----------------------------------------------------------------------------
-separateLine
-processCleanLog
-waitUser
+String::separateLine
+Clean::processCleanLog
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Start services
 ## -----------------------------------------------------------------------------
-startServices $m_CLEAN_SERVICES_START
+startServices ${m_CLEAN_SERVICES_START}
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"

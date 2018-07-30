@@ -12,140 +12,152 @@
 ## Dpkg
 ## -----------------------------------------------------
 
-existsPackage () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: existsPackage <name>"
+Apt::existsPackage() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: existsPackage <name>"
         exit 1
     fi
+    local -i iReturn
     dpkg -l | grep "$1" | grep "^ii " > /dev/null
     iReturn=$?
-    notice -n "Package exists $1:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    String::notice -n "Package exists $1:"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
-isInstalled () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: isInstalled <name>"
+Apt::isInstalled() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: isInstalled <name>"
         exit 1
     fi
-    $1 --help > /dev/null 2>&1
+    local -i iReturn
+    local sCommand="$1"
+    "$(sCommand)" --help > /dev/null 2>&1
     iReturn=$?
-    notice -n "$1 is installed:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    String::notice -n "${sCommand} is installed:"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Apt-get
 ## -----------------------------------------------------
 
-upgradeWithAptget () {
-    separateLine
-    notice "Update & Upgrade"
+Apt::upgradeWithAptget() {
+    String::separateLine
+    String::notice "Update & Upgrade"
+    local -i iReturnA
+    local -i iReturnB
     apt-get update > /dev/null 2>&1
-    iReturn1=$?
-    notice -n "\tUpdating:"
-     if [ 0 -eq $iReturn1 ] ; then
-        success "OK"
+    iReturnA=$?
+    String::notice -n "\tUpdating:"
+    if (( 0 == iReturnA )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn1"
+        String::error "NOK code: ${iReturnA}"
     fi
     apt-get full-upgrade -y
-    iReturn2=$?
-    notice -n "\tUpgrading:"
-    if [ 0 -eq $iReturn2 ]; then
-        success "OK"
+    iReturnB=$?
+    String::notice -n "\tUpgrading:"
+    if (( 0 == iReturnB )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn2"
+        String::error "NOK code: ${iReturnB}"
     fi
-    return $iReturn1 && $iReturn2
+    return ${iReturnA} && ${iReturnB}
 }
 
 ## -----------------------------------------------------
 ## Aptitude
 ## -----------------------------------------------------
 
-installPackage () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: installPackage <name>"
+Apt::installPackage() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: installPackage <name>"
         exit 1
     fi
-    separateLine
-    notice "Installing package $@:"
-    aptitude install -y $@
+    local -i iReturn
+    String::separateLine
+    String::notice "Installing package '$*':"
+    aptitude install -y "$@"
     iReturn=$?
-    notice -n "Installing $@:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    String::notice -n "Installing '$*':"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 uninstallPackage () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: uninstallPackage <name>"
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: uninstallPackage <name>"
         exit 1
     fi
-    separateLine
-    notice "Uninstalling package $@:"
-    aptitude purge -y $@
+    local -i iReturn
+    String::separateLine
+    String::notice "Uninstalling package '$*':"
+    aptitude purge -y "$@"
     iReturn=$?
-    notice -n "Uninstalling $@:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    String::notice -n "Uninstalling '$*':"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 updateAndUpgrade () {
-    separateLine
-    notice "Update & Upgrade"
+    local -i iReturnA
+    local -i iReturnB
+    String::separateLine
+    String::notice "Update & Upgrade"
     aptitude update > /dev/null 2>&1
-    iReturn1=$?
-    notice -n "\tUpdating:"
-    if [ 0 -eq $iReturn1 ]; then
-        success "OK"
+    iReturnA=$?
+    String::notice -n "\tUpdating:"
+    if (( 0 == iReturnA )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn1"
+        String::error "NOK code: $iReturnA"
     fi
     aptitude full-upgrade -y
-    iReturn2=$?
-    notice -n "\tUpgrading:"
-    if [ 0 -eq $iReturn2 ]; then
-        success "OK"
+    iReturnB=$?
+    String::notice -n "\tUpgrading:"
+    if (( 0 == iReturnB )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn2"
+        String::error "NOK code: $iReturnB"
     fi
-    return $iReturn1 && $iReturn2
+    return ${iReturnA} && ${iReturnB}
 }
 
 cleanAndPurge () {
-    separateLine
-    notice "Cleaning & Purging"
+    local -i iReturnA
+    local -i iReturnB
+    local -i iReturnC
+    String::separateLine
+    String::notice "Cleaning & Purging"
     aptitude clean
-    iReturn1=$?
+    iReturnA=$?
     aptitude autoclean
-    iReturn2=$?
+    iReturnB=$?
     apt-get autoremove --purge
-    iReturn3=$?
-    notice -n "Cleaning & Purging:"
-    if [ 0 -eq $iReturn1 ] && [ 0 -eq $iReturn2 ] && [ 0 -eq $iReturn3 ]; then
-        success "OK"
+    iReturnC=$?
+    String::notice -n "Cleaning & Purging:"
+    if (( 0 == iReturnA )) && (( 0 == iReturnB )) && (( 0 == iReturnC )); then
+        String::success "OK"
     else
-        error "NOK codes: $iReturn1, $iReturn2, $iReturn3"
+        String::error "NOK codes: ${iReturnA}, ${iReturnB}, ${iReturnC}"
     fi
     return 0
 }

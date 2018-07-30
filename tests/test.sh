@@ -36,13 +36,14 @@ String::notice "Today is: $(date -R)"
 String::notice "The PID for $(basename $0) process is: $$"
 Console::waitUser
 
-#. "${m_TEST_DIR_SYS_INC}/string_test.inc.sh"
-#Test::String::main
-#Console::waitUser
+. "${m_TEST_DIR_SYS_INC}/string_test.inc.sh"
+Test::String::main
+Console::waitUser
 
 . "${m_TEST_DIR_SYS_INC}/filesystem_test.inc.sh"
 Test::FileSystem::main
 Console::waitUser
+
 
 ## -----------------------------------------------------------------------------
 ## END

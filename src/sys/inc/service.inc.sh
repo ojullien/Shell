@@ -2,65 +2,65 @@
 ## Linux Scripts.
 ## Managing services
 ##
-## @category    Linux Scripts
-## @package     Includes
-## @version     20180728
+## @category Linux Scripts
+## @package Includes
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
-if [ -e "/bin/systemctl" ]; then
-	. "./sys/inc/systemD.inc.sh"
+if [[ -e "/bin/systemctl" ]]; then
+    . "${m_DIR_SYS_INC}/systemD.inc.sh"
 else
-	. "./sys/inc/systemV.inc.sh"
+    . "${m_DIR_SYS_INC}/systemV.inc.sh"
 fi
 
-disableServices() {
-    separateLine
-    notice "Disable services"
-    if [ -n "$1" ]; then
-        for myService in $@
+Service::disableServices() {
+    String::separateLine
+    String::notice "Disable services"
+    if [[ -n "$1" ]]; then
+        for myService in "$@"
         do
-            if [ -e "/etc/init.d/$myService" ]; then
-                stopService $myService
-                disableService $myService
+            if [[ -e "/etc/init.d/${myService}" ]]; then
+                Service::stopService "${myService}"
+                Service::disableService "${myService}"
             fi
         done
     else
-        error "Usage: disableServices <service 1> <service 2> <...>"
+        String::error "Usage: disableServices <service 1> <service 2> <...>"
         exit 1
     fi
     return 0
 }
 
-stopServices() {
-    separateLine
-    notice "Stop services"
-    if [ -n "$1" ]; then
-        for myService in $@
+Service::stopServices() {
+    String::separateLine
+    String::notice "Stop services"
+    if [[ -n "$1" ]]; then
+        for myService in "$@"
         do
-            if [ -e "/etc/init.d/$myService" ]; then
-                stopService $myService
+            if [ -e "/etc/init.d/${myService}" ]; then
+                Service::stopService "${myService}"
             fi
         done
     else
-        error "Usage: stopServices <service 1> <service 2> <...>"
+        String::error "Usage: stopServices <service 1> <service 2> <...>"
         exit 1
     fi
     return 0
 }
 
-startServices() {
-    separateLine
-    notice "Start services"
-    if [ -n "$1" ]; then
-        for myService in $@
+Service::startServices() {
+    String::separateLine
+    String::notice "Start services"
+    if [[ -n "$1" ]]; then
+        for myService in "$@"
         do
-            if [ -e "/etc/init.d/$myService" ]; then
-                startService $myService
+            if [ -e "/etc/init.d/${myService}" ]; then
+                startService "${myService}"
             fi
         done
     else
-        error "Usage: startService <service 1> <service 2> <...>"
+        String::error "Usage: startService <service 1> <service 2> <...>"
         exit 1
     fi
     return 0

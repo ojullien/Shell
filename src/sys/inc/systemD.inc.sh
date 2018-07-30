@@ -2,9 +2,9 @@
 ## Linux Scripts.
 ## Managing services with SystemD
 ##
-## @category  Linux Scripts
-## @package   Includes
-## @version   20180728
+## @category Linux Scripts
+## @package Includes
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
@@ -12,83 +12,91 @@
 ## Stops service
 ## -----------------------------------------------------
 
-stopService () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: stopService <name>"
+Service::stopService() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: stopService <name>"
         exit 1
     fi
-    notice -n "Stopping $1:"
-    /bin/systemctl stop $1.service > /dev/null 2>&1
+    local -i iReturn
+    local sService="$1"
+    String::notice -n "Stopping '${sService}':"
+    systemctl stop "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Starts service
 ## -----------------------------------------------------
 
-startService () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: startService <name>"
+Service::startService() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: startService <name>"
         exit 1
     fi
-    notice -n "Starting $1:"
-    /bin/systemctl start $1.service > /dev/null 2>&1
+    local -i iReturn
+    local sService="$1"
+    String::notice -n "Starting '${sService}':"
+    systemctl start "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Disables service
 ## -----------------------------------------------------
 
-disableService () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: disableService <name>"
+Service::disableService() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: disableService <name>"
         exit 1
     fi
-    notice -n "Disabling $1:"
-    /bin/systemctl disable $1.service > /dev/null 2>&1
+    local -i iReturn
+    local sService="$1"
+    String::notice -n "Disabling '${sService}':"
+    systemctl disable "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+    if (( 0 == iReturn )); then
+        String::success "OK"
     else
-        error "NOK code: $iReturn"
+        String::error "NOK code: ${iReturn}"
     fi
-    return $iReturn
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Status service
 ## -----------------------------------------------------
 
-statusService () {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: statusService <name>"
+Service::statusService() {
+    if (($# < 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: statusService <name>"
         exit 1
     fi
-    notice -n "Status $1:"
-    /bin/systemctl status $1.service > /dev/null 2>&1
+    local -i iReturn
+    local sService="$1"
+    String::notice -n "Status '${sService}':"
+    systemctl status "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    case $iReturn in
+    case "${iReturn}" in
         0)
-            notice "is running"
+            String::notice "is running"
             ;;
         3)
-            notice "is stopped"
+            String::notice "is stopped"
             ;;
         *)
-            error "ERROR code: $iReturn"
+            String::error "ERROR code: ${iReturn}"
     esac
-    return $iReturn
+    return ${iReturn}
 }
