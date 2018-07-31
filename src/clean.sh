@@ -42,21 +42,24 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
-Services::disableServices ${m_CLEAN_SERVICES_DISABLE}
-Services::stopServices ${m_CLEAN_SERVICES_STOP}
+String::separateLine
+Service::disableServices ${m_CLEAN_SERVICES_DISABLE}
+String::separateLine
+Service::stopServices ${m_CLEAN_SERVICES_STOP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean logs
 ## -----------------------------------------------------------------------------
 String::separateLine
-Clean::processCleanLog
+Clean::main
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Start services
 ## -----------------------------------------------------------------------------
-startServices ${m_CLEAN_SERVICES_START}
+String::separateLine
+Service::startServices ${m_CLEAN_SERVICES_START}
 
 ## -----------------------------------------------------------------------------
 ## END

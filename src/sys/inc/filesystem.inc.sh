@@ -13,17 +13,26 @@
 ## -----------------------------------------------------------------------------
 
 FileSystem::checkDir() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: checkDir <label> <path>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: FileSystem::checkDir <label> <path>"
         exit 1
     fi
-    if [[ -d "$2" ]]; then
-        String::success "$1"
+
+    # Init
+    local sLabel="$1" sPath="$2"
+    local -i iReturn
+
+    # Do the job
+    if [[ -d "${sPath}" ]]; then
+        String::success "${sLabel}"
         iReturn=0
     else
-        String::error "$1"
+        String::error "${sLabel}"
         iReturn=1
     fi
+
     return ${iReturn}
 }
 
@@ -32,17 +41,26 @@ FileSystem::checkDir() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::checkFile() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: checkFile <label> <path>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: FileSystem::checkFile <label> <path>"
         exit 1
     fi
-    if [[ -f "$2" ]]; then
-        String::success "$1"
+
+    # Init
+    local sLabel="$1" sPath="$2"
+    local -i iReturn
+
+    # Do the job
+    if [[ -f "${sPath}" ]]; then
+        String::success "${sLabel}"
         iReturn=0
     else
-        String::error "$1"
+        String::error "${sLabel}"
         iReturn=1
     fi
+
     return ${iReturn}
 }
 
@@ -51,23 +69,27 @@ FileSystem::checkFile() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::copyFile() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: copyFile <source> <destination>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: FileSystem::copyFile <source> <destination>"
         exit 1
     fi
+
+    # Init
+    local sSource="$1" sDestination="$2"
     local -i iReturn
-    String::notice -n "Copying '$1' to '$2':"
-    if [[ -e "$1" ]]; then
-        cp --recursive "$1" "$2"
+
+    # Do the job
+    String::notice -n "Copying '${sSource}' to '${sDestination}':"
+    if [[ -e "${sSource}" ]]; then
+        cp --force --recursive "${sSource}" "${sDestination}"
         iReturn=$?
     else
         iReturn=1
     fi
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -76,23 +98,27 @@ FileSystem::copyFile() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::moveFile() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: moveFile <source> <destination>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: FileSystem::moveFile <source> <destination>"
         exit 1
     fi
+
+    # Init
+    local sSource="$1" sDestination="$2"
     local -i iReturn
-    String::notice -n "Moving '$1' to '$2':"
-    if [[ -e "$1" ]]; then
-        mv --force "$1" "$2"
+
+    # Do the job
+    String::notice -n "Moving '${sSource}' to '${sDestination}':"
+    if [[ -e ${sSource} ]]; then
+        mv --force "${sSource}" "${sDestination}"
         iReturn=$?
     else
         iReturn=1
     fi
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -101,16 +127,16 @@ FileSystem::moveFile() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::syncFile() {
+
+    # Init
     local -i iReturn
+
+    # Do the job
     String::notice -n "flush file system buffers:"
     sync
-    iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
-    return ${iReturn}
+    String::checkReturnValueForTruthiness $?
+
+    return 0
 }
 
 ## -----------------------------------------------------------------------------
@@ -118,53 +144,65 @@ FileSystem::syncFile() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::removeDirectory() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: removeDirectory <path>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: FileSystem::removeDirectory <path>"
         exit 1
     fi
+
+    # Init
+    local sPath="$1"
     local -i iReturn
-    String::notice -n "Removing '$1':"
-    rm -Rf "$1"
+
+    # Do the job
+    String::notice -n "Removing '${sPath}':"
+    rm -Rf "${sPath}"
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
 FileSystem::cleanDirectory() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: cleanDirectory <path>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: FileSystem::cleanDirectory <path>"
         exit 1
     fi
+
+    # Init
+    local sPath="$1"
     local -i iReturn
-    String::notice -n "Cleaning '$1':"
-    rm -f "$1"//*
+
+    # Do the job
+    String::notice -n "Cleaning '${sPath}':"
+    rm -f "${sPath}//*"
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
 FileSystem::createDirectory() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: createDirectory <top directory>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: FileSystem::createDirectory <top directory>"
         exit 1
     fi
+
+    # Init
+    local sPath="$1"
     local -i iReturn
-    String::notice -n "Creating '$1':"
-    mkdir -p "$1"
+
+    # Do the job
+    String::notice -n "Creating '${sPath}':"
+    mkdir -p "${sPath}"
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -173,19 +211,23 @@ FileSystem::createDirectory() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::compressFile() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error 'Usage: compressFile <DESTINATION> <SOURCE>'
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error 'Usage: FileSystem::compressFile <DESTINATION> <SOURCE>'
         exit 1
     fi
+
+    # Init
+    local sSource="$2" sDestination="$1"
     local -i iReturn
-    String::notice -n "Compress '$2':"
-    tar -cjf "$1.tar.bz2" "$2" > /dev/null 2>&1
+
+    # Do the job
+    String::notice -n "Compress '${sSource}':"
+    tar -cjf "${sDestination}.tar.bz2" "${sSource}" > /dev/null 2>&1
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -194,18 +236,22 @@ FileSystem::compressFile() {
 ## -----------------------------------------------------------------------------
 
 FileSystem::findToRemove() {
-    if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: findToRemove <PATH> <NAME>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: FileSystem::findToRemove <PATH> <NAME>"
         exit 1
     fi
+
+    # Init
+    local sPath="$1" sName="$2"
     local -i iReturn
-    String::notice -n "Remove all '$2' in '$1':"
-    find "$1" -type f -iname "$2" -exec rm -f '{}' \;
+
+    # Do the job
+    String::notice -n "Remove all '${sName}' in '${sPath}':"
+    find "${sPath}" -type f -iname "${sName}" -exec rm -f '{}' \;
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }

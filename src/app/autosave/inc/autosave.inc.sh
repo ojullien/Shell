@@ -16,32 +16,39 @@
 #           $5 = destination directory
 #           $6 = local directory
 AutoSave::putFTP() {
-    if [[ $# -lt 6 ]] || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]]; then
-        error "Usage: putFTP <FTP Host> <FTP User> <FTP User password> <Source file name> <destination directory> <local directory>"
+
+    # Parameters
+    if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]]; then
+        String::error "Usage: putFTP <FTP Host> <FTP User> <FTP User password> <Source file name> <destination directory> <local directory>"
         exit 1
     fi
 
-    if (( m_OPTION_LOG == 1 )); then
+    # Init
+    local sHost="$1" sUser="$2" sPass="$3" sFile="$4" sDestDir="$5" sLocalDir="$6"
+    local -i iReturn iWordCount
 
-        ftp -pin "$1" <<END_SCRIPT >> "${m_LOGFILE}" 2> ftp.err.$$
-quote USER $2
-quote PASS $3
+    # Do the job
+    if ((m_OPTION_LOG)); then
+
+        ftp -pin "${sHost}" <<END_SCRIPT >> "${m_LOGFILE}" 2> ftp.err.$$
+quote USER ${sUser}
+quote PASS ${sPass}
 binary
-cd  $5
-lcd $6
-put $4
+cd ${sDestDir}
+lcd ${sLocalDir}
+put ${sFile}
 close
 quit
 END_SCRIPT
 
     else
-        ftp -pin "$1" <<END_SCRIPT 2> ftp.err.$$
-quote USER $2
-quote PASS $3
+        ftp -pin "${sHost}" <<END_SCRIPT 2> ftp.err.$$
+quote USER ${sUser}
+quote PASS ${sPass}
 binary
-cd  $5
-lcd $6
-put $4
+cd ${sDestDir}
+lcd ${sLocalDir}
+put ${sFile}
 close
 quit
 END_SCRIPT
@@ -49,13 +56,34 @@ END_SCRIPT
     fi
 
     # Check error
-    local -i iReturn
-    if [[ 0 != $(wc -c < ftp.err.$$) ]]; then
+    iWordCount=$(wc -c < ftp.err.$$)
+    if ((iWordCount)); then
         iReturn=1
     else
         iReturn=0
     fi
 
     [[ -f ftp.err.$$ ]] && rm ftp.err.$$ 2>/dev/null;
+
+    return ${iReturn}
+}
+
+AutoSave::watchLog() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: AutoSave::watchLog <logwatch file>"
+        exit 1
+    fi
+
+    # Init
+    local sFile="$1"
+    local -i iReturn
+
+    # Do the job
+    String::notice -n "Logwatch:"
+    logwatch --filename "${sFile}"
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }

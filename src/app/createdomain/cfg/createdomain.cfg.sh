@@ -15,8 +15,8 @@ m_OPTION_WAIT=0
 ## -----------------------------------------------------
 ## Trace
 ## -----------------------------------------------------
-separateLine
-notice "App configuration: createDomain"
-notice "\tDisplay mode is ON. Contents will be displayed."
-notice "\tLog mode is OFF. Contents will not be logged."
-notice "\tWait mode is OFF. Do not wait for user input between actions."
+String::separateLine
+String::notice "App configuration: createDomain"
+String::notice "\tDisplay mode is ON. Contents will be displayed."
+String::notice "\tLog mode is OFF. Contents will not be logged."
+String::notice "\tWait mode is OFF. Do not wait for user input between actions."

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
@@ -15,25 +15,25 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./app/createdomain/inc/createdomain.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_APP}/createdomain/inc/createdomain.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./app/createdomain/cfg/createdomain.cfg.sh"
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
+. "${m_DIR_APP}/createdomain/cfg/createdomain.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Must have an argument
 ## -----------------------------------------------------------------------------
-[ $# -eq 0 ] && display "Usage: createDomain <domain 1> [domain 2] ..." && exit 2
+[ $# -eq 0 ] && Console::display "Usage: createDomain <domain 1> [domain 2] ..." && exit 2
 
 until [ -z "${1+defined}" ]  # Until all parameters used up . . .
 do
-    createDirectory $1 && createGroup $1 && createUser $1 && changeOwner $1
+    FileSystem::createDirectory $1 && createGroup $1 && createUser $1 && changeOwner $1
     iReturn=$?
     if [ 0 -ne $iReturn ]; then
         exit $iReturn
@@ -44,4 +44,4 @@ done
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"

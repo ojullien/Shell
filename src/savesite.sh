@@ -1,48 +1,56 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Save a www site
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180728
+## @category Linux Scripts
+## @package Scripts
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
-set -u;
+## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./app/savesite/inc/savesite.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_APP}/savesite/inc/savesite.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./app/savesite/cfg/savesite.cfg.sh"
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/savesite/cfg/savesite.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Must have an argument
 ## -----------------------------------------------------------------------------
-[ $# -eq 0 ] && display "Usage: savesite.sh <directory 1> [directory 2] ..." && exit 2
+if [[ $# -eq 0 ]]; then
+    Console::display "Usage: savesite.sh <directory 1> [directory 2] ..."
+    exit 2
+fi
 
-until [ -z "${1+defined}" ]  # Until all parameters used up . . .
+declare -i iReturn
+
+until [[ -z "${1+defined}" ]]  # Until all parameters used up . . .
 do
-    saveSite $1 $m_SAVESITE_SAVEFOLDER
+    String::separateLine
+    SaveSite::save "$1" "${m_SAVESITE_SAVEFOLDER}"
     iReturn=$?
-    if [ 0 -ne $iReturn ]; then
-        exit $iReturn
-    fi
-    cd $m_DIR_SCRIPT
+    ((0!=iReturn)) && exit ${iReturn}
+    cd "${m_DIR_SCRIPT}" || exit 18
     shift
 done
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"

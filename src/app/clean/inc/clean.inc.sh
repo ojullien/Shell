@@ -9,59 +9,68 @@
 ## -----------------------------------------------------
 
 Clean::truncateLog() {
+    # Init
     local -i iReturn
+
+    # Do the job
     String::notice -n "Truncate all files in /var/log:"
     find /var/log -type f -exec truncate -s 0 {} \;
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success  "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
 Clean::cleanLog() {
-    local -i iReturn
-    if [[ -n "$1" ]]; then
-        for myFile in "$@"
-        do
-            findToRemove "/var/log" "${myFile}"
-            iReturn=$?
-        done
-    else
-        String::error "Usage: cleanLog <file extension 1> <file extension 2> <...>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Clean::cleanLog <file extension 1> <file extension 2> <...>"
         exit 1
     fi
-    return ${iReturn}
+
+    # Do the job
+    while [[ "${1+defined}" ]]; do
+        FileSystem::findToRemove "/var/log" "$1"
+        shift
+    done
+
+    return 0
 }
 
 Clean::cleanSpecificLog() {
-    if [[ $# -lt 2 ]] || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: cleanSpecificLog <dir in /var/log> <file extension>"
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: Clean::cleanSpecificLog <dir in /var/log> <file extension>"
         exit 1
     fi
-    local sDir="$1"
-    local sExtension="$2"
+
+    # Init
+    local sDir="$1" sExtension="$2"
     local -i iReturn
+
+    # Do the job
     if [[ -d "/var/log/${sDir}" ]]; then
-        findToRemove "/var/log${sDir}" "${sExtension}"
+        FileSystem::findToRemove "/var/log/${sDir}" "${sExtension}"
         iReturn=$?
     else
-        String::notice "Directory var/log/${sDir} does not exist."
+        String::notice "Directory '/var/log/${sDir}' does not exist."
         iReturn=0
     fi
+
     return ${iReturn}
 }
 
-Clean::processCleanLog() {
-    String::notice "Clean logs"
+Clean::main() {
+    String::separateLine
+    String::notice "Clean logs..."
     Clean::cleanSpecificLog "exim4" "*log.*"
     Clean::cleanSpecificLog "apache2_evasive" "dos-*"
     Clean::cleanSpecificLog "apache2" "*.log"
     Clean::cleanSpecificLog "php7.0" "*.log"
     Clean::cleanSpecificLog "php7.0" "*.slow"
     Clean::cleanSpecificLog "php5" "*.log"
-    Clean::cleanLog "${m_CLEAN_FILES}"
+    Clean::cleanLog ${m_CLEAN_FILES}
     Clean::truncateLog
 }

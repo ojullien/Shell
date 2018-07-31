@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
@@ -15,61 +15,61 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./sys/inc/option.inc.sh"
-. "./app/clean/inc/clean.inc.sh"
-. "./sys/inc/service.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_APP}/clean/inc/clean.inc.sh"
+. "${m_DIR_SYS_INC}/service.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
-. "./app/clean/cfg/clean.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Today is: `/bin/date -R`"
-notice "The PID for `/usr/bin/basename $0` process is: $$"
-waitUser
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
-disableServices $m_CLEAN_SERVICES_DISABLE
-stopServices $m_CLEAN_SERVICES_STOP
+Service::disableServices $m_CLEAN_SERVICES_DISABLE
+Service::stopServices $m_CLEAN_SERVICES_STOP
 
 ## -----------------------------------------------------------------------------
 ## Clean logs
 ## -----------------------------------------------------------------------------
-separateLine
+String::separateLine
 processCleanLog
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean logs
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Fills disk"
+String::separateLine
+String::notice "Fills disk"
 m_Disks="/ /home /usr /var /tmp"
 for sArg in $m_Disks
 do
     cd $sArg
-    notice "Filling: `pwd`"
+   String::notice "Filling: `pwd`"
     cat /dev/zero > zeros
     sync
     rm -f zeros
 done
 cd $m_DIR_SCRIPT
-notice "back to `pwd`"
+String::notice "back to `pwd`"
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
-waitUser
+String::notice "Now is: $(date -R)"
+Console::waitUser
 
 shutdown -h now

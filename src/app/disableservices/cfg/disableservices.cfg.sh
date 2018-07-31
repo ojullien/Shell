@@ -13,7 +13,7 @@ m_SERVICES_DISABLE="bind9 exim4 postfix smbd nmbd telnet rlogin rexec ftp automo
 ## -----------------------------------------------------
 ## Trace
 ## -----------------------------------------------------
-separateLine
-notice "App configuration: DisableServices"
-notice "\tServices to disable:"
-notice  "\t\t${m_SERVICES_DISABLE}"
+String::separateLine
+String::notice "App configuration: DisableServices"
+String::notice "\tServices to disable:"
+String::notice  "\t\t${m_SERVICES_DISABLE}"

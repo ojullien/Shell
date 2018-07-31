@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
@@ -15,33 +15,33 @@ set -u;
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./sys/inc/option.inc.sh"
-. "./sys/inc/service.inc.sh"
-. "./app/disableservices/inc/disableservices.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_SYS_INC}/service.inc.sh"
+. "${m_DIR_APP}/disableservices/inc/disableservices.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
-. "./app/disableservices/cfg/disableservices.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Today is: `/bin/date -R`"
-notice "The PID for `/usr/bin/basename $0` process is: $$"
-waitUser
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Disable services
 ## -----------------------------------------------------------------------------
-disableServices $m_SERVICES_DISABLE
+Service::disableServices $m_SERVICES_DISABLE
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"

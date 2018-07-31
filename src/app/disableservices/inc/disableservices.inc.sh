@@ -7,3 +7,5 @@
 ## @version   20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
+
+# Nothing in this file

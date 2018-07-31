@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
@@ -10,133 +10,136 @@
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
-set -u;
+## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./sys/inc/option.inc.sh"
-. "./sys/inc/apt.inc.sh"
-. "./sys/inc/service.inc.sh"
-. "./app/install/inc/install.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_SYS_INC}/apt.inc.sh"
+. "${m_DIR_SYS_INC}/service.inc.sh"
+. "${m_DIR_APP}/install/inc/install.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
-. "./app/install/cfg/install.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/install/cfg/install.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Today is: `/bin/date -R`"
-notice "The PID for `/usr/bin/basename $0` process is: $$"
-waitUser
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Initial update and upgrade
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Update source.list"
-moveFile $m_SOURCELIST_SYS_PATH $m_SOURCELIST_SAVE_PATH.$m_DATE
-copyFile $m_SOURCELIST_WRK_PATH.`lsb_release --short --codename` $m_SOURCELIST_SYS_PATH
-waitUser
+String::separateLine
+String::notice "Update source.list"
+FileSystem::moveFile ${m_SOURCELIST_SYS_PATH} ${m_SOURCELIST_SAVE_PATH}.${m_DATE}
+FileSystem::copyFile ${m_SOURCELIST_WRK_PATH}.`lsb_release --short --codename` ${m_SOURCELIST_SYS_PATH}
+Console::waitUser
 
-isInstalled aptitude
+Apt::isInstalled aptitude
 iAptitude=$?
 if [ 0 -eq $iAptitude ]; then
-    updateAndUpgrade
+    Apt::updateAndUpgrade
 else
-    upgradeWithAptget
-    separateLine
+    Apt::upgradeWithAptget
+   String::separateLine
     apt-get install -qqy aptitude
     iReturn=$?
-    notice -n "Installing aptitude:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
+   String::notice -n "Installing aptitude:"
+    if (( 0 == iReturn )); then
+       String::success "OK"
     else
-        error "NOK code: $iReturn"
+       String::error "NOK code: ${iReturn}"
     fi
 fi
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install or modify Bashrc files
 ## -----------------------------------------------------------------------------
-configureBashrc $m_APP_INSTALL_WRK_DIR $m_APP_INSTALL_SAVE_DIR
+Install::configureBashrc ${m_APP_INSTALL_WRK_DIR} ${m_APP_INSTALL_SAVE_DIR} ${m_APP_INSTALL_USER}
 configureBashAliases
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Configure swap
 ## -----------------------------------------------------------------------------
 configureSwap
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Uninstall packages
 ## -----------------------------------------------------------------------------
-uninstallPackage $m_PACKAGES_PURGE
-waitUser
+Apt::uninstallPackage ${m_PACKAGES_PURGE}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system
 ## -----------------------------------------------------------------------------
-installPackage $m_PACKAGES_SYSTEM
-waitUser
+installPackage ${m_PACKAGES_SYSTEM}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system without recommanded
 ## -----------------------------------------------------------------------------
-installPackage $m_PACKAGES_SYSTEM_NORECOMMENDS
-waitUser
+installPackage ${m_PACKAGES_SYSTEM}_NORECOMMENDS
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages apps
 ## -----------------------------------------------------------------------------
-installPackage $m_PACKAGES_APP
-waitUser
+installPackage ${m_PACKAGES_APP}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------------------------------
-notice "Configure Logwatch"
-configureLogwatch $m_LOGWATCH_SOURCE $m_LOGWATCH_DESTINATION
-waitUser
+String::notice "Configure Logwatch"
+configureLogwatch ${m_LOGWATCH_SOURCE} ${m_LOGWATCH_DESTINATION}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Vim
 ## -----------------------------------------------------------------------------
-notice "Update vimrc.local"
-copyFile $m_VIMRCLOCAL_WRK_PATH $m_VIMRCLOCAL_SYS_PATH
-waitUser
+String::notice "Update vimrc.local"
+FileSystem::copyFile ${m_VIMRCLOCAL_WRK_PATH} ${m_VIMRCLOCAL_SYS_PATH}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Mlocate
 ## -----------------------------------------------------------------------------
-notice -n "Updating a database for mlocate:"
+String::notice -n "Updating a database for mlocate:"
 updatedb
 iReturn=$?
-if [ 0 -eq $iReturn ]; then
-    success "OK"
+if (( 0 == iReturn )); then
+   String::success "OK"
 else
-    error "NOK code: $iReturn"
+   String::error "NOK code: ${iReturn}"
 fi
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Optimize SSD
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Optimize SSD"
-isSSD && supportTRIM && optimizeSSD $m_FSTRIM_CRON
-waitUser
+String::separateLine
+String::notice "Optimize SSD"
+isSSD && supportTRIM && optimizeSSD ${m_FSTRIM_CRON}
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"

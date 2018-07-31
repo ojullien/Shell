@@ -13,20 +13,23 @@
 ## -----------------------------------------------------
 
 Service::stopService() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: stopService <name>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::stopService <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
     local sService="$1"
-    String::notice -n "Stopping '${sService}':"
+
+    # Do the job
+    String::notice -n "'${sService}' is stopping:"
     systemctl stop "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -35,20 +38,23 @@ Service::stopService() {
 ## -----------------------------------------------------
 
 Service::startService() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: startService <name>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::startService <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
     local sService="$1"
-    String::notice -n "Starting '${sService}':"
+
+    # Do the job
+    String::notice -n "'${sService}' is starting:"
     systemctl start "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -57,20 +63,23 @@ Service::startService() {
 ## -----------------------------------------------------
 
 Service::disableService() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: disableService <name>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::disableService <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
     local sService="$1"
-    String::notice -n "Disabling '${sService}':"
+
+    # Do the job
+    String::notice -n "'${sService}' is disabling:"
     systemctl disable "${sService}.service" > /dev/null 2>&1
     iReturn=$?
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
@@ -79,21 +88,27 @@ Service::disableService() {
 ## -----------------------------------------------------
 
 Service::statusService() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: statusService <name>"
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::statusService <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
     local sService="$1"
-    String::notice -n "Status '${sService}':"
+
+    # Do the job
+    String::notice -n "'${sService}' status is:"
     systemctl status "${sService}.service" > /dev/null 2>&1
     iReturn=$?
     case "${iReturn}" in
         0)
-            String::notice "is running"
+            String::notice "running"
             ;;
         3)
-            String::notice "is stopped"
+            String::notice "stopped"
             ;;
         *)
             String::error "ERROR code: ${iReturn}"

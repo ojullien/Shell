@@ -14,7 +14,7 @@
 
 Apt::existsPackage() {
     if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: existsPackage <name>"
+        String::error "Usage: Apt::existsPackage <name>"
         exit 1
     fi
     local -i iReturn
@@ -31,7 +31,7 @@ Apt::existsPackage() {
 
 Apt::isInstalled() {
     if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: isInstalled <name>"
+        String::error "Usage: Apt::isInstalled <name>"
         exit 1
     fi
     local -i iReturn
@@ -81,11 +81,10 @@ Apt::upgradeWithAptget() {
 
 Apt::installPackage() {
     if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: installPackage <name>"
+        String::error "Usage: Apt::installPackage <name>"
         exit 1
     fi
     local -i iReturn
-    String::separateLine
     String::notice "Installing package '$*':"
     aptitude install -y "$@"
     iReturn=$?
@@ -98,13 +97,12 @@ Apt::installPackage() {
     return ${iReturn}
 }
 
-uninstallPackage () {
+Apt::uninstallPackage() {
     if (($# < 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: uninstallPackage <name>"
+        String::error "Usage: Apt::uninstallPackage <name>"
         exit 1
     fi
     local -i iReturn
-    String::separateLine
     String::notice "Uninstalling package '$*':"
     aptitude purge -y "$@"
     iReturn=$?
@@ -117,10 +115,9 @@ uninstallPackage () {
     return ${iReturn}
 }
 
-updateAndUpgrade () {
+Apt::updateAndUpgrade() {
     local -i iReturnA
     local -i iReturnB
-    String::separateLine
     String::notice "Update & Upgrade"
     aptitude update > /dev/null 2>&1
     iReturnA=$?
@@ -141,11 +138,10 @@ updateAndUpgrade () {
     return ${iReturnA} && ${iReturnB}
 }
 
-cleanAndPurge () {
+Apt::cleanAndPurge() {
     local -i iReturnA
     local -i iReturnB
     local -i iReturnC
-    String::separateLine
     String::notice "Cleaning & Purging"
     aptitude clean
     iReturnA=$?

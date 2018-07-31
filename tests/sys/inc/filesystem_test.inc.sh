@@ -96,7 +96,7 @@ Test::FileSystem::cleanDirectoryTest() {
     FileSystem::cleanDirectory "${sDirPath}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
     if [[ -f ${sFile01Path} ]] || [[ -f ${sFile02Path} ]]; then
-        String:error "Test::FileSystem::cleanDirectoryTest failure."
+        String::error "Test::FileSystem::cleanDirectoryTest failure."
     fi
     rm -Rf "${sDirPath}"
 }

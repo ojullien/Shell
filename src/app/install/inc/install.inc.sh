@@ -2,9 +2,9 @@
 ## Linux Scripts.
 ## Install App functions
 ##
-## @category  Linux Scripts
-## @package   Install
-## @version   20180728
+## @category Linux Scripts
+## @package Install
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
@@ -12,78 +12,82 @@
 ## BASHRC
 ## -----------------------------------------------------
 
-configureBashrc () {
-    if [ $# -lt 2 ] || [ -z "$1" ] || [ -z "$2" ]; then
-        error "Usage: configureBashrc <source path> <destination path>"
+Install::configureBashrc() {
+
+    # Parameters
+    if [[ $# -lt 3 ]] || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+        String::error "Usage: Install::configureBashrc <source path> <save path> <user>"
         exit 1
     fi
-    separateLine
-    notice "Configure .bashrc"
-    moveFile /root/.bashrc $2/.bashrc.root.$m_DATE
-    iReturn1=$?
-    copyFile $1/.bashrc.root /root/.bashrc
-    iReturn2=$?
-    moveFile /home/ojullien/.bashrc $2/.bashrc.ojullien.$m_DATE
-    iReturn3=$?
-    copyFile $1/.bashrc.ojullien /home/ojullien/.bashrc
-    iReturn4=$?
-    notice -n "Changing owner:"
-    chown ojullien:ojullien /home/ojullien/.bashrc /home/ojullien/.bashrc
-    iReturn5=$?
-    if [ 0 -eq $iReturn5 ]; then
-        success "OK"
-    else
-        error "NOK code: $iReturn"
-    fi
-    notice -n "Configuring .bashrc:"
-    if [ 0 -eq $iReturn1 ] && [ 0 -eq $iReturn2 ] && [ 0 -eq $iReturn3 ] && [ 0 -eq $iReturn4 ] && [ 0 -eq $iReturn5 ]; then
-        success "OK"
-    else
-        error "NOK codes: $iReturn1, $iReturn2, $iReturn3, $iReturn4, $iReturn5"
-    fi
-    return $iReturn1 && $iReturn2 && $iReturn3 && $iReturn4 && $iReturn5
+
+    # Init
+    String::separateLine
+    local sSource="$1" sSave="$2" sUser=$3
+
+    # Do the job
+    String::notice "Configure '.bashrc' for 'root'"
+    FileSystem::moveFile "/root/.bashrc" "${sSave}/.bashrc.root.${m_DATE}"
+    FileSystem::copyFile "${sSource}/.bashrc.root" "/root/.bashrc"
+
+    String::notice "Configure '.bashrc' for '${sUser}'"
+    FileSystem::moveFile "/home/${sUser}/.bashrc" "${sSave}/.bashrc.${sUser}.${m_DATE}"
+    FileSystem::copyFile "${sSource}/.bashrc.user" "/home/${sUser}/.bashrc"
+
+    String::notice -n "Changing owner:"
+    chown "${sUser}":"${sUser}" "/home/${sUser}/.bashrc"
+    String::checkReturnValueForTruthiness $?
+
+    return 0
 }
 
-configureBashAliases () {
-    separateLine
-    notice "Configure .bash_aliases"
-    m_Buffer="/root/.bash_aliases /home/ojullien/.bash_aliases"
-    for sArg in $m_Buffer
-    do
-        echo alias rm=\"rm -i\" | tee $sArg
-        echo alias cp=\"cp -i\" | tee -a $sArg
-        echo alias mv=\"mv -i\" | tee -a $sArg
-    done
-    chown ojullien:ojullien /home/ojullien/.bash_aliases
-    iReturn=$?
-    notice -n "Configuring .bash_aliases:"
-    if [ 0 -eq $iReturn ]; then
-        success "OK"
-    else
-        error "NOK code: $iReturn"
+Install::configureBashAliases() {
+
+    # Parameters
+    if [[ $# -lt 1 ]] || [[ -z "$1" ]]; then
+        String::error "Usage: Install::configureBashAliases <user>"
+        exit 1
     fi
-    return $iReturn
+
+    # Init
+    String::separateLine
+    local sUser=$3
+    local m_Buffer="/root/.bash_aliases /home/${sUser}/.bash_aliases"
+
+    # Do the job
+    String::notice "Configure .bash_aliases"
+    for sArg in ${m_Buffer}
+    do
+        echo "alias rm=\"rm -i\"" | tee "${sArg}"
+        echo "alias cp=\"cp -i\"" | tee -a "${sArg}"
+        echo "alias mv=\"mv -i\"" | tee -a "${sArg}"
+    done
+
+    String::notice -n "Changing owner:"
+    chown "${sUser}":"${sUser}" "/home/${sUser}/.bash_aliases"
+    String::checkReturnValueForTruthiness $?
+
+    return 0
 }
 
 ## -----------------------------------------------------
 ## SWAP
 ## -----------------------------------------------------
 
-configureSwap () {
-    separateLine
-    notice "Configure swap"
-    notice -n "\tCurrent swappiness:"
+configureSwap() {
+   String::separateLine
+   String::notice "Configure swap"
+   String::notice -n "\tCurrent swappiness:"
     cat /proc/sys/vm/swappiness
-    notice "\tWrite swappiness.conf"
+   String::notice "\tWrite swappiness.conf"
     echo vm.swappiness=5 | tee /etc/sysctl.d/99-swappiness.conf
     echo vm.vfs_cache_pressure=50 | tee -a /etc/sysctl.d/99-swappiness.conf
-    notice "\tRead values from swappiness.conf"
+   String::notice "\tRead values from swappiness.conf"
     sysctl -p /etc/sysctl.d/99-swappiness.conf
-    notice "\tDisable devices and files for paging and swapping"
+   String::notice "\tDisable devices and files for paging and swapping"
     swapoff -av
-    notice "\tEnable devices and files for paging and swapping"
+   String::notice "\tEnable devices and files for paging and swapping"
     swapon -av
-    notice -n "\tCurrent swappiness:"
+   String::notice -n "\tCurrent swappiness:"
     cat /proc/sys/vm/swappiness
     return 0
 }
@@ -92,47 +96,47 @@ configureSwap () {
 ## SSD
 ## -----------------------------------------------------
 
-isSSD () {
+isSSD() {
     grep 0 /sys/block/sda/queue/rotational > /dev/null 2>&1
     iReturn=$?
-    if [ 0 -eq $iReturn ]; then
-        success "\tSSD detected"
+    if (( 0 == iReturn )); then
+       String::success "\tSSD detected"
     else
-        error "\tNo SSD detected"
+       String::error "\tNo SSD detected"
     fi
     return $iReturn
 }
 
-supportTRIM () {
+supportTRIM() {
     hdparm -I /dev/sda | grep TRIM > /dev/null 2>&1
     iReturn=$?
-    if [ 0 -eq $iReturn ]; then
-        success "\tSSD support TRIM"
+    if (( 0 == iReturn )); then
+       String::success "\tSSD support TRIM"
     else
-        error "\tSSD do not support TRIM"
+       String::error "\tSSD do not support TRIM"
     fi
     return $iReturn
 }
 
-optimizeSSD () {
+optimizeSSD() {
     if [ $# -lt 1 ] || [ -z "$1" ]; then
-        error "Usage: optimizeSSD <fstrim cron file path>"
+       String::error "Usage: optimizeSSD <fstrim cron file path>"
         exit 1
     fi
     if [ -f $1 ] || [ -f /etc/systemd/system/fstrim.timer ]; then
-        success "\tSSD already optimized"
+       String::success "\tSSD already optimized"
     else
         m_Buffer="/usr/share/doc/util-linux/examples/fstrim.service /usr/share/doc/util-linux/examples/fstrim.timer"
         for sArg in $m_Buffer
         do
-            copyFile $sArg "/etc/systemd/system"
+            FileSystem::copyFile $sArg "/etc/systemd/system"
         done
         systemctl enable fstrim.timer
         iReturn=$?
-        if [ 0 -eq $iReturn ]; then
-            success "\tSSD optimized"
+        if (( 0 == iReturn )); then
+           String::success "\tSSD optimized"
         else
-            error "\tSSD not optimized"
+           String::error "\tSSD not optimized"
         fi
     fi
     return $iReturn
@@ -141,30 +145,30 @@ optimizeSSD () {
 ## -----------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------
-configureLogwatch () {
-    if [ $# -lt 2 ] || [ -z "$1" ] || [ -z "$2" ]; then
-        error "Usage: configureLogwatch <source path> <destination path>"
+configureLogwatch() {
+    if [[ $# -lt 2 ]] || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+       String::error "Usage: configureLogwatch <source path> <destination path>"
         exit 1
     fi
-    separateLine
-    notice "Configure Logwatch"
-    copyFile "$1/logfiles/*.conf" "$2/logfiles/"
+   String::separateLine
+   String::notice "Configure Logwatch"
+    FileSystem::copyFile "$1/logfiles/*.conf" "$2/logfiles/"
     iReturn1=$?
-    copyFile "$1/logwatch.conf" "$2/logwatch.conf"
+    FileSystem::copyFile "$1/logwatch.conf" "$2/logwatch.conf"
     iReturn2=$?
-    notice -n "Changing owner:"
+   String::notice -n "Changing owner:"
     chown root:root $2/logwatch.conf $2/logfiles/*.conf
     iReturn3=$?
     if [ 0 -eq $iReturn3 ]; then
-        success "OK"
+       String::success "OK"
     else
-        error "NOK code: $iReturn"
+       String::error "NOK code: ${iReturn}"
     fi
-    notice -n "Configuring Logwatch:"
+   String::notice -n "Configuring Logwatch:"
     if [ 0 -eq $iReturn1 ] && [ 0 -eq $iReturn2 ] && [ 0 -eq $iReturn3 ]; then
-        success "OK"
+       String::success "OK"
     else
-        error "NOK codes: $iReturn1, $iReturn2, $iReturn3"
+       String::error "NOK codes: $iReturn1, $iReturn2, $iReturn3"
     fi
     return $iReturn1 && $iReturn2 && $iReturn3
 }

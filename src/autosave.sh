@@ -45,16 +45,18 @@ Console::waitUser
 ## Creates directories
 ## -----------------------------------------------------------------------------
 String::separateLine
-removeDirectory "${m_APP_AUTOSAVE_DIR_CACHE}"
-createDirectory "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}"
-createDirectory "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+FileSystem::removeDirectory "${m_APP_AUTOSAVE_DIR_CACHE}"
+FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}"
+FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_UPLOAD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
-Services::disableServices "${m_CLEAN_SERVICES_DISABLE}"
-Services::stopServices "${m_CLEAN_SERVICES_STOP}"
+String::separateLine
+Service::disableServices ${m_CLEAN_SERVICES_DISABLE}
+String::separateLine
+Service::stopServices ${m_CLEAN_SERVICES_STOP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -66,24 +68,20 @@ FileSystem::syncFile
 ## -----------------------------------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------------------------------
-local -i iReturn
 String::separateLine
-String::notice -n "Logwatch:"
-logwatch --filename "${m_LOGWATCH_FILE}"
-iReturn=$?
-if (( 0 == iReturn )); then
-    String::success "OK"
-else
-    String::error "NOK code: ${iReturn}"
-fi
+AutoSave::watchLog
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## System: save, clean and delete logs
+## System: save
 ## -----------------------------------------------------------------------------
 String::separateLine
 FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}/log-${m_DATE}" "/var/log"
 Console::waitUser
+
+## -----------------------------------------------------------------------------
+## System: clean and delete logs
+## -----------------------------------------------------------------------------
 String::separateLine
 Clean::processCleanLog
 Console::waitUser
@@ -91,7 +89,8 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Start services
 ## -----------------------------------------------------------------------------
-Services::startServices "${m_CLEAN_SERVICES_START}"
+String::separateLine
+Service::startServices ${m_CLEAN_SERVICES_START}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------

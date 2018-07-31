@@ -79,6 +79,19 @@ String::success() {
     return 0
 }
 
+String::checkReturnValueForTruthiness() {
+    local -i iReturn=1
+    if [[ -n "$1" ]]; then
+        iReturn=$1
+        if ((iReturn)); then
+            String::error "NOK code: ${iReturn}"
+        else
+            String::success "OK"
+        fi
+    fi
+    return ${iReturn}
+}
+
 ## -----------------------------------------------------
 ## Clear screen
 ## -----------------------------------------------------
@@ -99,10 +112,6 @@ String::separateLine() {
 
 Console::waitUser() {
     local sBuffer
-    if ((m_OPTION_WAIT)); then
-        read -s -r -e -p "Press [ENTER] to continue." -n 1 sBuffer
-    else
-        sBuffer=0
-    fi
-    return $sBuffer
+    ((m_OPTION_WAIT)) && $(read -s -r -e -p "Press [ENTER] to continue." -n 1 sBuffer)
+    return 0
 }

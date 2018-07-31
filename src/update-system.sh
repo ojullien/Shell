@@ -1,87 +1,91 @@
-#!/bin/sh
+#!/bin/bash
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Update system.
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180728
+## @category Linux Scripts
+## @package Scripts
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
-set -u;
+## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
-. "./sys/inc/string.inc.sh"
-. "./sys/inc/filesystem.inc.sh"
-. "./sys/inc/option.inc.sh"
-. "./sys/inc/apt.inc.sh"
-. "./sys/inc/service.inc.sh"
+. "${m_DIR_SYS_INC}/string.inc.sh"
+. "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_SYS_INC}/apt.inc.sh"
+. "${m_DIR_SYS_INC}/service.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/main.cfg.sh"
-. "./sys/cfg/root.cfg.sh"
-. "./app/disableservices/cfg/disableservices.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Today is: `/bin/date -R`"
-notice "The PID for `/usr/bin/basename $0` process is: $$"
-waitUser
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Update and upgrade
 ## -----------------------------------------------------------------------------
-updateAndUpgrade
-waitUser
+Apt::updateAndUpgrade
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean
 ## -----------------------------------------------------------------------------
-cleanAndPurge
-waitUser
+Apt::cleanAndPurge
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Display Linux selections
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Linux selections"
+String::separateLine
+String::notice "Linux selections"
 dpkg --get-selections | grep -Ei "Linux-headers|linux-image"
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Find orphan
 ## -----------------------------------------------------------------------------
-separateLine
-notice "Find orphan"
+String::separateLine
+String::notice "Find orphan"
 deborphan
-waitUser
+Console::waitUser
 
-separateLine
-notice "Find orphan config"
+String::separateLine
+String::notice "Find orphan config"
 deborphan --find-config
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Purge locales
 ## -----------------------------------------------------------------------------
-separateLine
-notice -n "Removing unneeded localizations:"
+String::separateLine
+local -i iReturn
+String::notice -n "Removing unneeded localizations:"
 localepurge
 iReturn=$?
-if [ 0 -eq $iReturn ]; then
-    success "OK"
+if (( 0 == iReturn )); then
+   String::success "OK"
 else
-    error "NOK code: $iReturn"
+   String::error "NOK code: ${iReturn}"
 fi
-waitUser
+Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Disable services
@@ -91,17 +95,17 @@ disableServices $m_SERVICES_DISABLE
 ## -----------------------------------------------------------------------------
 ## updateDB
 ## -----------------------------------------------------------------------------
-separateLine
-notice -n "Updating database for mlocate:"
+String::separateLine
+String::notice -n "Updating database for mlocate:"
 updatedb
 iReturn=$?
-if [ 0 -eq $iReturn ]; then
-    success "OK"
+if (( 0 == iReturn )); then
+   String::success "OK"
 else
-    error "NOK code: $iReturn"
+   String::error "NOK code: ${iReturn}"
 fi
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-notice "Now is: `/bin/date -R`"
+String::notice "Now is: $(date -R)"
