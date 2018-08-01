@@ -106,19 +106,15 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 String::separateLine
 String::notice "Prepare to upload and upload"
-cd "${m_APP_AUTOSAVE_DIR_CACHE}" 2>/dev/null;
+cd "${m_APP_AUTOSAVE_DIR_CACHE}" || exit 18
 FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}" "${m_DATE}"
-cd "${m_DIR_SCRIPT}" 2>/dev/null;
+cd "${m_DIR_SCRIPT}" || exit 18
 
 if [[ -f "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}.tar.bz2" ]]; then
     AutoSave::putFTP "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}.tar.bz2" "." "${m_APP_AUTOSAVE_DIR_UPLOAD}"
     iReturn=$?
     String::notice -n "FTP ${m_DATE}.tar.bz2:"
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
 else
     String::error "NOK code: nothing to send or FTP mode is OFF"
     iReturn=0

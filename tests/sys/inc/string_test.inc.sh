@@ -14,32 +14,38 @@ Test::Log::writeToLogTest() {
 }
 
 Test::Console::displayErrorTest() {
-    Console::displayError "This is an error message sent to the console."
+    Console::displayError -n "This is an error message "
+    Console::displayError " sent to the console."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::Console::displaySuccessTest() {
-    Console::displaySuccess "This is a success message sent to the console."
+    Console::displaySuccess -n "This is a success message "
+    Console::displaySuccess " sent to the console."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::Console::displayTest() {
-    Console::display "This is a notice message sent to the console."
+    Console::display -n "This is a notice message "
+    Console::display " sent to the console."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::String::errorTest() {
-    String::error "This is an error message sent to the console and the log file."
+    String::error -n "This is an error message "
+    String::error " sent to the console and the log file."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::String::noticeTest() {
-    String::notice "This is a notice message sent to the console and the log file."
+    String::notice -n "This is a notice message "
+    String::error " sent to the console and the log file."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::String::successTest() {
-    String::success "This is a notice success sent to the console and the log file."
+    String::success -n "This is a notice success "
+    String::error " sent to the console and the log file."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 

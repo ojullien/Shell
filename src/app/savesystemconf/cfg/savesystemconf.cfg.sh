@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
 ## Linux Scripts.
-## saveSystemConf App Configuration file.
+## Save system conf App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package saveSystemConf
@@ -16,11 +16,11 @@ exit 3
 ## -----------------------------------------------------
 ## Destination folder
 ## -----------------------------------------------------
-readonly m_SAVECONF_SAVEFOLDER="/home/<user>/out"
+declare m_SAVECONF_SAVEFOLDER="/home/<user>/out"
 
 ## -----------------------------------------------------
 ## Trace
 ## -----------------------------------------------------
 String::separateLine
 String::notice "App configuration: saveSystemConf"
-FileSystem::checkDir "\tSave directory:\t${m_SAVECONF_SAVEFOLDER}" "${m_SAVECONF_SAVEFOLDER}"
+FileSystem::checkDir "\tDefault save directory:\t${m_SAVECONF_SAVEFOLDER}" "${m_SAVECONF_SAVEFOLDER}"

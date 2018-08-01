@@ -32,14 +32,24 @@ Log::writeToLog() {
 
 Console::displayError() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo -e "${COLORRED}$*${COLORRESET}" >&2
+        if [[ "$1" == "-n" ]]; then
+            shift
+            echo -e -n "${COLORRED}$*${COLORRESET}" >&2
+        else
+            echo -e "${COLORRED}$*${COLORRESET}" >&2
+        fi
     fi
     return 0
 }
 
 Console::displaySuccess() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo -e "${COLORGREEN}$*${COLORRESET}"
+        if [[ "$1" == "-n" ]]; then
+            shift
+            echo -e -n "${COLORGREEN}$*${COLORRESET}"
+        else
+            echo -e "${COLORGREEN}$*${COLORRESET}"
+        fi
     fi
     return 0
 }

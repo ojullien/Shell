@@ -1,19 +1,16 @@
 ## -----------------------------------------------------
 ## Linux Scripts.
-## Clean App Configuration file.
+## Update system Configuration file.
 ##
 ## @category Linux Scripts
-## @package Clean
+## @package Update system
 ## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
-
-readonly m_CLEAN_FILES="*.gz *.old *.1 *.2 *.log.*"
 
 ## -----------------------------------------------------
 ## Trace
 ## -----------------------------------------------------
 String::separateLine
-String::notice "App configuration: Clean"
-String::notice "\tFiles to delete:"
-String::notice  "\t\t${m_CLEAN_FILES}"
+String::notice "App configuration: update-system"
+String::notice "\tNo configuration needed"

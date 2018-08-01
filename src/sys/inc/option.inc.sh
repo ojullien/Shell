@@ -11,27 +11,64 @@
 declare -i m_OPTION_DISPLAY=1
 declare -i m_OPTION_LOG=0
 declare -i m_OPTION_WAIT=0
+declare m_APP_ARGUMENTS=""
 
-while getopts "dlw?" m_OPTION; do
-    case $m_OPTION in
-    d)
+Option::help() {
+    String::notice "Options:"
+    String::notice "\t-n | --no-display\tdisplay mode. Contents are not displayed."
+    String::notice "\t-l | --active-log\tlog mode. Contents are logged."
+    String::notice "\t-w | --wait\t\twait user. Wait for user input between actions."
+}
+
+## -----------------------------------------------------
+## Parse the common options
+## -----------------------------------------------------
+
+while (( "$#" )); do
+    case "$1" in
+    -n|--no-display)
         m_OPTION_DISPLAY=0
+        shift
         ;;
-    l)
+    -l|--active-log)
         m_OPTION_LOG=1
+        shift
         ;;
-    w)
+    -w|--wait)
         m_OPTION_WAIT=1
+        shift
         ;;
-    \?)
-        echo -e "Usage: $(basename $0) [option]"
-        echo -e "\t-d\tdisplay mode. Contents are not displayed."
-        echo -e "\t-l\tlog mode. Contents are logged."
-        echo -e "\t-w\twait user. Wait for user input between actions."
-        exit 1
+    --) # end argument parsing
+        shift
+        break
         ;;
-    esac
+    -*|--*=) # app options
+        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
+            m_APP_ARGUMENTS="$1 $2"
+        else
+            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1 $2"
+        fi
+        shift 2
+        ;;
+    *) # preserve positional app arguments
+        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
+            m_APP_ARGUMENTS="$1"
+        else
+            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1"
+        fi
+        shift
+        ;;
+  esac
 done
+
+# Keep the options and the arguments for the app.
+# set positional arguments in their proper place
+eval set -- "${m_APP_ARGUMENTS}"
+m_APP_ARGUMENTS=""
+
+## -----------------------------------------------------
+## Trace
+## -----------------------------------------------------
 
 if ((m_OPTION_DISPLAY)); then
 

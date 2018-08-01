@@ -1,9 +1,9 @@
 ## -----------------------------------------------------
 ## Linux Scripts.
-## saveSystemConf App Configuration file.
+## Save web site folder App Configuration file.
 ##
 ## @category Linux Scripts
-## @package savesite
+## @package SaveSite
 ## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
@@ -16,11 +16,11 @@ exit 3
 ## -----------------------------------------------------
 ## Destination folder
 ## -----------------------------------------------------
-readonly m_SAVESITE_SAVEFOLDER="/home/<user>/out"
+declare m_SAVESITE_SAVEFOLDER="/home/<user>/out"
 
 ## -----------------------------------------------------
 ## Trace
 ## -----------------------------------------------------
 String::separateLine
 String::notice "App configuration: saveSite"
-FileSystem::checkDir "\tSave directory:\t${m_SAVESITE_SAVEFOLDER}" "${m_SAVESITE_SAVEFOLDER}"
+FileSystem::checkDir "\tDefault save directory:\t${m_SAVESITE_SAVEFOLDER}" "${m_SAVESITE_SAVEFOLDER}"

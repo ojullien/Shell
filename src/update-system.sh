@@ -5,7 +5,7 @@
 ## Update system.
 ##
 ## @category Linux Scripts
-## @package Scripts
+## @package Update system
 ## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
@@ -23,6 +23,7 @@
 . "${m_DIR_SYS_INC}/option.inc.sh"
 . "${m_DIR_SYS_INC}/apt.inc.sh"
 . "${m_DIR_SYS_INC}/service.inc.sh"
+. "${m_DIR_APP}/update-system/inc/update-system.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
@@ -30,6 +31,7 @@
 . "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
 . "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
+. "${m_DIR_APP}/update-system/inc/update-system.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -40,14 +42,25 @@ String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
+## Disable & stop services
+## -----------------------------------------------------------------------------
+String::separateLine
+Service::disableServices ${m_SERVICES_DISABLE}
+String::separateLine
+Service::stopServices ${m_SERVICES_STOP}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
 ## Update and upgrade
 ## -----------------------------------------------------------------------------
+String::separateLine
 Apt::updateAndUpgrade
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean
 ## -----------------------------------------------------------------------------
+String::separateLine
 Apt::cleanAndPurge
 Console::waitUser
 
@@ -55,57 +68,42 @@ Console::waitUser
 ## Display Linux selections
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Linux selections"
-dpkg --get-selections | grep -Ei "Linux-headers|linux-image"
+Apt::displayLinuxSelections
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Find orphan
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Find orphan"
-deborphan
+UpdateSystem::findOrphan
 Console::waitUser
 
 String::separateLine
-String::notice "Find orphan config"
-deborphan --find-config
+UpdateSystem::findOrphanConfig
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Purge locales
 ## -----------------------------------------------------------------------------
 String::separateLine
-local -i iReturn
-String::notice -n "Removing unneeded localizations:"
-localepurge
-iReturn=$?
-if (( 0 == iReturn )); then
-   String::success "OK"
-else
-   String::error "NOK code: ${iReturn}"
-fi
+UpdateSystem::purgeLocales
 Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Disable services
-## -----------------------------------------------------------------------------
-disableServices $m_SERVICES_DISABLE
 
 ## -----------------------------------------------------------------------------
 ## updateDB
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice -n "Updating database for mlocate:"
-updatedb
-iReturn=$?
-if (( 0 == iReturn )); then
-   String::success "OK"
-else
-   String::error "NOK code: ${iReturn}"
-fi
+UpdateSystem::updateDB
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Start services
+## -----------------------------------------------------------------------------
+String::separateLine
+Service::startServices ${m_SERVICES_START}
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

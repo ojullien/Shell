@@ -13,38 +13,50 @@
 ## -----------------------------------------------------
 
 Apt::existsPackage() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Apt::existsPackage <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
-    dpkg -l | grep "$1" | grep "^ii " > /dev/null
+    local sPackage="$1"
+
+    # Do the job
+    String::notice -n "Does package '${sPackage}' exist?:"
+    dpkg -l | grep "${sPackage}" | grep "^ii " > /dev/null
     iReturn=$?
-    String::notice -n "Package exists $1:"
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
 }
 
 Apt::isInstalled() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Apt::isInstalled <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
-    local sCommand="$1"
-    "$(sCommand)" --help > /dev/null 2>&1
+    local sPackage="$1"
+
+    # Do the job
+    String::notice -n "Is the package '${sPackage}' installed?:"
+    "$(sPackage)" --help > /dev/null 2>&1
     iReturn=$?
-    String::notice -n "${sCommand} is installed:"
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
-    fi
+    String::checkReturnValueForTruthiness ${iReturn}
+
     return ${iReturn}
+}
+
+Apt::displayLinuxSelections() {
+    String::notice "Linux selections"
+    dpkg --get-selections | grep -Ei "Linux-headers|linux-image"
 }
 
 ## -----------------------------------------------------
@@ -52,108 +64,151 @@ Apt::isInstalled() {
 ## -----------------------------------------------------
 
 Apt::upgradeWithAptget() {
-    String::separateLine
-    String::notice "Update & Upgrade"
-    local -i iReturnA
-    local -i iReturnB
+
+    # Init
+    local -i iReturn
+
+    # Do the job
+    String::notice "Updating..."
     apt-get update > /dev/null 2>&1
-    iReturnA=$?
-    String::notice -n "\tUpdating:"
-    if (( 0 == iReturnA )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturnA}"
+    iReturn=$?
+    String::notice -n "Update:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((0==iReturn)); then
+        String::notice "Upgrading..."
+        apt-get full-upgrade -y
+        iReturn=$?
+        String::notice -n "Upgrade:"
+        String::checkReturnValueForTruthiness ${iReturn}
     fi
-    apt-get full-upgrade -y
-    iReturnB=$?
-    String::notice -n "\tUpgrading:"
-    if (( 0 == iReturnB )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturnB}"
+
+    if ((0==iReturn)); then
+        String::notice "Checking..."
+        apt-get check
+        iReturn=$?
+        String::notice -n "Check:"
+        String::checkReturnValueForTruthiness ${iReturn}
     fi
-    return ${iReturnA} && ${iReturnB}
+
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Aptitude
 ## -----------------------------------------------------
 
+Apt::updateAndUpgrade() {
+
+    # Init
+    local -i iReturn
+
+    # Do the job
+    String::notice "Updating..."
+    aptitude update > /dev/null 2>&1
+    iReturn=$?
+    String::notice -n "Update:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((0==iReturn)); then
+        String::notice "Upgrading..."
+        aptitude full-upgrade -y
+        iReturn=$?
+        String::notice -n "Upgrade:"
+        String::checkReturnValueForTruthiness ${iReturn}
+    fi
+
+    if ((0==iReturn)); then
+        String::notice "Checking..."
+        apt-get check
+        iReturn=$?
+        String::notice -n "Check:"
+        String::checkReturnValueForTruthiness ${iReturn}
+    fi
+
+    return ${iReturn}
+}
+
 Apt::installPackage() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Apt::installPackage <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
-    String::notice "Installing package '$*':"
+
+    # Do the job
+    String::notice "Installing '$*' package(s)..."
     aptitude install -y "$@"
     iReturn=$?
-    String::notice -n "Installing '$*':"
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
+    String::notice -n "Install '$*' package(s):"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((0==iReturn)); then
+        String::notice "Checking..."
+        apt-get check
+        iReturn=$?
+        String::notice -n "Check:"
+        String::checkReturnValueForTruthiness ${iReturn}
     fi
+
     return ${iReturn}
 }
 
 Apt::uninstallPackage() {
-    if (($# < 1)) || [[ -z "$1" ]]; then
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Apt::uninstallPackage <name>"
         exit 1
     fi
+
+    # Init
     local -i iReturn
-    String::notice "Uninstalling package '$*':"
+
+    String::notice "Purgeing '$*' package(s)..."
     aptitude purge -y "$@"
     iReturn=$?
-    String::notice -n "Uninstalling '$*':"
-    if (( 0 == iReturn )); then
-        String::success "OK"
-    else
-        String::error "NOK code: ${iReturn}"
+    String::notice -n "Purge '$*' package(s):"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((0==iReturn)); then
+        String::notice "Checking..."
+        apt-get check
+        iReturn=$?
+        String::notice -n "Check:"
+        String::checkReturnValueForTruthiness ${iReturn}
     fi
+
     return ${iReturn}
 }
 
-Apt::updateAndUpgrade() {
-    local -i iReturnA
-    local -i iReturnB
-    String::notice "Update & Upgrade"
-    aptitude update > /dev/null 2>&1
-    iReturnA=$?
-    String::notice -n "\tUpdating:"
-    if (( 0 == iReturnA )); then
-        String::success "OK"
-    else
-        String::error "NOK code: $iReturnA"
-    fi
-    aptitude full-upgrade -y
-    iReturnB=$?
-    String::notice -n "\tUpgrading:"
-    if (( 0 == iReturnB )); then
-        String::success "OK"
-    else
-        String::error "NOK code: $iReturnB"
-    fi
-    return ${iReturnA} && ${iReturnB}
-}
-
 Apt::cleanAndPurge() {
-    local -i iReturnA
-    local -i iReturnB
-    local -i iReturnC
-    String::notice "Cleaning & Purging"
+
+    # Init
+    local -i iReturn
+
+    # Do the job
+    String::notice "Cleaning downloaded packages..."
     aptitude clean
-    iReturnA=$?
+    iReturn=$?
+    String::notice -n "Clean downloaded packages:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    String::notice "Cleaning old downloaded packages..."
     aptitude autoclean
-    iReturnB=$?
+    iReturn=$?
+    String::notice -n "Clean old downloaded packages:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    String::notice "Removing no longer needed dependencies packages..."
     apt-get autoremove --purge
     iReturnC=$?
-    String::notice -n "Cleaning & Purging:"
-    if (( 0 == iReturnA )) && (( 0 == iReturnB )) && (( 0 == iReturnC )); then
-        String::success "OK"
-    else
-        String::error "NOK codes: ${iReturnA}, ${iReturnB}, ${iReturnC}"
-    fi
-    return 0
+    String::notice -n "Remove no longer needed dependencies packages:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    return ${iReturn}
 }
