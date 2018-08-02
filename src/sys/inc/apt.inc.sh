@@ -132,8 +132,8 @@ Apt::updateAndUpgrade() {
 Apt::installPackage() {
 
     # Parameters
-    if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: Apt::installPackage <name>"
+    if (($# == 0)) || [[ -z "$1" ]]; then
+        String::error "Usage: Apt::installPackage <package 1> [package 2 ...]"
         exit 1
     fi
 
@@ -141,7 +141,7 @@ Apt::installPackage() {
     local -i iReturn
 
     # Do the job
-    String::notice "Installing '$*' package(s)..."
+    String::notice "Installing '$*' package(s) ..."
     aptitude install -y "$@"
     iReturn=$?
     String::notice -n "Install '$*' package(s):"
@@ -161,8 +161,8 @@ Apt::installPackage() {
 Apt::uninstallPackage() {
 
     # Parameters
-    if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: Apt::uninstallPackage <name>"
+    if (($# == 0)) || [[ -z "$1" ]]; then
+        String::error "Usage: Apt::uninstallPackage <package 1> [package 2 ...]"
         exit 1
     fi
 

@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Autosave App functions
+## Autosave
+## App functions
 ##
 ## @category Linux Scripts
 ## @package Autosave
@@ -81,8 +81,10 @@ AutoSave::watchLog() {
     local -i iReturn
 
     # Do the job
-    String::notice -n "Logwatch:"
+    String::notice "Log parsing and analyzing ..."
     logwatch --filename "${sFile}"
+    iReturn=$?
+    String::notice -n "logwatch:"
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}

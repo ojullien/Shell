@@ -4,13 +4,16 @@
 ## Linux Scripts.
 ## Fills disks with zero for compression.
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180728
+## @category Linux Scripts
+## @package fillWithZeros
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
-set -u;
+## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes
@@ -18,15 +21,18 @@ set -u;
 . "${m_DIR_SYS_INC}/string.inc.sh"
 . "${m_DIR_SYS_INC}/filesystem.inc.sh"
 . "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_APP}/clean/inc/clean.inc.sh"
 . "${m_DIR_SYS_INC}/service.inc.sh"
+. "${m_DIR_APP}/clean/inc/clean.inc.sh"
+. "${m_DIR_APP}/fillwithzeros/inc/fillwithzeros.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 . "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
+. "${m_DIR_APP}/fillwithzeros/inc/fillwithzeros.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -39,37 +45,38 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
-Service::disableServices $m_CLEAN_SERVICES_DISABLE
-Service::stopServices $m_CLEAN_SERVICES_STOP
-
-## -----------------------------------------------------------------------------
-## Clean logs
-## -----------------------------------------------------------------------------
 String::separateLine
-processCleanLog
+Service::disableServices ${m_SERVICES_DISABLE}
+String::separateLine
+Service::stopServices ${m_SERVICES_STOP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean logs
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Fills disk"
-m_Disks="/ /home /usr /var /tmp"
-for sArg in $m_Disks
-do
-    cd $sArg
-   String::notice "Filling: `pwd`"
-    cat /dev/zero > zeros
-    sync
-    rm -f zeros
+Clean::main
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Fill
+## -----------------------------------------------------------------------------
+
+declare -a aDisks=( $(lsblk --noheadings --nodeps --list --output NAME) )
+declare sDisk="" sMount=""
+
+for sDisk in "${aDisks[@]}"; do
+    if [[ ${sDisk} =~ ^sd(.*) ]]; then
+        sMount=$(findmnt --noheadings --output TARGET "/dev/${sDisk}1")
+        [[ -n ${sMount} ]] && FillWithZeros::fill "${sMount}"
+    fi
 done
-cd $m_DIR_SCRIPT
-String::notice "back to `pwd`"
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+String::notice "Ready to shutdown!"
 Console::waitUser
 
 shutdown -h now

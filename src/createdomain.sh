@@ -4,44 +4,58 @@
 ## Linux Scripts.
 ## Creates an apache user/group and a home directory in /var/www.
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180728
+## @category Linux Scripts
+## @package createdomain.cfg
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
-set -u;
+## -----------------------------------------------------------------------------
+## Load constants
+## -----------------------------------------------------------------------------
+. "./sys/cfg/constant.cfg.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes
 ## -----------------------------------------------------------------------------
 . "${m_DIR_SYS_INC}/string.inc.sh"
 . "${m_DIR_SYS_INC}/filesystem.inc.sh"
+. "${m_DIR_SYS_INC}/option.inc.sh"
 . "${m_DIR_APP}/createdomain/inc/createdomain.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_APP}/createdomain/cfg/createdomain.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_APP}/createdomain/cfg/createdomain.cfg.sh"
 
-## -----------------------------------------------------------------------------
-## Must have an argument
-## -----------------------------------------------------------------------------
-[ $# -eq 0 ] && Console::display "Usage: createDomain <domain 1> [domain 2] ..." && exit 2
+## -----------------------------------------------------
+## Parse the app options and arguments
+## -----------------------------------------------------
+declare -i iReturn
 
-until [ -z "${1+defined}" ]  # Until all parameters used up . . .
-do
-    FileSystem::createDirectory $1 && createGroup $1 && createUser $1 && changeOwner $1
-    iReturn=$?
-    if [ 0 -ne $iReturn ]; then
-        exit $iReturn
-    fi
-    shift
+while (( "$#" )); do
+    case "$1" in
+    -*|--*=) # unknown option
+        shift
+        String::separateLine
+        Domain::showHelp
+        exit 0
+        ;;
+    *) # We presume its a domain name
+        String::separateLine
+        Domain::create "$1"
+        iReturn=$?
+        ((0!=iReturn)) && exit ${iReturn}
+        shift
+        Console::waitUser
+        ;;
+    esac
 done
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

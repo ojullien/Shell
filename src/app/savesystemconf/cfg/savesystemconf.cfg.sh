@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Save system conf App Configuration file.
+## Save host-specific system-wide configuration
+## App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package saveSystemConf

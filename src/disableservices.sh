@@ -27,8 +27,8 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 
 ## -----------------------------------------------------------------------------
@@ -48,3 +48,4 @@ Service::disableServices $m_SERVICES_DISABLE
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

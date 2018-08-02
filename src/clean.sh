@@ -5,7 +5,7 @@
 ## Clean logs.
 ##
 ## @category Linux Scripts
-## @package Scripts
+## @package clean
 ## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
@@ -27,8 +27,9 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 . "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
 
 ## -----------------------------------------------------------------------------
@@ -43,9 +44,9 @@ Console::waitUser
 ## Disable & stop services
 ## -----------------------------------------------------------------------------
 String::separateLine
-Service::disableServices ${m_CLEAN_SERVICES_DISABLE}
+Service::disableServices ${m_SERVICES_DISABLE}
 String::separateLine
-Service::stopServices ${m_CLEAN_SERVICES_STOP}
+Service::stopServices ${m_SERVICES_STOP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -59,9 +60,10 @@ Console::waitUser
 ## Start services
 ## -----------------------------------------------------------------------------
 String::separateLine
-Service::startServices ${m_CLEAN_SERVICES_START}
+Service::startServices ${m_SERVICES_START}
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

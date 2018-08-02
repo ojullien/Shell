@@ -28,9 +28,13 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_APP}/install/cfg/install.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+if [[ -f "${m_DIR_APP}/install/cfg/priv-install.cfg.sh" ]]; then
+    . "${m_DIR_APP}/install/cfg/priv-install.cfg.sh"
+else
+    . "${m_DIR_APP}/install/cfg/install.cfg.sh"
+fi
 
 ## -----------------------------------------------------------------------------
 ## Start

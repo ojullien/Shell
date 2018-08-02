@@ -28,9 +28,13 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_APP}/install/cfg/install.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+if [[ -f "${m_DIR_APP}/install/cfg/priv-install.cfg.sh" ]]; then
+    . "${m_DIR_APP}/install/cfg/priv-install.cfg.sh"
+else
+    . "${m_DIR_APP}/install/cfg/install.cfg.sh"
+fi
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -43,30 +47,26 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Install logwatch
 ## -----------------------------------------------------------------------------
-installPackage "chkrootkit debsums logwatch"
+String::separateLine
+Apt::installPackage "chkrootkit" "debsums" "logwatch"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------------------------------
-String::notice "Configure Logwatch"
-configureLogwatch ${m_LOGWATCH_SOURCE} ${m_LOGWATCH_DESTINATION}
+String::separateLine
+Install::configureLogwatch "${m_LOGWATCH_SOURCE}" "${m_LOGWATCH_DESTINATION}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Mlocate
 ## -----------------------------------------------------------------------------
-String::notice -n "Updating a database for mlocate:"
-updatedb
-iReturn=$?
-if (( 0 == iReturn )); then
-   String::success "OK"
-else
-   String::error "NOK code: ${iReturn}"
-fi
+String::separateLine
+Install::updateMlocate
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

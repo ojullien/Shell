@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Autosave App Configuration file.
+## Autosave.
+## App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package Autosave
@@ -16,10 +16,16 @@ exit 3
 ## -----------------------------------------------------
 ## App Directories
 ## -----------------------------------------------------
+readonly UPLOAD_DIRECTORY_OWNER="<user>"
+
+## -----------------------------------------------------
+## App Directories
+## -----------------------------------------------------
+
 # Directory holds data to proceed
-readonly m_APP_AUTOSAVE_DIR_CACHE="/home/<user>/out/autosave/cache"
+readonly m_APP_AUTOSAVE_DIR_CACHE="/home/${UPLOAD_DIRECTORY_OWNER}/out/autosave/cache"
 # Directory holds data to transfert
-readonly m_APP_AUTOSAVE_DIR_UPLOAD="/home/<user>/out/autosave/upload"
+readonly m_APP_AUTOSAVE_DIR_UPLOAD="/home/${UPLOAD_DIRECTORY_OWNER}/out/autosave/upload"
 
 ## -----------------------------------------------------
 ## Files

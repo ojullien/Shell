@@ -28,8 +28,8 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
 . "${m_DIR_APP}/update-system/inc/update-system.inc.sh"
 

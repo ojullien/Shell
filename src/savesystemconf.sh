@@ -26,9 +26,13 @@
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_APP}/savesystemconf/cfg/savesystemconf.cfg.sh"
+. "${m_DIR_SYS_CFG}/main.cfg.sh"
+if [[ -f "${m_DIR_APP}/savesystemconf/cfg/priv-savesystemconf.cfg.sh" ]]; then
+    . "${m_DIR_APP}/savesystemconf/cfg/priv-savesystemconf.cfg.sh"
+else
+    . "${m_DIR_APP}/savesystemconf/cfg/savesystemconf.cfg.sh"
+fi
 
 ## -----------------------------------------------------
 ## Parse the app options and arguments
@@ -44,7 +48,8 @@ while (( "$#" )); do
         ;;
     -*|--*=) # unknown option
         shift
-        SaveSystemConf::help
+        String::separateLine
+        SaveSystemConf::showHelp
         exit 0
         ;;
     *) # We presume its a /etc/conf directory

@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Clean App Configuration file.
+## Clean logs.
+## App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package Clean

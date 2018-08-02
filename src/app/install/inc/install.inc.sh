@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Install App functions
+## Install.
+## App functions.
 ##
 ## @category Linux Scripts
 ## @package Install
@@ -15,80 +15,84 @@
 Install::configureBashrc() {
 
     # Parameters
-    if [[ $# -lt 3 ]] || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+    if (( $# != 3 )) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
         String::error "Usage: Install::configureBashrc <source path> <save path> <user>"
         exit 1
     fi
 
     # Init
-    String::separateLine
-    local sSource="$1" sSave="$2" sUser=$3
+    local sSource="$1" sSave="$2" sUser="$3"
+    local -i iReturn
 
     # Do the job
-    String::notice "Configure '.bashrc' for 'root'"
+    String::notice "Configuring '.bashrc' for 'root' ..."
     FileSystem::moveFile "/root/.bashrc" "${sSave}/.bashrc.root.${m_DATE}"
     FileSystem::copyFile "${sSource}/.bashrc.root" "/root/.bashrc"
 
-    String::notice "Configure '.bashrc' for '${sUser}'"
+    String::notice "Configuring '.bashrc' for '${sUser}' ..."
     FileSystem::moveFile "/home/${sUser}/.bashrc" "${sSave}/.bashrc.${sUser}.${m_DATE}"
     FileSystem::copyFile "${sSource}/.bashrc.user" "/home/${sUser}/.bashrc"
 
     String::notice -n "Changing owner:"
     chown "${sUser}":"${sUser}" "/home/${sUser}/.bashrc"
-    String::checkReturnValueForTruthiness $?
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
 
-    return 0
+    return ${iReturn}
 }
 
 Install::configureBashAliases() {
 
     # Parameters
-    if [[ $# -lt 1 ]] || [[ -z "$1" ]]; then
+    if (( $# != 1 )) || [[ -z "$1" ]]; then
         String::error "Usage: Install::configureBashAliases <user>"
         exit 1
     fi
 
     # Init
-    String::separateLine
-    local sUser=$3
-    local m_Buffer="/root/.bash_aliases /home/${sUser}/.bash_aliases"
+    local sUser="$1" sFile=""
+    local -i iReturn
+    local -a aFiles=( "/root/.bash_aliases" "/home/${sUser}/.bash_aliases" )
 
     # Do the job
-    String::notice "Configure .bash_aliases"
-    for sArg in ${m_Buffer}
-    do
-        echo "alias rm=\"rm -i\"" | tee "${sArg}"
-        echo "alias cp=\"cp -i\"" | tee -a "${sArg}"
-        echo "alias mv=\"mv -i\"" | tee -a "${sArg}"
+    String::notice -n "Configure .bash_aliases:"
+    for sFile in "${aFiles[@]}"; do
+        echo "alias rm=\"rm -i\"" | tee "${sFile}"
+        echo "alias cp=\"cp -i\"" | tee -a "${sFile}"
+        echo "alias mv=\"mv -i\"" | tee -a "${sFile}"
     done
+    String::success "OK"
 
     String::notice -n "Changing owner:"
     chown "${sUser}":"${sUser}" "/home/${sUser}/.bash_aliases"
-    String::checkReturnValueForTruthiness $?
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
 
-    return 0
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## SWAP
 ## -----------------------------------------------------
 
-configureSwap() {
-   String::separateLine
-   String::notice "Configure swap"
-   String::notice -n "\tCurrent swappiness:"
+Install::configureSwap() {
+    String::notice "Configuring swap ..."
+    String::notice -n "\tCurrent swappiness:"
     cat /proc/sys/vm/swappiness
-   String::notice "\tWrite swappiness.conf"
+    String::notice "\tWrite swappiness.conf"
     echo vm.swappiness=5 | tee /etc/sysctl.d/99-swappiness.conf
     echo vm.vfs_cache_pressure=50 | tee -a /etc/sysctl.d/99-swappiness.conf
-   String::notice "\tRead values from swappiness.conf"
+    String::notice "\tRead values from swappiness.conf"
     sysctl -p /etc/sysctl.d/99-swappiness.conf
-   String::notice "\tDisable devices and files for paging and swapping"
+    String::notice "\tDisable devices and files for paging and swapping"
     swapoff -av
-   String::notice "\tEnable devices and files for paging and swapping"
+    String::notice "\tEnable devices and files for paging and swapping"
     swapon -av
-   String::notice -n "\tCurrent swappiness:"
+    String::notice -n "\tCurrent swappiness:"
     cat /proc/sys/vm/swappiness
+    String::notice -n "Configure swap:"
+    String::success "OK"
+
     return 0
 }
 
@@ -96,7 +100,12 @@ configureSwap() {
 ## SSD
 ## -----------------------------------------------------
 
-isSSD() {
+Install::isSSD() {
+
+    # Init
+    local -i iReturn
+
+    # Do the job
     grep 0 /sys/block/sda/queue/rotational > /dev/null 2>&1
     iReturn=$?
     if (( 0 == iReturn )); then
@@ -104,10 +113,16 @@ isSSD() {
     else
        String::error "\tNo SSD detected"
     fi
-    return $iReturn
+
+    return ${iReturn}
 }
 
-supportTRIM() {
+Install::supportTRIM() {
+
+    # Init
+    local -i iReturn
+
+    # Do the job
     hdparm -I /dev/sda | grep TRIM > /dev/null 2>&1
     iReturn=$?
     if (( 0 == iReturn )); then
@@ -115,21 +130,31 @@ supportTRIM() {
     else
        String::error "\tSSD do not support TRIM"
     fi
-    return $iReturn
+
+    return ${iReturn}
 }
 
-optimizeSSD() {
-    if [ $# -lt 1 ] || [ -z "$1" ]; then
-       String::error "Usage: optimizeSSD <fstrim cron file path>"
+Install::optimizeSSD() {
+
+    # Parameters
+    if (( $# != 1 )) || [ -z "$1" ]; then
+       String::error "Usage: Install::optimizeSSD <fstrim cron file path>"
         exit 1
     fi
-    if [ -f $1 ] || [ -f /etc/systemd/system/fstrim.timer ]; then
+
+    # Init
+    local -i iReturn
+    local -a aFiles=("/usr/share/doc/util-linux/examples/fstrim.service" "/usr/share/doc/util-linux/examples/fstrim.timer")
+    local sFile=""
+
+    # Do the job
+    if [[ -f $1 ]] || [ -f /etc/systemd/system/fstrim.timer ]; then
        String::success "\tSSD already optimized"
     else
         m_Buffer="/usr/share/doc/util-linux/examples/fstrim.service /usr/share/doc/util-linux/examples/fstrim.timer"
-        for sArg in $m_Buffer
+        for sFile in "$aFiles[@]"
         do
-            FileSystem::copyFile $sArg "/etc/systemd/system"
+            FileSystem::copyFile "${sFile}" "/etc/systemd/system"
         done
         systemctl enable fstrim.timer
         iReturn=$?
@@ -139,36 +164,63 @@ optimizeSSD() {
            String::error "\tSSD not optimized"
         fi
     fi
-    return $iReturn
+
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------
-configureLogwatch() {
-    if [[ $# -lt 2 ]] || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-       String::error "Usage: configureLogwatch <source path> <destination path>"
+Install::configureLogwatch() {
+
+    # Parameters
+    if (( $# != 2 )) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+       String::error "Usage: Install::configureLogwatch <source path> <destination path>"
         exit 1
     fi
-   String::separateLine
-   String::notice "Configure Logwatch"
-    FileSystem::copyFile "$1/logfiles/*.conf" "$2/logfiles/"
-    iReturn1=$?
-    FileSystem::copyFile "$1/logwatch.conf" "$2/logwatch.conf"
-    iReturn2=$?
-   String::notice -n "Changing owner:"
-    chown root:root $2/logwatch.conf $2/logfiles/*.conf
-    iReturn3=$?
-    if [ 0 -eq $iReturn3 ]; then
-       String::success "OK"
-    else
-       String::error "NOK code: ${iReturn}"
-    fi
-   String::notice -n "Configuring Logwatch:"
-    if [ 0 -eq $iReturn1 ] && [ 0 -eq $iReturn2 ] && [ 0 -eq $iReturn3 ]; then
-       String::success "OK"
-    else
-       String::error "NOK codes: $iReturn1, $iReturn2, $iReturn3"
-    fi
-    return $iReturn1 && $iReturn2 && $iReturn3
+
+    # Init
+    local -i iReturn
+    local sSource="$1" sDestination="$2"
+
+    # Do the job
+    String::notice "Configuring Logwatch ..."
+
+    FileSystem::copyFile "${sSource}"/logfiles/*.conf "${sDestination}"/logfiles/
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+    ((0!=iReturn)) && return ${iReturn}
+
+    FileSystem::copyFile "${sSource}"/logwatch.conf "${sDestination}"/logwatch.conf
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+    ((0!=iReturn)) && return ${iReturn}
+
+    String::notice -n "Change owner:"
+    chown root:root "${sDestination}/logwatch.conf" "${sDestination}/logfiles/*.conf"
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+    ((0!=iReturn)) && return ${iReturn}
+
+    String::notice -n "Configuring Logwatch:"
+    String::success "OK"
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------
+## mlocate
+## -----------------------------------------------------
+Install::updateMlocate() {
+
+    # Init
+    local -i iReturn
+
+    # Do the job
+    String::notice -n "Update a database for mlocate:"
+    updatedb
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    return ${iReturn}
 }

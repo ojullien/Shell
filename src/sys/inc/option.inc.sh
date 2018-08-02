@@ -13,7 +13,7 @@ declare -i m_OPTION_LOG=0
 declare -i m_OPTION_WAIT=0
 declare m_APP_ARGUMENTS=""
 
-Option::help() {
+Option::showHelp() {
     String::notice "Options:"
     String::notice "\t-n | --no-display\tdisplay mode. Contents are not displayed."
     String::notice "\t-l | --active-log\tlog mode. Contents are logged."
@@ -37,6 +37,15 @@ while (( "$#" )); do
     -w|--wait)
         m_OPTION_WAIT=1
         shift
+        ;;
+    -h|--help)
+        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
+            m_APP_ARGUMENTS="$1"
+        else
+            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1"
+        fi
+        shift
+
         ;;
     --) # end argument parsing
         shift

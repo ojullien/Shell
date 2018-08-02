@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Update system Configuration file.
+## Update system.
+## App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package Update system

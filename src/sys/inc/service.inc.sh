@@ -15,7 +15,7 @@ else
 fi
 
 Service::disableServices() {
-    String::notice "Disabling '$@' services..."
+    String::notice "Disabling '$*' services..."
     if [[ -n "$1" ]]; then
         for myService in "$@"
         do
@@ -32,7 +32,7 @@ Service::disableServices() {
 }
 
 Service::stopServices() {
-    String::notice "Stopping '$@' services..."
+    String::notice "Stopping '$*' services..."
     if [[ -n "$1" ]]; then
         for myService in "$@"
         do
@@ -48,7 +48,7 @@ Service::stopServices() {
 }
 
 Service::startServices() {
-    String::notice "Starting '$@' services..."
+    String::notice "Starting '$*' services..."
     if [[ -n "$1" ]]; then
         for myService in "$@"
         do
@@ -64,7 +64,7 @@ Service::startServices() {
 }
 
 Service::statusServices() {
-    String::notice "Getting status for '$@' services..."
+    String::notice "Getting status for '$*' services..."
     if [[ -n "$1" ]]; then
         for myService in "$@"
         do

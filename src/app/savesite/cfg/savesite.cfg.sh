@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Save web site folder App Configuration file.
+## Save web site folder
+## App Configuration file.
 ##
 ## @category Linux Scripts
 ## @package SaveSite

@@ -1,20 +1,17 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Save web site folder App functions
+## Save web site folder
+## App functions
 ##
-## @category  Linux Scripts
-## @package   saveSite
-## @version   20180728
+## @category Linux Scripts
+## @package saveSite
+## @version 20180728
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
-SaveSite::help() {
+SaveSite::showHelp() {
     String::notice "Usage: $(basename $0) [options] <directory 1> [directory 2 ...]"
     String::notice "\tSave a web site dir located in /var/www/"
-    String::notice "Options:"
-    String::notice "\t-n | --no-display\tdisplay mode. Contents are not displayed."
-    String::notice "\t-l | --active-log\tlog mode. Contents are logged."
-    String::notice "\t-w | --wait\t\twait user. Wait for user input between actions."
+    Option::showHelp
     String::notice "\t-d | --destination\tDestination folder. The default is /home/<user>/out"
     String::notice "\t<directory 1>\tConfiguration directory located in /var/www/"
 }

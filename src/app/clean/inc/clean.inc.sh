@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Clean App functions
+## Clean logs.
+## App functions
 ##
 ## @category Linux Scripts
 ## @package Clean
@@ -9,6 +9,7 @@
 ## -----------------------------------------------------
 
 Clean::truncateLog() {
+
     # Init
     local -i iReturn
 
@@ -24,7 +25,7 @@ Clean::truncateLog() {
 Clean::cleanLog() {
 
     # Parameters
-    if (($# != 1)) || [[ -z "$1" ]]; then
+    if (($# == 0)) || [[ -z "$1" ]]; then
         String::error "Usage: Clean::cleanLog <file extension 1> <file extension 2> <...>"
         exit 1
     fi
@@ -63,7 +64,6 @@ Clean::cleanSpecificLog() {
 }
 
 Clean::main() {
-    String::separateLine
     String::notice "Clean logs..."
     Clean::cleanSpecificLog "exim4" "*log.*"
     Clean::cleanSpecificLog "apache2_evasive" "dos-*"

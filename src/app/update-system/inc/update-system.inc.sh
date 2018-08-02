@@ -1,6 +1,6 @@
 ## -----------------------------------------------------
-## Linux Scripts.
-## Update system functions
+## Update system
+## App functions
 ##
 ## @category Linux Scripts
 ## @package Update system
