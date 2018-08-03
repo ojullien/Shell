@@ -76,6 +76,7 @@ Apt::upgradeWithAptget() {
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
+        String::separateLine
         String::notice "Upgrading..."
         apt-get full-upgrade -y
         iReturn=$?
@@ -84,6 +85,7 @@ Apt::upgradeWithAptget() {
     fi
 
     if ((0==iReturn)); then
+        String::separateLine
         String::notice "Checking..."
         apt-get check
         iReturn=$?
@@ -111,6 +113,7 @@ Apt::updateAndUpgrade() {
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
+        String::separateLine
         String::notice "Upgrading..."
         aptitude full-upgrade -y
         iReturn=$?
@@ -119,6 +122,7 @@ Apt::updateAndUpgrade() {
     fi
 
     if ((0==iReturn)); then
+        String::separateLine
         String::notice "Checking..."
         apt-get check
         iReturn=$?

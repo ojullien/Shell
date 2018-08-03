@@ -115,3 +115,12 @@ Service::statusService() {
     esac
     return "${iReturn}"
 }
+
+## -----------------------------------------------------
+## Shutting down the system
+## -----------------------------------------------------
+
+Service::shutdown() {
+    shutdown -h now
+    return 0
+}

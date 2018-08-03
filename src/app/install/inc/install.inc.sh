@@ -151,8 +151,7 @@ Install::optimizeSSD() {
     if [[ -f $1 ]] || [ -f /etc/systemd/system/fstrim.timer ]; then
        String::success "\tSSD already optimized"
     else
-        m_Buffer="/usr/share/doc/util-linux/examples/fstrim.service /usr/share/doc/util-linux/examples/fstrim.timer"
-        for sFile in "$aFiles[@]"
+        for sFile in "${aFiles[@]}"
         do
             FileSystem::copyFile "${sFile}" "/etc/systemd/system"
         done
@@ -180,24 +179,29 @@ Install::configureLogwatch() {
     fi
 
     # Init
+    local sSource="$1" sDestination="$2" sFile=""
     local -i iReturn
-    local sSource="$1" sDestination="$2"
+    local -a aFiles
 
     # Do the job
     String::notice "Configuring Logwatch ..."
 
-    FileSystem::copyFile "${sSource}"/logfiles/*.conf "${sDestination}"/logfiles/
+    mapfile -t aFiles < <(find "${sSource}/logfiles" -type f -iname '*.conf' -printf "%f\n")
     iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
     ((0!=iReturn)) && return ${iReturn}
 
-    FileSystem::copyFile "${sSource}"/logwatch.conf "${sDestination}"/logwatch.conf
+    for sFile in "${aFiles[@]}"; do
+        FileSystem::copyFile "${sSource}/logfiles/${sFile}" "${sDestination}/logfiles/"
+        iReturn=$?
+        ((0!=iReturn)) && return ${iReturn}
+    done
+
+    FileSystem::copyFile "${sSource}/logwatch.conf" "${sDestination}/logwatch.conf"
     iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
     ((0!=iReturn)) && return ${iReturn}
 
     String::notice -n "Change owner:"
-    chown root:root "${sDestination}/logwatch.conf" "${sDestination}/logfiles/*.conf"
+    chown root:root "${sDestination}/logwatch.conf" "${sDestination}/logfiles/"*".conf"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
     ((0!=iReturn)) && return ${iReturn}

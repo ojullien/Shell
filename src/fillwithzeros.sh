@@ -62,8 +62,10 @@ Console::waitUser
 ## Fill
 ## -----------------------------------------------------------------------------
 
-declare -a aDisks=( $(lsblk --noheadings --nodeps --list --output NAME) )
 declare sDisk="" sMount=""
+declare -a aDisks
+
+mapfile -t aDisks < <(lsblk --noheadings --nodeps --list --output NAME)
 
 for sDisk in "${aDisks[@]}"; do
     if [[ ${sDisk} =~ ^sd(.*) ]]; then
@@ -79,4 +81,4 @@ String::notice "Now is: $(date -R)"
 String::notice "Ready to shutdown!"
 Console::waitUser
 
-shutdown -h now
+Service::shutdownSystem

@@ -115,3 +115,12 @@ Service::statusService() {
     esac
     return ${iReturn}
 }
+
+## -----------------------------------------------------
+## Shutting down the system
+## -----------------------------------------------------
+
+Service::shutdown() {
+    systemctl poweroff
+    return 0
+}

@@ -48,102 +48,118 @@ Console::waitUser
 ## Initial update and upgrade
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Update source.list"
-FileSystem::moveFile ${m_SOURCELIST_SYS_PATH} ${m_SOURCELIST_SAVE_PATH}.${m_DATE}
-FileSystem::copyFile ${m_SOURCELIST_WRK_PATH}.`lsb_release --short --codename` ${m_SOURCELIST_SYS_PATH}
+String::notice "Updating source.list ..."
+FileSystem::moveFile "${m_SOURCELIST_SYS_PATH}" "${m_SOURCELIST_SAVE_PATH}.${m_DATE}"
+FileSystem::copyFile "${m_SOURCELIST_WRK_PATH}.$(lsb_release --short --codename)" "${m_SOURCELIST_SYS_PATH}"
 Console::waitUser
 
-Apt::isInstalled aptitude
-iAptitude=$?
-if [ 0 -eq $iAptitude ]; then
+declare -i iReturn
+
+String::separateLine
+Apt::isInstalled "aptitude"
+iReturn=$?
+if ((0 == iReturn )); then
     Apt::updateAndUpgrade
 else
     Apt::upgradeWithAptget
-   String::separateLine
-    apt-get install -qqy aptitude
+    String::separateLine
+    String::notice "Installing aptitude ..."
+    apt-get install -qqy "aptitude"
     iReturn=$?
-   String::notice -n "Installing aptitude:"
-    if (( 0 == iReturn )); then
-       String::success "OK"
-    else
-       String::error "NOK code: ${iReturn}"
-    fi
+    String::notice -n "Install aptitude:"
+    String::checkReturnValueForTruthiness ${iReturn}
 fi
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install or modify Bashrc files
 ## -----------------------------------------------------------------------------
-Install::configureBashrc ${m_APP_INSTALL_WRK_DIR} ${m_APP_INSTALL_SAVE_DIR} ${m_APP_INSTALL_USER}
-configureBashAliases
+String::separateLine
+Install::configureBashrc "${m_APP_INSTALL_WRK_DIR}" "${m_APP_INSTALL_SAVE_DIR}" "${m_APP_INSTALL_USER}"
+String::separateLine
+Install::configureBashAliases "${m_APP_INSTALL_USER}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Configure swap
 ## -----------------------------------------------------------------------------
-configureSwap
+String::separateLine
+Install::configureSwap
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Uninstall packages
 ## -----------------------------------------------------------------------------
+String::separateLine
 Apt::uninstallPackage ${m_PACKAGES_PURGE}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system
 ## -----------------------------------------------------------------------------
-installPackage ${m_PACKAGES_SYSTEM}
+String::separateLine
+Apt::installPackage ${m_PACKAGES_SYSTEM}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system without recommanded
 ## -----------------------------------------------------------------------------
-installPackage ${m_PACKAGES_SYSTEM}_NORECOMMENDS
+String::separateLine
+Apt::installPackage ${m_PACKAGES_SYSTEM_NORECOMMENDS}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages apps
 ## -----------------------------------------------------------------------------
-installPackage ${m_PACKAGES_APP}
+String::separateLine
+Apt::installPackage ${m_PACKAGES_APP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------------------------------
-String::notice "Configure Logwatch"
-configureLogwatch ${m_LOGWATCH_SOURCE} ${m_LOGWATCH_DESTINATION}
+String::separateLine
+Install::configureLogwatch "${m_LOGWATCH_SOURCE}" "${m_LOGWATCH_DESTINATION}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Vim
 ## -----------------------------------------------------------------------------
-String::notice "Update vimrc.local"
-FileSystem::copyFile ${m_VIMRCLOCAL_WRK_PATH} ${m_VIMRCLOCAL_SYS_PATH}
+String::separateLine
+String::notice "Updating vimrc.local ..."
+FileSystem::copyFile "${m_VIMRCLOCAL_WRK_PATH}" "${m_VIMRCLOCAL_SYS_PATH}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Mlocate
 ## -----------------------------------------------------------------------------
-String::notice -n "Updating a database for mlocate:"
-updatedb
-iReturn=$?
-if (( 0 == iReturn )); then
-   String::success "OK"
-else
-   String::error "NOK code: ${iReturn}"
-fi
+String::separateLine
+Install::updateMlocate
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Optimize SSD
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Optimize SSD"
-isSSD && supportTRIM && optimizeSSD ${m_FSTRIM_CRON}
+String::notice "Optimizing SSD ..."
+isSSD
+iReturn=$?
+if ((0 == iReturn )); then
+    supportTRIM
+    iReturn=$?
+    if ((0 == iReturn )); then
+        optimizeSSD ${m_FSTRIM_CRON}
+        iReturn=$?
+    fi
+else
+    iReturn=0
+fi
+String::notice -n "Optimize SSD:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
+exit 0

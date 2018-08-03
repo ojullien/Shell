@@ -78,3 +78,12 @@ Service::statusServices() {
     fi
     return 0
 }
+
+## -----------------------------------------------------
+## Shutting down the system
+## -----------------------------------------------------
+
+Service::shutdownSystem() {
+    Service::shutdown
+    return 0
+}
