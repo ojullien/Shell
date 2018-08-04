@@ -42,7 +42,7 @@ readonly m_PROJECT_NAME="Shell"
 ## Main Files
 ## -----------------------------------------------------
 readonly m_LOGFILE="${m_DIR_SCRIPT}/${m_DATE}_$(basename "$0").log"
-local -i iReturn
+declare -i iReturn
 
 ## -----------------------------------------------------------------------------
 ## Includes

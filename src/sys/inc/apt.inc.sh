@@ -47,7 +47,7 @@ Apt::isInstalled() {
 
     # Do the job
     String::notice -n "Is the package '${sPackage}' installed?:"
-    "$(sPackage)" --help > /dev/null 2>&1
+    dpkg-query -s "${sPackage}" > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

@@ -25,7 +25,7 @@ Service::stopService() {
     local sService="$1"
 
     # Do the job
-    String::notice -n "'${sService}' is stopping:"
+    String::notice -n "Stopping '${sService}' service:"
     service "${sService}" stop > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
@@ -50,7 +50,7 @@ Service::startService() {
     local sService="$1"
 
     # Do the job
-    String::notice -n "'${sService}' is starting:"
+    String::notice -n "starting '${sService}' service:"
     service "${sService}" start > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
@@ -75,7 +75,7 @@ Service::disableService() {
     local sService="$1"
 
     # Do the job
-    String::notice -n "'${sService}' is disabling:"
+    String::notice -n "Disabling '${sService}' service:"
     update-rc.d -f "${sService}" remove  > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}

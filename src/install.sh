@@ -49,8 +49,12 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 String::separateLine
 String::notice "Updating source.list ..."
-FileSystem::moveFile "${m_SOURCELIST_SYS_PATH}" "${m_SOURCELIST_SAVE_PATH}.${m_DATE}"
-FileSystem::copyFile "${m_SOURCELIST_WRK_PATH}.$(lsb_release --short --codename)" "${m_SOURCELIST_SYS_PATH}"
+FileSystem::copyFile "${m_SOURCELIST_SYS_PATH}" "${m_SOURCELIST_SAVE_PATH}.${m_DATE}"
+declare sRelease="$(lsb_release --short --codename)"
+if [[ -z "${sRelease}" ]] || [[ "n/a" = "${sRelease}" ]]; then
+    sRelease='testing'
+fi
+FileSystem::copyFile "${m_SOURCELIST_WRK_PATH}.${sRelease}" "${m_SOURCELIST_SYS_PATH}"
 Console::waitUser
 
 declare -i iReturn
@@ -142,13 +146,13 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 String::separateLine
 String::notice "Optimizing SSD ..."
-isSSD
+Install::isSSD
 iReturn=$?
 if ((0 == iReturn )); then
-    supportTRIM
+    Install::supportTRIM
     iReturn=$?
     if ((0 == iReturn )); then
-        optimizeSSD ${m_FSTRIM_CRON}
+        Install::optimizeSSD ${m_FSTRIM_CRON}
         iReturn=$?
     fi
 else

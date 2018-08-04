@@ -13,7 +13,7 @@ Personal Shell scripting projects.
 
 ## Installation
 
-Require a Debian/Ubuntu version of linux.
+Require a Debian/Ubuntu version of linux and a Bash version 4.4 at least
 
 1. [Download a release](https://github.com/ojullien/Shell/releases) or clone this repository to install this project.
 2. For each apps in app folder check out and edit the configuration files located in app/\<app_name\>/cfg/.
@@ -21,9 +21,9 @@ Require a Debian/Ubuntu version of linux.
 
 All the main app scripts can take the following options:
 
-- `-d` Display mode. Contents are not displayed.
-- `-l` Log mode. Contents are logged.
-- `-w` Wait user. Wait for user input between actions.
+- `-n | --no-display` Display mode. Contents are not displayed.
+- `-l | --active-log` Log mode. Contents are logged.
+- `-w | --wait` Wait user. Wait for user input between actions.
 
 ## Features
 
@@ -56,7 +56,7 @@ All the main app scripts can take the following options:
     - Install system packages (dkms, build-essential, util-linux, deborphan, localepurge, hdparm, smartmontools, ...)
     - Install and configure app packages (vim, fail2ban, ftp, mlocate, chkrootkit, logwatch, ...)
     - Optimize SSD
-  - savesite.sh: Saves a www site.
+  - savesite.sh: Saves a www site (located in /var/www).
   - savesystemconf.sh: Saves a system configuration (located in /etc).
   - update-system.sh: Updates the system.
 
@@ -66,7 +66,7 @@ I wrote and I use these scripts for my own projects. And, unfortunately, I do no
 
 ## Test
 
-I do not provide any test at this time. Sorry.
+I wrote few lines of 'unit test' code for the core framework (sys). Not more, sorry.
 
 ## Contributing
 
