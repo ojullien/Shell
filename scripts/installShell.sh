@@ -6,7 +6,7 @@
 ##
 ## @category Linux Scripts
 ## @package installShell
-## @version 20180728
+## @version 20180804
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
