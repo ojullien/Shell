@@ -25,7 +25,7 @@ Domain::createGroup() {
 
     # Init
     local sDomain="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Creating '${sDomain}' group ..."
@@ -47,7 +47,7 @@ Domain::createUser() {
 
     # Init
     local sDomain="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Creating '${sDomain}' user ..."
@@ -70,7 +70,7 @@ Domain::createDirectories() {
     # Init
     local sDomain="$1" sDirectory=""
     local -a aDirectories=( 'config' 'public' 'logs' 'tmp')
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     for sDirectory in "${aDirectories[@]}"; do
@@ -94,7 +94,7 @@ Domain::changeOwner() {
 
     # Init
     local sDomain="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Change owner/group and access right
 
@@ -128,7 +128,7 @@ Domain::create() {
 
     # Init
     local sDomain="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     Domain::createDirectories "${sDomain}"

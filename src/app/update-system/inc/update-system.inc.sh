@@ -25,7 +25,7 @@ UpdateSystem::findOrphanConfig() {
 UpdateSystem::purgeLocales() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Removing unneeded localizations..."
@@ -40,7 +40,7 @@ UpdateSystem::purgeLocales() {
 UpdateSystem::updateDB() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Updating database for mlocate..."

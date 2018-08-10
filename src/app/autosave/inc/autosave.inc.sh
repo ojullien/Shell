@@ -25,7 +25,7 @@ AutoSave::putFTP() {
 
     # Init
     local sHost="$1" sUser="$2" sPass="$3" sFile="$4" sDestDir="$5" sLocalDir="$6"
-    local -i iReturn iWordCount
+    local -i iReturn=1 iWordCount=0
 
     # Do the job
     if ((m_OPTION_LOG)); then
@@ -78,7 +78,7 @@ AutoSave::watchLog() {
 
     # Init
     local sFile="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Log parsing and analyzing ..."

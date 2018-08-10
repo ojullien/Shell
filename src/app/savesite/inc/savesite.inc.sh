@@ -27,7 +27,7 @@ SaveSite::save() {
     # Init
     local sSource="$1" sDestination="$2"
     local m_Save
-    local -i iReturn
+    local -i iReturn=1
 
     # Source does not exist
     if [[ ! -d "/var/www/${sSource}" ]]; then

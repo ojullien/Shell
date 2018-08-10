@@ -21,7 +21,7 @@ Service::stopService() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sService="$1"
 
     # Do the job
@@ -46,7 +46,7 @@ Service::startService() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sService="$1"
 
     # Do the job
@@ -71,7 +71,7 @@ Service::disableService() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sService="$1"
 
     # Do the job
@@ -96,7 +96,7 @@ Service::statusService() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sService="$1"
 
     # Do the job

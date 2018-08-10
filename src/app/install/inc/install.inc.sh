@@ -22,7 +22,7 @@ Install::configureBashrc() {
 
     # Init
     local sSource="$1" sSave="$2" sUser="$3"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Configuring '.bashrc' for 'root' ..."
@@ -51,7 +51,7 @@ Install::configureBashAliases() {
 
     # Init
     local sUser="$1" sFile=""
-    local -i iReturn
+    local -i iReturn=1
     local -a aFiles=( "/root/.bash_aliases" "/home/${sUser}/.bash_aliases" )
 
     # Do the job
@@ -103,7 +103,7 @@ Install::configureSwap() {
 Install::isSSD() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     grep 0 /sys/block/sda/queue/rotational > /dev/null 2>&1
@@ -120,7 +120,7 @@ Install::isSSD() {
 Install::supportTRIM() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     hdparm -I /dev/sda | grep TRIM > /dev/null 2>&1
@@ -143,7 +143,7 @@ Install::optimizeSSD() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local -a aFiles=("/usr/share/doc/util-linux/examples/fstrim.service" "/usr/share/doc/util-linux/examples/fstrim.timer")
     local sFile=""
 
@@ -180,7 +180,7 @@ Install::configureLogwatch() {
 
     # Init
     local sSource="$1" sDestination="$2" sFile=""
-    local -i iReturn
+    local -i iReturn=1
     local -a aFiles
 
     # Do the job
@@ -218,7 +218,7 @@ Install::configureLogwatch() {
 Install::updateMlocate() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Update a database for mlocate:"

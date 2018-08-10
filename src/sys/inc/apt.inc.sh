@@ -21,7 +21,7 @@ Apt::existsPackage() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sPackage="$1"
 
     # Do the job
@@ -42,7 +42,7 @@ Apt::isInstalled() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
     local sPackage="$1"
 
     # Do the job
@@ -66,7 +66,7 @@ Apt::displayLinuxSelections() {
 Apt::upgradeWithAptget() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Updating..."
@@ -103,7 +103,7 @@ Apt::upgradeWithAptget() {
 Apt::updateAndUpgrade() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Updating..."
@@ -142,7 +142,7 @@ Apt::installPackage() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Installing '$*' package(s) ..."
@@ -171,7 +171,7 @@ Apt::uninstallPackage() {
     fi
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     String::notice "Purgeing '$*' package(s)..."
     aptitude purge -y "$@"
@@ -193,7 +193,7 @@ Apt::uninstallPackage() {
 Apt::cleanAndPurge() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Cleaning downloaded packages..."

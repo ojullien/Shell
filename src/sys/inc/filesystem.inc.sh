@@ -22,7 +22,7 @@ FileSystem::checkDir() {
 
     # Init
     local sLabel="$1" sPath="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     if [[ -d "${sPath}" ]]; then
@@ -50,7 +50,7 @@ FileSystem::checkFile() {
 
     # Init
     local sLabel="$1" sPath="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     if [[ -f "${sPath}" ]]; then
@@ -78,7 +78,7 @@ FileSystem::copyFile() {
 
     # Init
     local sSource="$1" sDestination="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Copying '${sSource}' to '${sDestination}':"
@@ -107,7 +107,7 @@ FileSystem::moveFile() {
 
     # Init
     local sSource="$1" sDestination="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Moving '${sSource}' to '${sDestination}':"
@@ -129,7 +129,7 @@ FileSystem::moveFile() {
 FileSystem::syncFile() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "flush file system buffers:"
@@ -153,7 +153,7 @@ FileSystem::removeDirectory() {
 
     # Init
     local sPath="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Removing '${sPath}':"
@@ -174,7 +174,7 @@ FileSystem::cleanDirectory() {
 
     # Init
     local sPath="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Cleaning '${sPath}':"
@@ -195,7 +195,7 @@ FileSystem::createDirectory() {
 
     # Init
     local sPath="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Creating '${sPath}':"
@@ -220,7 +220,7 @@ FileSystem::compressFile() {
 
     # Init
     local sSource="$2" sDestination="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Compress '${sSource}':"
@@ -245,7 +245,7 @@ FileSystem::findToRemove() {
 
     # Init
     local sPath="$1" sName="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Remove all '${sName}' in '${sPath}':"

@@ -11,7 +11,7 @@
 Clean::truncateLog() {
 
     # Init
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice -n "Truncate all files in /var/log:"
@@ -49,7 +49,7 @@ Clean::cleanSpecificLog() {
 
     # Init
     local sDir="$1" sExtension="$2"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     if [[ -d "/var/log/${sDir}" ]]; then

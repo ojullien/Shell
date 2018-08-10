@@ -18,7 +18,7 @@ FillWithZeros::fill() {
 
     # Init
     local sDir="$1"
-    local -i iReturn
+    local -i iReturn=1
 
     # Do the job
     String::notice "Filling '${sDir}' with zeros ..."
