@@ -2,9 +2,9 @@
 ## Linux Scripts.
 ## Aptitude functions
 ##
-## @category  Linux Scripts
-## @package   Includes
-## @version   20180804
+## @category Linux Scripts
+## @package Includes
+## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 

@@ -6,7 +6,7 @@
 ##
 ## @category Linux Scripts
 ## @package Includes
-## @version 20180804
+## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
@@ -141,48 +141,25 @@ Mysql::repair() {
 Mysql::dump() {
 
     # Parameters
-    if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: Mysql::repair <user> <password> <database>"
+    if (($# != 5)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
+        String::error "Usage: Mysql::dump <user> <password> <database> <error log file> <result file>"
         exit 1
     fi
 
-    # Init
-    local sUser="$1" sPwd="$2" sDatabase="$3"
+    # Init"$4"
+    local sUser="$1" sPwd="$2" sDatabase="$3" sErrorLog="$4" sResultFile="$5"
     local -i iReturn=1
 
     # Do the job
-    String::notice "Repairing '${sDatabase}' ..."
-    mysqlcheck --user="${sUser}" --password="${sPwd}" --host=localhost --repair --flush --force --silent "${sDatabase}"
+    String::notice "Dumping '${sDatabase}' to '${sResultFile}' with error in '${sErrorLog}' ..."
+    mysqldump --user="${sUser}" --password="${sPwd}" --log-error="${sErrorLog}" --result-file="${sResultFile}" \
+        --host=localhost --add-drop-database --add-drop-table --add-locks --allow-keywords --comments \
+        --complete-insert --create-options --dump-date --extended-insert --flush-logs --flush-privileges --force \
+        --hex-blob --single-transaction --max_allowed_packet=50M --quick --quote-names --routines --triggers \
+        --tz-utc "${sDatabase}"
     iReturn=$?
-    String::notice -n "Repair '${sDatabase}':"
+    String::notice -n "Dump '${sDatabase}':"
     String::checkReturnValueForTruthiness ${iReturn}
-
-mysqldump
---add-drop-database
---add-drop-table
---add-locks
---allow-keywords
---comments
---complete-insert
---create-options
---dump-date
---extended-insert
---flush-logs
---flush-privileges
---force
---hex-blob
---single-transaction
---max_allowed_packet=50M
---quick
---quote-names
---routines
---triggers
---tz-utc
---host=localhost
---log-error=name
---user=$m_MYSQLUSER
---password=$m_MYSQLPASSWD
---result-file=$2 $1
 
     return ${iReturn}
 }

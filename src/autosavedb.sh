@@ -2,10 +2,10 @@
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## AutoSave.
+## Save databases.
 ##
 ## @category Linux Scripts
-## @package AutoSave
+## @package AutoSavedb
 ## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
@@ -22,21 +22,17 @@
 . "${m_DIR_SYS_INC}/filesystem.inc.sh"
 . "${m_DIR_SYS_INC}/ftp.inc.sh"
 . "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/clean/inc/clean.inc.sh"
-. "${m_DIR_APP}/autosave/inc/autosave.inc.sh"
+. "${m_DIR_APP}/autosavedb/inc/autosavedb.inc.sh"
 
 ## -----------------------------------------------------------------------------
 ## Load common configuration
 ## -----------------------------------------------------------------------------
 . "${m_DIR_SYS_CFG}/root.cfg.sh"
 . "${m_DIR_SYS_CFG}/main.cfg.sh"
-. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
-. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
-if [[ -f "${m_DIR_APP}/autosave/cfg/priv-autosave.cfg.sh" ]]; then
-    . "${m_DIR_APP}/autosave/cfg/priv-autosave.cfg.sh"
+if [[ -f "${m_DIR_APP}/autosavedb/cfg/priv-autosavedb.cfg.sh" ]]; then
+    . "${m_DIR_APP}/autosavedb/cfg/priv-autosavedb.cfg.sh"
 else
-    . "${m_DIR_APP}/autosave/cfg/autosave.cfg.sh"
+    . "${m_DIR_APP}/autosavedb/cfg/autosavedb.cfg.sh"
 fi
 
 ## -----------------------------------------------------------------------------
@@ -51,71 +47,61 @@ Console::waitUser
 ## Creates directories
 ## -----------------------------------------------------------------------------
 String::separateLine
-FileSystem::removeDirectory "${m_APP_AUTOSAVE_DIR_CACHE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+FileSystem::removeDirectory "${m_APP_AUTOSAVEDB_DIR_CACHE}"
+FileSystem::createDirectory "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}"
+FileSystem::createDirectory "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## Disable & stop services
-## -----------------------------------------------------------------------------
-String::separateLine
-Service::disableServices ${m_SERVICES_DISABLE}
-String::separateLine
-Service::stopServices ${m_SERVICES_STOP}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Logwatch
+## Flush
 ## -----------------------------------------------------------------------------
 String::separateLine
 FileSystem::syncFile
-AutoSave::watchLog "${m_LOGWATCH_FILE}"
+MariaDB::flush "${m_DB_USR}" "${m_DB_PWD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## System: save
+## For each databases
+## -----------------------------------------------------------------------------
+for sDatabase in ${m_APP_AUTOSAVEDB_DATABASES[@]}; do
+
+    ## -----------------------------------------------------------------------------
+    ## Check before saving
+    ## -----------------------------------------------------------------------------
+    String::separateLine
+    FileSystem::syncFile
+    MariaDB::check "${m_DB_USR}" "${m_DB_PWD}" "${sDatabase}"
+    Console::waitUser
+
+    ## -----------------------------------------------------------------------------
+    ## Save database
+    ## -----------------------------------------------------------------------------
+    String::separateLine
+    MariaDB::dump "${m_DB_USR}" "${m_DB_PWD}" "${sDatabase}" "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}-error.log" "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}.sql"
+    Console::waitUser
+
+done
+
+## -----------------------------------------------------------------------------
+## Prepare to upload
 ## -----------------------------------------------------------------------------
 String::separateLine
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}/log-${m_DATE}" "/var/log"
+String::notice "Preparing to upload ..."
+cd "${m_APP_AUTOSAVEDB_DIR_CACHE}" || exit 18
+FileSystem::compressFile "${m_APP_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db" "${m_DATE}"
+cd "${m_DIR_SCRIPT}" || exit 18
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## System: clean and delete logs
-## -----------------------------------------------------------------------------
-String::separateLine
-Clean::main
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Start services
-## -----------------------------------------------------------------------------
-String::separateLine
-Service::startServices ${m_SERVICES_START}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Save logs again
-## -----------------------------------------------------------------------------
-String::separateLine
-FileSystem::syncFile
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}/$(uname -n)-start" "/var/log"
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Prepare to upload and ftp
+## Upload
 ## -----------------------------------------------------------------------------
 String::separateLine
 declare -i iReturn
-String::notice "Prepare to upload and upload"
-cd "${m_APP_AUTOSAVE_DIR_CACHE}" || exit 18
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}" "${m_DATE}"
-cd "${m_DIR_SCRIPT}" || exit 18
-
-if [[ -f "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}.tar.bz2" ]]; then
-    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}.tar.bz2" "." "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+String::notice "Uploading ..."
+if [[ -f "${m_APP_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db.tar.bz2" ]]; then
+    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}-db.tar.bz2" "." "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
     iReturn=$?
-    String::notice -n "FTP ${m_DATE}.tar.bz2:"
+    String::notice -n "FTP ${m_DATE}-db.tar.bz2:"
     String::checkReturnValueForTruthiness ${iReturn}
 else
     String::error "NOK code: nothing to send or FTP mode is OFF"
@@ -127,15 +113,12 @@ Console::waitUser
 ## END
 ## -----------------------------------------------------------------------------
 m_OPTION_LOG=0
-if [[ -f ${m_LOGWATCH_FILE} ]]; then
-    FileSystem::copyFile "${m_LOGWATCH_FILE}" "${m_APP_AUTOSAVE_DIR_UPLOAD}"
-fi
 if [[ -f ${m_LOGFILE} ]]; then
-    $(mv "${m_LOGFILE}" "${m_APP_AUTOSAVE_DIR_UPLOAD}")
+    $(mv "${m_LOGFILE}" "${m_APP_AUTOSAVEDB_DIR_UPLOAD}")
 fi
 
 String::notice -n "Changing upload directory owner:"
-chown -R "${UPLOAD_DIRECTORY_OWNER}":"${UPLOAD_DIRECTORY_OWNER}" "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+chown -R "${UPLOAD_DIRECTORY_OWNER}":"${UPLOAD_DIRECTORY_OWNER}" "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 

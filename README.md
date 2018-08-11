@@ -13,7 +13,7 @@ Personal Shell scripting projects.
 
 ## Installation
 
-Require a Debian/Ubuntu version of linux and a Bash version 4.4 at least
+Require a Debian/Ubuntu version of linux and a Bash version ~4.4.
 
 1. [Download a release](https://github.com/ojullien/Shell/releases) or clone this repository to install this project.
 2. For each apps in app folder check out and edit the configuration files located in app/\<app_name\>/cfg/.
@@ -32,6 +32,9 @@ All the main app scripts can take the following options:
   - [sys/inc/](https://github.com/ojullien/Shell/blob/master/src/sys/inc) contains scripts that offer useful functions:
     - apt.inc.sh: package manager (dpkg, apt, aptitude)
     - filesystem.inc.sh: file system functions.
+    - ftp.inc.sh: FTP functions.
+    - mariadb.inc.sh: MariaDB functions.
+    - mysql.inc.sh: MySQL functions.
     - option.inc.sh: command line options functions.
     - string.inc.sh: string functions.
     - service.inc.sh: service manager (use systemV.inc.sh or systemD.inc.sh)
@@ -40,7 +43,8 @@ All the main app scripts can take the following options:
 
 - Applications
   - [app/](https://github.com/ojullien/Shell/blob/master/src/app) contains the main core files (functions, configurations, ...) for each apps.
-  - autosave.sh: Builds a timestamped compressed archive with system logs, web logs and databases data, and send it to a ftp server. Clean the system log after that.
+  - autosave.sh: Builds a timestamped compressed archive with system logs, web logs and send it to a ftp server. Clean the system log after that.
+  - autosavedb.sh: Builds a timestamped compressed archive with databases data, and send it to a ftp server.
   - clean.sh: Cleans the /var/log folder.
   - createdomain.sh: Creates an apache user/group and a home directory in /var/www.
   - disableservices.sh: Disables unwanted services.
@@ -56,6 +60,7 @@ All the main app scripts can take the following options:
     - Install system packages (dkms, build-essential, util-linux, deborphan, localepurge, hdparm, smartmontools, ...)
     - Install and configure app packages (vim, fail2ban, ftp, mlocate, chkrootkit, logwatch, ...)
     - Optimize SSD
+  - savedb.sh: Saves a database.
   - savesite.sh: Saves a www site (located in /var/www).
   - savesystemconf.sh: Saves a system configuration (located in /etc).
   - update-system.sh: Updates the system.
@@ -66,7 +71,7 @@ I wrote and I use these scripts for my own projects. And, unfortunately, I do no
 
 ## Test
 
-I wrote few lines of 'unit test' code for the core framework (sys). Not more, sorry.
+I wrote few lines of 'unit test' code for the core framework (sys). No more, sorry.
 
 ## Contributing
 

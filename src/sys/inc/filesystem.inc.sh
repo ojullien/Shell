@@ -4,7 +4,7 @@
 ##
 ## @category Linux Scripts
 ## @package Includes
-## @version 20180804
+## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
@@ -224,7 +224,7 @@ FileSystem::compressFile() {
 
     # Do the job
     String::notice -n "Compress '${sSource}':"
-    tar -cjf "${sDestination}.tar.bz2" "${sSource}" > /dev/null 2>&1
+    tar --create --bzip2 -f "${sDestination}.tar.bz2" "${sSource}" > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

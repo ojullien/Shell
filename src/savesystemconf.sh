@@ -6,7 +6,7 @@
 ##
 ## @category Linux Scripts
 ## @package saveSystemConf
-## @version 20180804
+## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------------------------------
 
@@ -34,6 +34,14 @@ else
     . "${m_DIR_APP}/savesystemconf/cfg/savesystemconf.cfg.sh"
 fi
 
+## -----------------------------------------------------------------------------
+## Start
+## -----------------------------------------------------------------------------
+String::separateLine
+String::notice "Today is: $(date -R)"
+String::notice "The PID for $(basename "$0") process is: $$"
+Console::waitUser
+
 ## -----------------------------------------------------
 ## Parse the app options and arguments
 ## -----------------------------------------------------
@@ -56,8 +64,8 @@ while (( "$#" )); do
         String::separateLine
         SaveSystemConf::save "$1" "${m_SAVECONF_SAVEFOLDER}"
         iReturn=$?
-        ((0!=iReturn)) && exit ${iReturn}
         cd "${m_DIR_SCRIPT}" || exit 18
+        ((0!=iReturn)) && exit ${iReturn}
         shift
         Console::waitUser
         ;;

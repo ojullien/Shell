@@ -6,4 +6,9 @@ if [ -f /root/work/Shell/autosave.sh ]; then
     bash autosave.sh --active-log --no-display
     cd /etc/cron.daily 2>/dev/null;
 fi
+if [ -f /root/work/Shell/autosavedb.sh ]; then
+    cd /root/work/Shell || exit 1
+    bash autosavedb.sh --active-log --no-display
+    cd /etc/cron.daily 2>/dev/null;
+fi
 exit 0

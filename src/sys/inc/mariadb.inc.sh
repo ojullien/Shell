@@ -2,9 +2,11 @@
 ## Linux Scripts.
 ## Mysql database functions
 ##
+## Requires MariaDB 10.1 at least
+##
 ## @category Linux Scripts
 ## @package Includes
-## @version 20180804
+## @version 20180811
 ## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
 ## -----------------------------------------------------
 
@@ -18,25 +20,14 @@ MariaDB::flush() {
 
     # Init
     local sUser="$1" sPwd="$2"
-    local -i iReturn=1 iMariaDB
-
-    # is MariaDB
-    iMariaDB=$(mysql --version | grep "MariaDB" | wc -l)
+    local -i iReturn=1
 
     # Do the job
     String::notice "Flushing all informations ..."
-    mysqladmin --user="${sUser}" --password="${sPwd}" --host=localhost flush-hosts flush-logs flush-privileges flush-status flush-tables flush-threads
+    mysqladmin --user="${sUser}" --password="${sPwd}" --host=localhost flush-hosts flush-logs flush-privileges flush-status flush-tables flush-threads  flush-all-statistics flush-all-status
     iReturn=$?
     String::notice -n "Flush all informations:"
     String::checkReturnValueForTruthiness ${iReturn}
-
-    if ((iMariaDB)) && ((0==iReturn)); then
-        String::notice "Flushing mariaDB specific ..."
-        mysqladmin --user="${sUser}" --password="${sPwd}" --host=localhost flush-all-statistics flush-all-status
-        iReturn=$?
-        String::notice -n "Flush mariaDB specific:"
-        String::checkReturnValueForTruthiness ${iReturn}
-    fi
 
     return ${iReturn}
 }
@@ -147,34 +138,25 @@ MariaDB::repair() {
     return ${iReturn}
 }
 
-MariaDB::aa() {
+MariaDB::dump() {
 
-mysqldump
---add-drop-database
---add-drop-table
---add-drop-trigger
---add-locks
---allow-keywords
---comments
---complete-insert
---create-options
---dump-date
---extended-insert
---flush-logs
---flush-privileges
---force
---hex-blob
---single-transaction
---log-queries
---max_allowed_packet=50M
---quick
---quote-names
---routines
---triggers
---tz-utc
---host=localhost
---log-error=name
---user=$m_MYSQLUSER
---password=$m_MYSQLPASSWD
---result-file=$2 $1
+    # Parameters
+    if (($# != 5)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
+        String::error "Usage: MariaDB::dump <user> <password> <database> <error log file> <result file>"
+        exit 1
+    fi
+
+    # Init
+    local sUser="$1" sPwd="$2" sDatabase="$3" sErrorLog="$4" sResultFile="$5"
+    local -i iReturn=1
+
+    # Do the job
+    # TODO: Add  --add-drop-trigger for MariaDB 10.2
+    String::notice "Dumping '${sDatabase}' to '${sResultFile}' with error in '${sErrorLog}' ..."
+    mysqldump --user="${sUser}" --password="${sPwd}" --log-error="${sErrorLog}" --result-file="${sResultFile}" --host=localhost --flush-logs --flush-privileges --add-drop-database --allow-keywords --comments --complete-insert --dump-date --opt --force --hex-blob --single-transaction --log-queries --max_allowed_packet=50M --quick --quote-names --routines --triggers --tz-utc "${sDatabase}"
+    iReturn=$?
+    String::notice -n "Dump '${sDatabase}':"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    return ${iReturn}
 }
