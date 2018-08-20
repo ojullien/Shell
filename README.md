@@ -63,6 +63,7 @@ All the main app scripts can take the following options:
   - savedb.sh: Saves a database.
   - savesite.sh: Saves a www site (located in /var/www).
   - savesystemconf.sh: Saves a system configuration (located in /etc).
+  - tartime.sh: Tar and compress files to a timestamped bz2 archive. Standalone script.
   - update-system.sh: Updates the system.
 
 ## Documentation
