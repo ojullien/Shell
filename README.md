@@ -48,6 +48,7 @@ All the main app scripts can take the following options:
   - clean.sh: Cleans the /var/log folder.
   - createdomain.sh: Creates an apache user/group and a home directory in /var/www.
   - disableservices.sh: Disables unwanted services.
+  - enableGit.sh: Add your github key to the ssh agent, add completion and change the prompt to see repository status. Please, read the comments to understand how to install and how to use
   - fillwithzeros.sh: Fills disks with zero for compression (virtualization) and shutdown the server.
   - install.sh: Configures a fresh debian/ubuntu installation. (ssh is already installed and configured)
     - Initial update and upgrade
