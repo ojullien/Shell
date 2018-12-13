@@ -2,31 +2,29 @@
 
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Tests
+## Run tests
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------------------------------
+## @package ojullien\Shell\Tests
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+. "./sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes sources
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
+. "${m_DIR_SYS}/string.sh"
+. "${m_DIR_SYS}/filesystem.sh"
+. "${m_DIR_SYS}/option.sh"
+. "${m_TEST_DIR_SYS}/test.sh"
 
 ## -----------------------------------------------------------------------------
-## Load configuration
+## Trace
 ## -----------------------------------------------------------------------------
-. "${m_TEST_DIR_SYS_CFG}/main.cfg.sh"
-#. "${m_TEST_DIR_SYS_CFG}/root.cfg.sh"
+Test::Constant::trace
 
 ## -----------------------------------------------------------------------------
 ## Start

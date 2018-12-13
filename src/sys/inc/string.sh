@@ -2,18 +2,9 @@
 ## Linux Scripts.
 ## String functions
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------
-
-## -----------------------------------------------------
-## Defines colors
-## -----------------------------------------------------
-readonly COLORRED="$(tput -Txterm setaf 1)"
-readonly COLORGREEN="$(tput -Txterm setaf 2)"
-readonly COLORRESET="$(tput -Txterm sgr0)"
 
 ## -----------------------------------------------------
 ## Write functions
@@ -99,7 +90,7 @@ String::checkReturnValueForTruthiness() {
             String::success "OK"
         fi
     fi
-    return ${iReturn}
+    return "${iReturn}"
 }
 
 ## -----------------------------------------------------
@@ -122,6 +113,6 @@ String::separateLine() {
 
 Console::waitUser() {
     local sBuffer
-    ((m_OPTION_WAIT)) && $(read -s -r -e -p "Press [ENTER] to continue." -n 1 sBuffer)
+    ((m_OPTION_WAIT)) && read -s -r -e -p "Press [ENTER] to continue." -n 1 sBuffer
     return 0
 }
