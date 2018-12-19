@@ -1,12 +1,10 @@
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## String functions
+## Test of the string functions
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\tests
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
 Test::Log::writeToLogTest() {
     Log::writeToLog "Hello log file"
@@ -39,13 +37,13 @@ Test::String::errorTest() {
 
 Test::String::noticeTest() {
     String::notice -n "This is a notice message "
-    String::error " sent to the console and the log file."
+    String::notice " sent to the console and the log file."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::String::successTest() {
     String::success -n "This is a notice success "
-    String::error " sent to the console and the log file."
+    String::success " sent to the console and the log file."
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
@@ -54,9 +52,9 @@ Test::String::separateLineTest() {
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ##
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 
 Test::String::main() {
     Test::String::separateLineTest

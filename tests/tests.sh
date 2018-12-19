@@ -4,14 +4,19 @@
 ## Linux Scripts.
 ## Run tests
 ##
-## @package ojullien\Shell\Tests
+## @package ojullien\Shell\tests
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/tests
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/constant.sh"
+. "${m_DIR_REALPATH}/sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes sources
@@ -19,7 +24,7 @@
 . "${m_DIR_SYS}/string.sh"
 . "${m_DIR_SYS}/filesystem.sh"
 . "${m_DIR_SYS}/option.sh"
-. "${m_TEST_DIR_SYS}/test.sh"
+. "${m_TEST_DIR_SYS}/library.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -34,11 +39,11 @@ String::notice "Today is: $(date -R)"
 String::notice "The PID for $(basename $0) process is: $$"
 Console::waitUser
 
-. "${m_TEST_DIR_SYS_INC}/string_test.inc.sh"
+. "${m_TEST_DIR_SYS}/string_test.sh"
 Test::String::main
 Console::waitUser
 
-. "${m_TEST_DIR_SYS_INC}/filesystem_test.inc.sh"
+. "${m_TEST_DIR_SYS}/filesystem_test.sh"
 Test::FileSystem::main
 Console::waitUser
 

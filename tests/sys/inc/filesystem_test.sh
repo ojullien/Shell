@@ -1,11 +1,9 @@
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## File System functions
+## Test of the filesystem functions
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\tests
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
@@ -13,12 +11,12 @@
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkDirTest() {
-    FileSystem::checkDir "Directory exists:\t${m_DIR}" "${m_DIR}"
+    FileSystem::checkDir "Directory exists:\t${m_DIR_REALPATH}" "${m_DIR_REALPATH}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::checkDirErrorTest() {
-    FileSystem::checkDir "Directory does not exist:\t${m_DIR}/doesnotexist" "${m_DIR}/doesnotexist"
+    FileSystem::checkDir "Directory does not exist:\t${m_DIR_REALPATH}/doesnotexist" "${m_DIR_REALPATH}/doesnotexist"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
