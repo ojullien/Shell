@@ -2,10 +2,8 @@
 ## Linux Scripts.
 ## File System functions
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------

@@ -11,12 +11,14 @@
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkDirTest() {
-    FileSystem::checkDir "Directory exists:\t${m_DIR_REALPATH}" "${m_DIR_REALPATH}"
+    local sValueToTest="${m_TEST_DIR_SYS}"
+    FileSystem::checkDir "Directory exists:\t${sValueToTest}" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::checkDirErrorTest() {
-    FileSystem::checkDir "Directory does not exist:\t${m_DIR_REALPATH}/doesnotexist" "${m_DIR_REALPATH}/doesnotexist"
+    local sValueToTest="${m_TEST_DIR_SYS}/doesnotexist"
+    FileSystem::checkDir "Directory does not exist:\t${sValueToTest}" "${sValueToTest}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -25,12 +27,14 @@ Test::FileSystem::checkDirErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkFileTest() {
-    FileSystem::checkFile "File exists:\t${m_TEST_DIR_SYS_CFG}/constant.cfg.sh" "${m_TEST_DIR_SYS_CFG}/constant.cfg.sh"
+    local sValueToTest="${m_TEST_DIR_SYS}/library.sh"
+    FileSystem::checkFile "File exists:\t${sValueToTest}" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::checkFileErrorTest() {
-    FileSystem::checkFile "File does not exist:\t${m_TEST_DIR_SYS_CFG}/doesnotexist.cfg.sh" "${m_TEST_DIR_SYS_CFG}/doesnotexist.cfg.sh"
+    local sValueToTest="${m_TEST_DIR_SYS}/doesnotexist.sh"
+    FileSystem::checkFile "File does not exist:\t${sValueToTest}" "${sValueToTest}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -39,12 +43,16 @@ Test::FileSystem::checkFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::copyFileTest() {
-    FileSystem::copyFile "${m_TEST_DIR_SYS_CFG}" "${m_TEST_DIR_SCRIPT}/log"
+    local sSource="${m_TEST_DIR_SYS}"
+    local sDestination="${m_LOGDIR}"
+    FileSystem::copyFile "${sSource}" "${sDestination}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::copyFileErrorTest() {
-    FileSystem::copyFile "${m_TEST_DIR_SYS_CFG}/doesnotexist" "${m_TEST_DIR_SCRIPT}/log"
+    local sSource="${m_TEST_DIR_SYS}/doesnotexist"
+    local sDestination="${m_LOGDIR}"
+    FileSystem::copyFile "${sSource}" "${sDestination}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -53,11 +61,15 @@ Test::FileSystem::copyFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::moveFileTest() {
-    FileSystem::moveFile "${m_TEST_DIR_SCRIPT}/log/cfg" "${m_TEST_DIR_SCRIPT}/log/delete_me"
+    local sSource="${m_LOGDIR}/sys"
+    local sDestination="${m_LOGDIR}/delete_me"
+    FileSystem::moveFile "${sSource}" "${sDestination}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::moveFileErrorTest() {
+    local sSource="${m_LOGDIR}/doesnotexist"
+    local sDestination="${m_LOGDIR}/delete_me_too"
     FileSystem::moveFile "${m_TEST_DIR_SCRIPT}/log/doesnotexist" "${m_TEST_DIR_SCRIPT}/log/delete_me_too"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
@@ -76,19 +88,21 @@ Test::FileSystem::syncFileTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::removeDirectoryTest() {
-    FileSystem::removeDirectory "${m_TEST_DIR_SCRIPT}/log/delete_me"
+    local sValueToTest="${m_LOGDIR}/delete_me"
+    FileSystem::removeDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::removeDirectoryErrorTest() {
-    FileSystem::removeDirectory "${m_TEST_DIR_SCRIPT}/log/doesnotexist"
+    local sValueToTest="${m_LOGDIR}/doesnotexist"
+    FileSystem::removeDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::cleanDirectoryTest() {
-    local sDirPath="${m_TEST_DIR_SCRIPT}/log/delete_me"
-    local sFile01Path="${m_TEST_DIR_SCRIPT}/log/delete_me/file01.txt"
-    local sFile02Path="${m_TEST_DIR_SCRIPT}/log/delete_me/file02.txt"
+    local sDirPath="${m_LOGDIR}/delete_me"
+    local sFile01Path="${sDirPath}/file01.txt"
+    local sFile02Path="${sDirPath}/file02.txt"
     mkdir -p "${sDirPath}"
     touch "${sFile01Path}" "${sFile02Path}"
     FileSystem::cleanDirectory "${sDirPath}"
@@ -100,8 +114,8 @@ Test::FileSystem::cleanDirectoryTest() {
 }
 
 Test::FileSystem::cleanDirectoryErrorTest() {
-    local sDirPath="${m_TEST_DIR_SCRIPT}/log/doesnotexist"
-    FileSystem::cleanDirectory "${m_TEST_DIR_SCRIPT}/log/doesnotexist"
+    local sValueToTest="${m_LOGDIR}/doesnotexist"
+    FileSystem::cleanDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
@@ -110,20 +124,20 @@ Test::FileSystem::cleanDirectoryErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::compressFileTest() {
-    local sDirPath="${m_TEST_DIR_SCRIPT}/log/compress_me"
-    local sFile01Path="${m_TEST_DIR_SCRIPT}/log/compress_me/file01.txt"
-    local sFile02Path="${m_TEST_DIR_SCRIPT}/log/compress_me/file02.txt"
+    local sDirPath="${m_LOGDIR}/compress_me"
+    local sFile01Path="${m_LOGDIR}/file01.txt"
+    local sFile02Path="${m_LOGDIR}/file02.txt"
     mkdir -p "${sDirPath}"
     touch "${sFile01Path}" "${sFile02Path}"
-    FileSystem::compressFile "${m_TEST_DIR_SCRIPT}/log/compressed" "${sDirPath}"
+    FileSystem::compressFile "${m_LOGDIR}/compressed" "${sDirPath}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
-    rm -Rf "${sDirPath}" "${m_TEST_DIR_SCRIPT}/log/compressed.tar.bz2"
+    rm -Rf "${sDirPath}" "${m_LOGDIR}/compressed.tar.bz2"
 }
 
 Test::FileSystem::compressFileErrorTest() {
-    FileSystem::compressFile "${m_TEST_DIR_SCRIPT}/log/empty" "${m_TEST_DIR_SCRIPT}/log/doesnotexist"
+    FileSystem::compressFile "${m_LOGDIR}/empty" "${m_LOGDIR}/doesnotexist"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
-    rm -f "${m_TEST_DIR_SCRIPT}/log/empty.tar.bz2"
+    rm -f "${m_LOGDIR}/empty.tar.bz2"
 }
 
 ## -----------------------------------------------------------------------------
@@ -131,12 +145,12 @@ Test::FileSystem::compressFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::findToRemoveTest() {
-    local sDirPath="${m_TEST_DIR_SCRIPT}/log/delete_me"
-    local sFile01Path="${m_TEST_DIR_SCRIPT}/log/delete_me/file01.txt"
-    local sFile02Path="${m_TEST_DIR_SCRIPT}/log/delete_me/file02.txt"
+    local sDirPath="${m_LOGDIR}/delete_me"
+    local sFile01Path="${m_LOGDIR}/file01.txt"
+    local sFile02Path="${m_LOGDIR}/file02.txt"
     mkdir -p "${sDirPath}"
     touch "${sFile01Path}" "${sFile02Path}"
-    FileSystem::findToRemove "${m_TEST_DIR_SCRIPT}/log" "*.txt"
+    FileSystem::findToRemove "${m_LOGDIR}" "*.txt"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
     if [[ -f ${sFile01Path} ]] || [[ -f ${sFile02Path} ]]; then
         String:error "Test::FileSystem::findToRemoveTest failure."

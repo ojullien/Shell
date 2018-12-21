@@ -16,7 +16,7 @@ readonly m_DATE="$(date +"%Y%m%d")_$(date +"%H%M")"
 ## -----------------------------------------------------------------------------
 
 # Directory holds system test files
-readonly m_TEST_DIR_SYS="${m_DIR_REALPATH}/sys/inc"
+readonly m_TEST_DIR_SYS="${m_DIR_REALPATH}/sys"
 # Directory holds test apps
 readonly m_TEST_DIR_APP="${m_DIR_REALPATH}/app"
 
@@ -25,7 +25,7 @@ readonly m_TEST_DIR_APP="${m_DIR_REALPATH}/app"
 ## -----------------------------------------------------------------------------
 
 # Directory holds system files
-readonly m_DIR_SYS="$(realpath "${m_DIR_REALPATH}/../src/sys/inc")"
+readonly m_DIR_SYS="$(realpath "${m_DIR_REALPATH}/../src/sys")"
 # Directory holds apps
 readonly m_DIR_APP="$(realpath "${m_DIR_REALPATH}/../src/app")"
 
@@ -33,9 +33,11 @@ readonly m_DIR_APP="$(realpath "${m_DIR_REALPATH}/../src/app")"
 ## Defines main files
 ## -----------------------------------------------------------------------------
 if [[ ! -d "/var/log" ]]; then
-    readonly m_LOGFILE="/tmp/${m_DATE}_$(basename "$0").log"
+    readonly m_LOGDIR="/tmp"
+    readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
 else
-    readonly m_LOGFILE="/var/log/${m_DATE}_$(basename "$0").log"
+    readonly m_LOGDIR="/var/log"
+    readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
 fi
 
 ## -----------------------------------------------------------------------------
