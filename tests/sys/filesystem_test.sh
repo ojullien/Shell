@@ -27,7 +27,7 @@ Test::FileSystem::checkDirErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkFileTest() {
-    local sValueToTest="${m_TEST_DIR_SYS}/library.sh"
+    local sValueToTest="${m_TEST_DIR_SYS}/filesystem_test.sh"
     FileSystem::checkFile "File exists:\t${sValueToTest}" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }

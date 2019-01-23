@@ -22,7 +22,7 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Load constants
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
-. "${m_DIR_REALPATH}/sys/constant.sh"
+. "${m_DIR_REALPATH}/framework/constant.sh"
 
 ## -----------------------------------------------------------------------------
 ## Includes sources
@@ -34,7 +34,7 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
-. "${m_TEST_DIR_SYS}/library.sh"
+. "${m_DIR_REALPATH}/framework/library.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace

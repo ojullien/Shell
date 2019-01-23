@@ -132,9 +132,10 @@ FileSystem::syncFile() {
     # Do the job
     String::notice -n "flush file system buffers:"
     sync
-    String::checkReturnValueForTruthiness $?
+    iReturn=$?
+    String::checkReturnValueForTruthiness "${iReturn}"
 
-    return 0
+    return "${iReturn}"
 }
 
 ## -----------------------------------------------------------------------------

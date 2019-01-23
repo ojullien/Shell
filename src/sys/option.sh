@@ -49,7 +49,7 @@ while (( "$#" )); do
         shift
         break
         ;;
-    -*|--*=) # app options
+    --*|-*=) # app options
         if [[ -z "${m_APP_ARGUMENTS}" ]]; then
             m_APP_ARGUMENTS="$1 $2"
         else
