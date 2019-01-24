@@ -60,6 +60,11 @@ Test::FileSystem::main
 Console::waitUser
 
 
+# shellcheck source=/dev/null
+. "${m_TEST_DIR_SYS}/package_test.sh"
+Test::Package::main
+Console::waitUser
+
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------

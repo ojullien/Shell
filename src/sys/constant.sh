@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Constants
 ##
-## @package ojullien\Shell
+## @package ojullien\Shell\sys
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 

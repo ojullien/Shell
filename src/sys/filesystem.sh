@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## File System functions
 ##
-## @package ojullien\Shell
+## @package ojullien\Shell\sys
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
@@ -133,9 +133,9 @@ FileSystem::syncFile() {
     String::notice -n "flush file system buffers:"
     sync
     iReturn=$?
-    String::checkReturnValueForTruthiness "${iReturn}"
+    String::checkReturnValueForTruthiness ${iReturn}
 
-    return "${iReturn}"
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------

@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Test of the string functions
 ##
-## @package ojullien\Shell\tests
+## @package ojullien\Shell\tests\sys
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 

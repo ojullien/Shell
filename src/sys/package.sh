@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Package Management System
 ##
-## @package ojullien\Shell
+## @package ojullien\Shell\sys
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
@@ -11,9 +11,16 @@
 ## -----------------------------------------------------------------------------
 
 Package::displayLinuxSelections() {
+
+    # Init
+    local -i iReturn=1
+
+    # Do the job
     String::notice "Linux selections"
     dpkg --get-selections | grep -Ei "Linux-headers|linux-image"
-    return 0
+    iReturn=$?
+
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
@@ -65,7 +72,7 @@ Package::upgrade() {
 ## Report existing status of specified package.
 ## Returns:
 ##          0 if the package exists in repos sourced in sources.list.
-##          1 if Problems were encountered while parsing the command line or
+##        100 if Problems were encountered while parsing the command line or
 ##            performing the query, including no file or package being found.
 ## -----------------------------------------------------------------------------
 
@@ -73,7 +80,7 @@ Package::exists() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: Package::existsPackage <name>"
+        String::error "Usage: Package::exists <package name>"
         exit 100
     fi
 
@@ -102,7 +109,7 @@ Package::isInstalled() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: Dpkg::isInstalled <name>"
+        String::error "Usage: Package::isInstalled <package name>"
         exit 1
     fi
 
@@ -119,14 +126,15 @@ Package::isInstalled() {
     return ${iReturn}
 }
 
+## -----------------------------------------------------------------------------
+## Install or upgrade specific packages
+## -----------------------------------------------------------------------------
 
-
-
-Package::installPackage() {
+Package::install() {
 
     # Parameters
     if (($# == 0)) || [[ -z "$1" ]]; then
-        String::error "Usage: Apt::installPackage <package 1> [package 2 ...]"
+        String::error "Usage: Package::install <package 1> [package 2 ...]"
         exit 1
     fi
 
@@ -135,27 +143,31 @@ Package::installPackage() {
 
     # Do the job
     String::notice "Installing '$*' package(s) ..."
-    aptitude install -y "$@"
+    apt-get install --yes "$@"
     iReturn=$?
-    String::notice -n "Install '$*' package(s):"
+    String::notice -n "Install '$*' package(s) status:"
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
         String::notice "Checking..."
         apt-get check
         iReturn=$?
-        String::notice -n "Check:"
+        String::notice -n "Check status:"
         String::checkReturnValueForTruthiness ${iReturn}
     fi
 
     return ${iReturn}
 }
 
-Apt::uninstallPackage() {
+## -----------------------------------------------------------------------------
+## Removes software packages including their configuration files
+## -----------------------------------------------------------------------------
+
+Package::uninstall() {
 
     # Parameters
     if (($# == 0)) || [[ -z "$1" ]]; then
-        String::error "Usage: Apt::uninstallPackage <package 1> [package 2 ...]"
+        String::error "Usage: Package::uninstall <package 1> [package 2 ...]"
         exit 1
     fi
 
@@ -163,45 +175,45 @@ Apt::uninstallPackage() {
     local -i iReturn=1
 
     String::notice "Purgeing '$*' package(s)..."
-    aptitude purge -y "$@"
+    apt-get purge --yes "$@"
     iReturn=$?
-    String::notice -n "Purge '$*' package(s):"
+    String::notice -n "Purge '$*' package(s) status:"
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
         String::notice "Checking..."
         apt-get check
         iReturn=$?
-        String::notice -n "Check:"
+        String::notice -n "Check status:"
         String::checkReturnValueForTruthiness ${iReturn}
     fi
 
     return ${iReturn}
 }
 
-Apt::cleanAndPurge() {
+## -----------------------------------------------------------------------------
+## Removes packages that were automatically installed to satisfy dependencies
+## for other packages and are now no longer needed.
+## Clears out the local repository of retrieved package files.
+## -----------------------------------------------------------------------------
+
+Package::clean() {
 
     # Init
-    local -i iReturn=1
+    local -i iReturnA=1 iReturnC=1
 
     # Do the job
-    String::notice "Cleaning downloaded packages..."
-    aptitude clean
-    iReturn=$?
-    String::notice -n "Clean downloaded packages:"
-    String::checkReturnValueForTruthiness ${iReturn}
-
-    String::notice "Cleaning old downloaded packages..."
-    aptitude autoclean
-    iReturn=$?
-    String::notice -n "Clean old downloaded packages:"
-    String::checkReturnValueForTruthiness ${iReturn}
-
     String::notice "Removing no longer needed dependencies packages..."
     apt-get autoremove --purge
-    iReturnC=$?
-    String::notice -n "Remove no longer needed dependencies packages:"
+    iReturn=$?
+    String::notice -n "Autoremove status:"
     String::checkReturnValueForTruthiness ${iReturn}
 
-    return ${iReturn}
+    String::notice "Cleaning downloaded packages..."
+    apt-get clean
+    iReturn=$?
+    String::notice -n "Clean status:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    return $((iReturnA+iReturnC))
 }
