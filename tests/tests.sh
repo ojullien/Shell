@@ -59,7 +59,8 @@ Console::waitUser
 Test::FileSystem::main
 Console::waitUser
 
-
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/package.sh"
 # shellcheck source=/dev/null
 . "${m_TEST_DIR_SYS}/package_test.sh"
 Test::Package::main
