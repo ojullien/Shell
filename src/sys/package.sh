@@ -81,7 +81,7 @@ Package::exists() {
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Package::exists <package name>"
-        exit 100
+        return 100
     fi
 
     # Init
@@ -110,7 +110,7 @@ Package::isInstalled() {
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: Package::isInstalled <package name>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -135,7 +135,7 @@ Package::install() {
     # Parameters
     if (($# == 0)) || [[ -z "$1" ]]; then
         String::error "Usage: Package::install <package 1> [package 2 ...]"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -168,7 +168,7 @@ Package::uninstall() {
     # Parameters
     if (($# == 0)) || [[ -z "$1" ]]; then
         String::error "Usage: Package::uninstall <package 1> [package 2 ...]"
-        exit 1
+        return 1
     fi
 
     # Init

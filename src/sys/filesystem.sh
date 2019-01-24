@@ -15,7 +15,7 @@ FileSystem::checkDir() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: FileSystem::checkDir <label> <path>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -43,7 +43,7 @@ FileSystem::checkFile() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: FileSystem::checkFile <label> <path>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -71,7 +71,7 @@ FileSystem::copyFile() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: FileSystem::copyFile <source> <destination>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -100,7 +100,7 @@ FileSystem::moveFile() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: FileSystem::moveFile <source> <destination>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -147,7 +147,7 @@ FileSystem::removeDirectory() {
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: FileSystem::removeDirectory <path>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -168,7 +168,7 @@ FileSystem::cleanDirectory() {
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: FileSystem::cleanDirectory <path>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -189,7 +189,7 @@ FileSystem::createDirectory() {
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: FileSystem::createDirectory <top directory>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -214,7 +214,7 @@ FileSystem::compressFile() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error 'Usage: FileSystem::compressFile <DESTINATION> <SOURCE>'
-        exit 1
+        return 1
     fi
 
     # Init
@@ -239,7 +239,7 @@ FileSystem::findToRemove() {
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: FileSystem::findToRemove <PATH> <NAME>"
-        exit 1
+        return 1
     fi
 
     # Init
