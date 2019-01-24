@@ -207,13 +207,13 @@ Package::clean() {
     apt-get autoremove --purge
     iReturnA=$?
     String::notice -n "Autoremove status:"
-    String::checkReturnValueForTruthiness ${iReturn}
+    String::checkReturnValueForTruthiness ${iReturnA}
 
     String::notice "Cleaning downloaded packages..."
     apt-get clean
     iReturnC=$?
     String::notice -n "Clean status:"
-    String::checkReturnValueForTruthiness ${iReturn}
+    String::checkReturnValueForTruthiness ${iReturnC}
 
     return $((iReturnA+iReturnC))
 }

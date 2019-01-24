@@ -114,7 +114,7 @@ Test::Package::uninstallErrorTest() {
 }
 
 Test::Package::uninstallTest() {
-    local sValueToTest="apt"
+    local sValueToTest="nano"
     Package::uninstall "--simulate" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
