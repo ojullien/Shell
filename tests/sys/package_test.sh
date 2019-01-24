@@ -92,8 +92,8 @@ Test::Package::installErrorTest() {
 }
 
 Test::Package::installTest() {
-    local sValueToTest="--simulate apt-file"
-    Package::install "${sValueToTest}"
+    local sValueToTest="apt-file"
+    Package::install "--simulate" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
@@ -114,8 +114,8 @@ Test::Package::uninstallErrorTest() {
 }
 
 Test::Package::uninstallTest() {
-    local sValueToTest="--simulate apt"
-    Package::uninstall "${sValueToTest}"
+    local sValueToTest="apt"
+    Package::uninstall "--simulate" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
