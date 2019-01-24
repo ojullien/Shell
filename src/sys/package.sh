@@ -205,13 +205,13 @@ Package::clean() {
     # Do the job
     String::notice "Removing no longer needed dependencies packages..."
     apt-get autoremove --purge
-    iReturn=$?
+    iReturnA=$?
     String::notice -n "Autoremove status:"
     String::checkReturnValueForTruthiness ${iReturn}
 
     String::notice "Cleaning downloaded packages..."
     apt-get clean
-    iReturn=$?
+    iReturnC=$?
     String::notice -n "Clean status:"
     String::checkReturnValueForTruthiness ${iReturn}
 
