@@ -159,10 +159,10 @@ Test::FileSystem::findToRemoveTest() {
 }
 
 ## -----------------------------------------------------------------------------
-##
+## Use lowerspace in namespace of the main function
 ## -----------------------------------------------------------------------------
 
-Test::FileSystem::main() {
+Test::filesystem::main() {
     String::separateLine
     String::notice "Testing: sys/filesystem ..."
     Test::FileSystem::checkDirTest

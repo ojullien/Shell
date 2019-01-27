@@ -18,6 +18,7 @@ Test::assertTrue() {
     else
         String::error "Test of ${sFunctionName}: failure."
     fi
+    return 0
 }
 
 Test::assertFalse() {
@@ -32,4 +33,5 @@ Test::assertFalse() {
     else
         String::error "Test of ${sFunctionName}: failure."
     fi
+    return 0
 }

@@ -35,6 +35,8 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_REALPATH}/framework/library.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/package.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -44,26 +46,35 @@ Test::Constant::trace
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
+
+declare aPackages=("filesystem" "package" "string")
+declare -i iChoice=-1
+
+while ((iChoice>=${#aPackages[*]})) || ((iChoice<0)); do
+
+    String::separateLine
+    declare -i iIndex=0
+    echo "Packages list:"
+
+    for iIndex in ${!aPackages[*]}
+    do
+        printf "%4d: %s\n" "$iIndex" "${aPackages[$iIndex]}"
+    done
+
+    echo -n "Enter your choice (0..$iIndex): "
+    read -r -N 1 iChoice
+    echo
+
+done
+
 String::separateLine
 String::notice "Today is: $(date -R)"
 String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
 # shellcheck source=/dev/null
-. "${m_TEST_DIR_SYS}/string_test.sh"
-Test::String::main
-Console::waitUser
-
-# shellcheck source=/dev/null
-. "${m_TEST_DIR_SYS}/filesystem_test.sh"
-Test::FileSystem::main
-Console::waitUser
-
-# shellcheck source=/dev/null
-. "${m_DIR_SYS}/package.sh"
-# shellcheck source=/dev/null
-. "${m_TEST_DIR_SYS}/package_test.sh"
-Test::Package::main
+. "${m_TEST_DIR_SYS}/${aPackages[$iChoice]}_test.sh"
+Test::"${aPackages[$iChoice]}"::main
 Console::waitUser
 
 ## -----------------------------------------------------------------------------

@@ -131,10 +131,10 @@ Test::Package::clean() {
 }
 
 ## -----------------------------------------------------------------------------
-##
+## Use lowerspace in namespace of the main function
 ## -----------------------------------------------------------------------------
 
-Test::Package::main() {
+Test::package::main() {
     String::separateLine
     String::notice "Testing: sys/package ..."
     Test::Package::displayLinuxSelectionsTest

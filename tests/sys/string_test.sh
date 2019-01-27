@@ -53,10 +53,10 @@ Test::String::separateLineTest() {
 }
 
 ## -----------------------------------------------------------------------------
-##
+## Use lowerspace in namespace of the main function
 ## -----------------------------------------------------------------------------
 
-Test::String::main() {
+Test::string::main() {
     Test::String::separateLineTest
     String::notice "Testing: sys/string ..."
 
@@ -69,5 +69,4 @@ Test::String::main() {
     Test::String::successTest
 
     Test::String::separateLineTest
-
 }
