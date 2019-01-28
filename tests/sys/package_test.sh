@@ -137,6 +137,8 @@ Test::Package::clean() {
 Test::package::main() {
     String::separateLine
     String::notice "Testing: sys/package ..."
+    # shellcheck source=/dev/null
+    . "${m_DIR_SYS}/runasroot.sh"
     Test::Package::displayLinuxSelectionsTest
     Test::Package::upgradeTest
     Test::Package::existsParameterTest
