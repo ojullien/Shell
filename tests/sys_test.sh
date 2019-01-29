@@ -37,6 +37,8 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_REALPATH}/framework/library.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/package.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/service.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -47,7 +49,7 @@ Test::Constant::trace
 ## Start
 ## -----------------------------------------------------------------------------
 
-declare aPackages=("filesystem" "package" "string")
+declare aPackages=("filesystem" "package" "string" "service")
 declare -i iChoice=-1
 
 while ((iChoice>=${#aPackages[*]})) || ((iChoice<0)); do
