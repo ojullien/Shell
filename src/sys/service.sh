@@ -15,7 +15,7 @@ else
 fi
 
 ## -----------------------------------------------------------------------------
-## Stops service
+## Stop
 ## -----------------------------------------------------------------------------
 
 Service::stop() {
@@ -37,7 +37,7 @@ Service::stop() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        String::success "not loaded"
+        String::notice "not loaded"
     fi
 
     return ${iReturn}
@@ -66,7 +66,7 @@ Service::stopServices() {
 }
 
 ## -----------------------------------------------------------------------------
-## Disables service
+## Disable
 ## -----------------------------------------------------------------------------
 
 Service::disableServices() {
@@ -93,37 +93,114 @@ Service::disableServices() {
     return ${iReturn}
 }
 
+## -----------------------------------------------------------------------------
+## Start
+## -----------------------------------------------------------------------------
+
+Service::start() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::start <service>"
+        return 1
+    fi
+
+    # Init
+    local -i iReturn=1
+    local sService="$1"
+
+    # Do the job
+    String::notice -n "starting '${sService}' service:"
+    if service --status-all | grep -wq "${sService}$"; then
+        service "${sService}" start > /dev/null 2>&1
+        iReturn=$?
+        String::checkReturnValueForTruthiness ${iReturn}
+    else
+        String::notice "not found"
+    fi
+
+    return ${iReturn}
+}
 
 Service::startServices() {
-    String::notice "Starting '$*' services..."
-    if [[ -n "$1" ]]; then
-        for myService in "$@"
-        do
-            if [ -e "/etc/init.d/${myService}" ]; then
-               Service::startService "${myService}"
-            fi
-        done
-    else
-        String::error "Usage: Service::startService <service 1> <service 2> <...>"
-        exit 1
+
+    # Parameters
+    if [[ -z "$1" ]]; then
+        String::error "Usage: Service::startServices <service 1> <service 2> <...>"
+        return 1
     fi
-    return 0
+
+    # Init
+    local -i iReturn=0
+
+    # Do the job
+    String::notice "Starting '$*' services..."
+    for myService in "$@"
+    do
+        Service::start "${myService}"
+        ((iReturn+=$?))
+    done
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## Status
+## -----------------------------------------------------------------------------
+
+Service::status() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: Service::status <service>"
+        return 1
+    fi
+
+    # Init
+    local -i iReturn=1
+    local sService="$1"
+
+    # Do the job
+    String::notice -n "'${sService}' status is:"
+    if service --status-all | grep -wq "${sService}$"; then
+        service "${sService}" status > /dev/null 2>&1
+        iReturn=$?
+        case ${iReturn} in
+            0)
+                String::notice "running"
+                ;;
+            3)
+                String::notice "stopped"
+                ;;
+            *)
+                String::error "ERROR code: ${iReturn}"
+        esac
+    else
+        String::notice "not found"
+    fi
+
+    return ${iReturn}
 }
 
 Service::statusServices() {
-    String::notice "Getting status for '$*' services..."
-    if [[ -n "$1" ]]; then
-        for myService in "$@"
-        do
-            if [ -e "/etc/init.d/${myService}" ]; then
-               Service::statusService "${myService}"
-            fi
-        done
-    else
+
+    # Parameters
+    if [[ -z "$1" ]]; then
         String::error "Usage: Service::statusServices <service 1> <service 2> <...>"
-        exit 1
+        return 1
     fi
-    return 0
+
+    # Init
+    local -i iReturn=0
+
+    String::notice "Getting status for '$*' services..."
+    for myService in "$@"
+    do
+        Service::statusService "${myService}"
+        ((iReturn+=$?))
+    done
+
+    return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
