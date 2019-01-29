@@ -54,7 +54,7 @@ Console::waitUser
 
 # shellcheck source=/dev/null
 . "${m_TEST_DIR_SYS}/system/d_test.sh"
-Test::servicev::main
+Test::serviced::main
 Console::waitUser
 
 ## -----------------------------------------------------------------------------

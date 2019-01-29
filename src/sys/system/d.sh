@@ -10,25 +10,6 @@
 ## Disable
 ## -----------------------------------------------------------------------------
 
-Service::isEnabled() {
-
-    # Parameters
-    if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: Service::isEnabled <service>"
-        return 1
-    fi
-
-    # Init
-    local -i iReturn=0
-    local sService="$1"
-
-    # Do the job
-    systemctl -q is-enabled "${sService}" > /dev/null 2>&1
-    iReturn=$?
-
-    return ${iReturn}
-}
-
 Service::disable() {
 
     # Parameters
@@ -43,7 +24,7 @@ Service::disable() {
 
     # Do the job
     String::notice -n "Disabling '${sService}' service:"
-    if systemctl -q is-enabled "${sService}"; then
+    if systemctl -q is-enabled "${sService}" > /dev/null 2>&1 ; then
         systemctl -q disable "${sService}" > /dev/null 2>&1
         iReturn=$?
     fi
