@@ -11,13 +11,13 @@
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkDirTest() {
-    local sValueToTest="${m_TEST_DIR_SYS}"
+    local sValueToTest="$1"
     FileSystem::checkDir "Directory exists:\t${sValueToTest}" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::checkDirErrorTest() {
-    local sValueToTest="${m_TEST_DIR_SYS}/doesnotexist"
+    local sValueToTest="$1"
     FileSystem::checkDir "Directory does not exist:\t${sValueToTest}" "${sValueToTest}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
@@ -27,13 +27,13 @@ Test::FileSystem::checkDirErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::checkFileTest() {
-    local sValueToTest="${m_TEST_DIR_SYS}/filesystem_test.sh"
+    local sValueToTest=$(mktemp -p "${1}" -t tmp.XXXXXXXXXX)
     FileSystem::checkFile "File exists:\t${sValueToTest}" "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::checkFileErrorTest() {
-    local sValueToTest="${m_TEST_DIR_SYS}/doesnotexist.sh"
+    local sValueToTest="${1}/doesnotexist.sh"
     FileSystem::checkFile "File does not exist:\t${sValueToTest}" "${sValueToTest}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
@@ -43,15 +43,15 @@ Test::FileSystem::checkFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::copyFileTest() {
-    local sSource="${m_TEST_DIR_SYS}"
-    local sDestination="${m_LOGDIR}"
+    local sSource="${1}"
+    local sDestination="${2}"
     FileSystem::copyFile "${sSource}" "${sDestination}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::copyFileErrorTest() {
-    local sSource="${m_TEST_DIR_SYS}/doesnotexist"
-    local sDestination="${m_LOGDIR}"
+    local sSource="${1}"
+    local sDestination="${2}"
     FileSystem::copyFile "${sSource}" "${sDestination}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
@@ -61,16 +61,16 @@ Test::FileSystem::copyFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::moveFileTest() {
-    local sSource="${m_LOGDIR}/sys"
-    local sDestination="${m_LOGDIR}/delete_me"
+    local sSource="${1}"
+    local sDestination="${2}"
     FileSystem::moveFile "${sSource}" "${sDestination}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::moveFileErrorTest() {
-    local sSource="${m_LOGDIR}/doesnotexist"
-    local sDestination="${m_LOGDIR}/delete_me_too"
-    FileSystem::moveFile "${m_TEST_DIR_SCRIPT}/log/doesnotexist" "${m_TEST_DIR_SCRIPT}/log/delete_me_too"
+    local sSource="${1}"
+    local sDestination="${2}"
+    FileSystem::moveFile "${sSource}" "${sDestination}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -88,33 +88,37 @@ Test::FileSystem::syncFileTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::removeDirectoryTest() {
-    local sValueToTest="${m_LOGDIR}/delete_me"
+    local sValueToTest="${1}"
     FileSystem::removeDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::removeDirectoryErrorTest() {
-    local sValueToTest="${m_LOGDIR}/doesnotexist"
+    local sValueToTest="${1}"
     FileSystem::removeDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::cleanDirectoryTest() {
-    local sDirPath="${m_LOGDIR}/delete_me"
-    local sFile01Path="${sDirPath}/file01.txt"
-    local sFile02Path="${sDirPath}/file02.txt"
-    mkdir -p "${sDirPath}"
-    touch "${sFile01Path}" "${sFile02Path}"
+
+    # Init
+    local -i iReturn=1
+    local sDirPath=$(mktemp --directory -p "${1}" -t tmp.XXXXXXXXXX)
+    local sFile01Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+    local sFile02Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+
+    # Do the job
     FileSystem::cleanDirectory "${sDirPath}"
-    Test::assertTrue "${FUNCNAME[0]}" "$?"
-    if [[ -f ${sFile01Path} ]] || [[ -f ${sFile02Path} ]]; then
-        String::error "Test::FileSystem::cleanDirectoryTest failure."
+    iReturn=$?
+    FileSystem::syncFile
+    if [[ -f "${sFile01Path}" ]] || [[ -f "${sFile02Path}" ]]; then
+        iReturn=1
     fi
-    rm -Rf "${sDirPath}"
+    Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 Test::FileSystem::cleanDirectoryErrorTest() {
-    local sValueToTest="${m_LOGDIR}/doesnotexist"
+    local sValueToTest="${1}"
     FileSystem::cleanDirectory "${sValueToTest}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
@@ -124,20 +128,20 @@ Test::FileSystem::cleanDirectoryErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::compressFileTest() {
-    local sDirPath="${m_LOGDIR}/compress_me"
-    local sFile01Path="${m_LOGDIR}/file01.txt"
-    local sFile02Path="${m_LOGDIR}/file02.txt"
-    mkdir -p "${sDirPath}"
-    touch "${sFile01Path}" "${sFile02Path}"
-    FileSystem::compressFile "${m_LOGDIR}/compressed" "${sDirPath}"
+
+    # Init
+    local sDirPath=$(mktemp --directory -p "${1}" -t tmp.XXXXXXXXXX)
+    local sFile01Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+    local sFile02Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+
+    # Do the job
+    FileSystem::compressFile "${1}/compressed" "${sDirPath}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
-    rm -Rf "${sDirPath}" "${m_LOGDIR}/compressed.tar.bz2"
 }
 
 Test::FileSystem::compressFileErrorTest() {
-    FileSystem::compressFile "${m_LOGDIR}/empty" "${m_LOGDIR}/doesnotexist"
+    FileSystem::compressFile "${1}/empty" "${1}/doesnotexist"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
-    rm -f "${m_LOGDIR}/empty.tar.bz2"
 }
 
 ## -----------------------------------------------------------------------------
@@ -145,17 +149,21 @@ Test::FileSystem::compressFileErrorTest() {
 ## -----------------------------------------------------------------------------
 
 Test::FileSystem::findToRemoveTest() {
-    local sDirPath="${m_LOGDIR}/delete_me"
-    local sFile01Path="${m_LOGDIR}/file01.txt"
-    local sFile02Path="${m_LOGDIR}/file02.txt"
-    mkdir -p "${sDirPath}"
-    touch "${sFile01Path}" "${sFile02Path}"
-    FileSystem::findToRemove "${m_LOGDIR}" "*.txt"
-    Test::assertTrue "${FUNCNAME[0]}" "$?"
-    if [[ -f ${sFile01Path} ]] || [[ -f ${sFile02Path} ]]; then
-        String:error "Test::FileSystem::findToRemoveTest failure."
+
+    # Init
+    local -i iReturn=1
+    local sDirPath=$(mktemp --directory -p "${1}" -t tmp.XXXXXXXXXX)
+    local sFile01Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+    local sFile02Path=$(mktemp -p "${sDirPath}" -t tmp.XXXXXXXXXX)
+
+    # Do the job
+    FileSystem::findToRemove "${sDirPath}" "tmp.*"
+    iReturn=$?
+    FileSystem::syncFile
+    if [[ -f "${sFile01Path}" ]] || [[ -f "${sFile02Path}" ]]; then
+        iReturn=1
     fi
-    rm -Rf "${sDirPath}"
+    Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
 ## -----------------------------------------------------------------------------
@@ -163,23 +171,37 @@ Test::FileSystem::findToRemoveTest() {
 ## -----------------------------------------------------------------------------
 
 Test::filesystem::main() {
+
+    # Init
+    local sTmpFolder=$(mktemp --directory -t tmp.XXXXXXXXXX)
+
+    # Do the job
+
     String::separateLine
     String::notice "Testing: sys/filesystem ..."
-    Test::FileSystem::checkDirTest
-    Test::FileSystem::checkDirErrorTest
-    Test::FileSystem::checkFileTest
-    Test::FileSystem::checkFileErrorTest
+
+    Test::FileSystem::checkDirTest "${sTmpFolder}"
+    Test::FileSystem::checkDirErrorTest "${sTmpFolder}/doesnotexist"
+    Test::FileSystem::checkFileTest "${sTmpFolder}"
+    Test::FileSystem::checkFileErrorTest "${sTmpFolder}/doesnotexist.sh"
+
     # Keep the order
-    Test::FileSystem::copyFileTest
-    Test::FileSystem::copyFileErrorTest
-    Test::FileSystem::moveFileTest
-    Test::FileSystem::moveFileErrorTest
+    Test::FileSystem::copyFileTest "${m_TEST_DIR_SYS}" "${sTmpFolder}"
+    Test::FileSystem::copyFileErrorTest "${m_TEST_DIR_SYS}/doesnotexist" "${sTmpFolder}"
+    Test::FileSystem::moveFileTest "${sTmpFolder}/sys" "${sTmpFolder}/delete_me"
+    Test::FileSystem::moveFileErrorTest "${sTmpFolder}/doesnotexist" "${sTmpFolder}/delete_me_too"
     Test::FileSystem::syncFileTest
-    Test::FileSystem::removeDirectoryTest
-    Test::FileSystem::removeDirectoryErrorTest
-    Test::FileSystem::cleanDirectoryTest
-    Test::FileSystem::cleanDirectoryErrorTest
-    Test::FileSystem::compressFileTest
-    Test::FileSystem::compressFileErrorTest
-    Test::FileSystem::findToRemoveTest
+    Test::FileSystem::removeDirectoryTest "${sTmpFolder}/delete_me"
+    Test::FileSystem::removeDirectoryErrorTest "${sTmpFolder}/doesnotexist"
+    Test::FileSystem::cleanDirectoryTest "${sTmpFolder}"
+    Test::FileSystem::cleanDirectoryErrorTest "${sTmpFolder}/doesnotexist"
+    Test::FileSystem::compressFileTest "${sTmpFolder}"
+    Test::FileSystem::compressFileErrorTest "${sTmpFolder}"
+    Test::FileSystem::findToRemoveTest "${sTmpFolder}"
+    rm -Rf "${sTmpFolder}"
 }
+
+function finish {
+  echo hello finish
+}
+trap finish EXIT

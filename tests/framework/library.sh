@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Test functions
 ##
-## @package ojullien\Shell\tests
+## @package ojullien\Shell\tests\framework
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 

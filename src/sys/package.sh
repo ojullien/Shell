@@ -17,7 +17,7 @@ Package::displayLinuxSelections() {
 
     # Do the job
     String::notice "Linux selections"
-    dpkg --get-selections | grep -Ei "Linux-headers|linux-image"
+    dpkg --get-selections | grep --extended-regexp --ignore-case "Linux-headers|linux-image"
     iReturn=$?
 
     return ${iReturn}
@@ -119,7 +119,7 @@ Package::isInstalled() {
 
     # Do the job
     String::notice -n "Is the package '${sPackage}' installed? "
-    dpkg-query -s "${sPackage}" > /dev/null 2>&1
+    dpkg-query --status "${sPackage}" > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

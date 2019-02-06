@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Test of serviceV functions
 ##
-## @package ojullien\Shell\tests\sys
+## @package ojullien\Shell\tests\sys\system
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 

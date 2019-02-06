@@ -156,7 +156,7 @@ FileSystem::removeDirectory() {
 
     # Do the job
     String::notice -n "Removing '${sPath}':"
-    rm -Rf "${sPath}"
+    rm --recursive --force "${sPath}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -177,7 +177,7 @@ FileSystem::cleanDirectory() {
 
     # Do the job
     String::notice -n "Cleaning '${sPath}':"
-    rm -f "${sPath}//*"
+    rm --force "${sPath}//*"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -198,7 +198,7 @@ FileSystem::createDirectory() {
 
     # Do the job
     String::notice -n "Creating '${sPath}':"
-    mkdir -p "${sPath}"
+    mkdir --parents "${sPath}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -248,7 +248,7 @@ FileSystem::findToRemove() {
 
     # Do the job
     String::notice -n "Remove all '${sName}' in '${sPath}':"
-    find "${sPath}" -type f -iname "${sName}" -exec rm -f '{}' \;
+    find "${sPath}" -type f -iname "${sName}" -exec rm --force '{}' \;
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

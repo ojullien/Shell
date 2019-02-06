@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Managing services with SystemD
 ##
-## @package ojullien\Shell\sys\service
+## @package ojullien\Shell\sys\system
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
@@ -24,8 +24,8 @@ Service::disable() {
 
     # Do the job
     String::notice -n "Disabling '${sService}' service:"
-    if systemctl -q is-enabled "${sService}" > /dev/null 2>&1 ; then
-        systemctl -q disable "${sService}" > /dev/null 2>&1
+    if systemctl --quiet is-enabled "${sService}" > /dev/null 2>&1 ; then
+        systemctl --quiet disable "${sService}" > /dev/null 2>&1
         iReturn=$?
     fi
     String::checkReturnValueForTruthiness ${iReturn}
@@ -38,6 +38,6 @@ Service::disable() {
 ## -----------------------------------------------------------------------------
 
 Service::shutdown() {
-    systemctl -q poweroff
+    systemctl --quiet poweroff
     return 0
 }

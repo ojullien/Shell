@@ -32,7 +32,7 @@ Service::stop() {
 
     # Do the job
     String::notice -n "Stopping '${sService}' service:"
-    if service --status-all | grep -wq "${sService}$"; then
+    if service --status-all | grep --word-regexp --quiet "${sService}$"; then
         service "${sService}" stop > /dev/null 2>&1
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
@@ -111,7 +111,7 @@ Service::start() {
 
     # Do the job
     String::notice -n "starting '${sService}' service:"
-    if service --status-all | grep -wq "${sService}$"; then
+    if service --status-all | grep --word-regexp --quiet "${sService}$"; then
         service "${sService}" start > /dev/null 2>&1
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
@@ -162,7 +162,7 @@ Service::status() {
 
     # Do the job
     String::notice -n "'${sService}' status is:"
-    if service --status-all | grep -wq "${sService}$"; then
+    if service --status-all | grep --word-regexp --quiet "${sService}$"; then
         service "${sService}" status > /dev/null 2>&1
         iReturn=$?
         case ${iReturn} in

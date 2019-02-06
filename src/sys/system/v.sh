@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Managing services with SystemV
 ##
-## @package ojullien\Shell\sys\service
+## @package ojullien\Shell\sys\system
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
@@ -40,6 +40,6 @@ Service::disable() {
 ## -----------------------------------------------------------------------------
 
 Service::shutdown() {
-    shutdown -h now
+    shutdown --poweroff now
     return 0
 }

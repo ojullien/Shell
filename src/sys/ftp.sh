@@ -1,12 +1,10 @@
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## FTP functions
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\sys
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
 # Copies files over using FTP.
 # @param    $1 = FTP Host
@@ -30,7 +28,7 @@ FTP::put() {
     # Do the job
     if ((m_OPTION_LOG)); then
 
-        ftp -pin "${sHost}" <<END_SCRIPT >> "${m_LOGFILE}" 2> ftp.err.$$
+        ftp -pin "${sHost}" <<'END_SCRIPT' >> "${m_LOGFILE}" 2> ftp.err.$$
 quote USER ${sUser}
 quote PASS ${sPass}
 binary
@@ -42,7 +40,7 @@ quit
 END_SCRIPT
 
     else
-        ftp -pin "${sHost}" <<END_SCRIPT 2> ftp.err.$$
+        ftp -pin "${sHost}" <<'END_SCRIPT' 2> ftp.err.$$
 quote USER ${sUser}
 quote PASS ${sPass}
 binary
@@ -56,14 +54,14 @@ END_SCRIPT
     fi
 
     # Check error
-    iWordCount=$(wc -c < ftp.err.$$)
+    iWordCount=$(wc --bytes < ftp.err.$$)
     if ((iWordCount)); then
         iReturn=1
     else
         iReturn=0
     fi
 
-    [[ -f ftp.err.$$ ]] && rm ftp.err.$$ 2>/dev/null;
+    [[ -f ftp.err.$$ ]] && rm --force ftp.err.$$ 2>/dev/null;
 
     return ${iReturn}
 }
