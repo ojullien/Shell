@@ -18,7 +18,7 @@ FTP::put() {
     # Parameters
     if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]]; then
         String::error "Usage: FTP::put <FTP Host> <FTP User> <FTP User password> <Source file name> <destination directory> <local directory>"
-        exit 1
+        return 1
     fi
 
     # Init

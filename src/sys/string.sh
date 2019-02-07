@@ -12,7 +12,12 @@
 
 Log::writeToLog() {
     if [[ -n "$1" ]] && ((m_OPTION_LOG)); then
-        echo -e "$@" >> "${m_LOGFILE}"
+        if [[ "$1" == "-n" ]]; then
+            shift
+            printf "%b" "${*}" >> "${m_LOGFILE}"
+        else
+            printf "%b\\n" "${*}" >> "${m_LOGFILE}"
+        fi
     fi
     return 0
 }
@@ -25,9 +30,9 @@ Console::displayError() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
         if [[ "$1" == "-n" ]]; then
             shift
-            echo -e -n "${COLORRED}$*${COLORRESET}" >&2
+            printf "${COLORRED}%b${COLORRESET}" "${*}" >&2
         else
-            echo -e "${COLORRED}$*${COLORRESET}" >&2
+            printf "${COLORRED}%b${COLORRESET}\\n" "${*}" >&2
         fi
     fi
     return 0
@@ -37,9 +42,9 @@ Console::displaySuccess() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
         if [[ "$1" == "-n" ]]; then
             shift
-            echo -e -n "${COLORGREEN}$*${COLORRESET}"
+            printf "${COLORGREEN}%b${COLORRESET}" "${*}"
         else
-            echo -e "${COLORGREEN}$*${COLORRESET}"
+            printf "${COLORGREEN}%b${COLORRESET}\\n" "${*}"
         fi
     fi
     return 0
@@ -47,7 +52,12 @@ Console::displaySuccess() {
 
 Console::display() {
     if [[ -n "$1" ]] && ((m_OPTION_DISPLAY)); then
-        echo -e "$@"
+        if [[ "$1" == "-n" ]]; then
+            shift
+            printf "%b" "${*}"
+        else
+            printf "%b\\n" "${*}"
+        fi
     fi
     return 0
 }

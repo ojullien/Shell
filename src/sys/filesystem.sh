@@ -177,7 +177,7 @@ FileSystem::cleanDirectory() {
 
     # Do the job
     String::notice -n "Cleaning '${sPath}':"
-    rm --force "${sPath}//*"
+    find "${sPath}" -mindepth 1 -delete > /dev/null 2>&1
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

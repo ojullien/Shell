@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Run tests
@@ -7,6 +6,9 @@
 ## @package ojullien\Shell\tests
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
     echo "At least Bash version 4 is needed!" >&2
@@ -35,10 +37,6 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_REALPATH}/framework/library.sh"
-# shellcheck source=/dev/null
-. "${m_DIR_SYS}/package.sh"
-# shellcheck source=/dev/null
-. "${m_DIR_SYS}/service.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -49,7 +47,8 @@ Test::Constant::trace
 ## Start
 ## -----------------------------------------------------------------------------
 
-declare aPackages=("filesystem" "package" "string" "service")
+declare aPackages=("filesystem" "string" "package" "service" "mysql" "mariadb")
+declare aFiles=("filesystem" "string" "package" "service" "db/mysql" "db/mariadb")
 declare -i iChoice=-1
 
 while ((iChoice>=${#aPackages[*]})) || ((iChoice<0)); do
@@ -75,7 +74,7 @@ String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
 # shellcheck source=/dev/null
-. "${m_TEST_DIR_SYS}/${aPackages[$iChoice]}_test.sh"
+. "${m_TEST_DIR_SYS}/${aFiles[$iChoice]}_test.sh"
 Test::"${aPackages[$iChoice]}"::main
 Console::waitUser
 

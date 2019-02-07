@@ -1,5 +1,4 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Run sys\serviceD tests
@@ -7,6 +6,10 @@
 ## @package ojullien\Shell\tests
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
     echo "At least Bash version 4 is needed!" >&2

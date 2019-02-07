@@ -125,6 +125,9 @@ Test::Package::uninstallTest() {
 ## Clears out the local repository of retrieved package files.
 ## -----------------------------------------------------------------------------
 
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/package.sh"
+
 Test::Package::clean() {
     Package::clean
     Test::assertTrue "${FUNCNAME[0]}" "$?"

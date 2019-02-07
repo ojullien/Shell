@@ -1,21 +1,19 @@
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Mysql database functions
 ##
 ## Requires MySQL 5.5 at least
 ##
-## @category Linux Scripts
-## @package Includes
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\sys\db
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
 Mysql::flush() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: Mysql::flush <user> <password>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -37,17 +35,17 @@ Mysql::check() {
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: Mysql::check <user> <password> [database]"
-        exit 1
+        return 1
     fi
 
     # Init
     local sUser="$1" sPwd="$2" sDatabase=""
     local -i iReturn=1
 
-    if [[ -z "$3" ]]; then
-        sDatabase="--all-databases"
-    else
+    if (($# == 3)) && [[ -n "$3" ]]; then
         sDatabase="$3"
+    else
+        sDatabase="--all-databases"
     fi
 
     # Do the job
@@ -65,17 +63,17 @@ Mysql::analyse() {
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: Mysql::analyse <user> <password> [database]"
-        exit 1
+        return 1
     fi
 
     # Init
     local sUser="$1" sPwd="$2" sDatabase=""
     local -i iReturn=1
 
-    if [[ -z "$3" ]]; then
-        sDatabase="--all-databases"
-    else
+    if (($# == 3)) && [[ -n "$3" ]]; then
         sDatabase="$3"
+    else
+        sDatabase="--all-databases"
     fi
 
     # Do the job
@@ -93,17 +91,17 @@ Mysql::optimize() {
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
         String::error "Usage: Mysql::optimize <user> <password> [database]"
-        exit 1
+        return 1
     fi
 
     # Init
     local sUser="$1" sPwd="$2" sDatabase=""
     local -i iReturn=1
 
-    if [[ -z "$3" ]]; then
-        sDatabase="--all-databases"
-    else
+    if (($# == 3)) && [[ -n "$3" ]]; then
         sDatabase="$3"
+    else
+        sDatabase="--all-databases"
     fi
 
     # Do the job
@@ -121,7 +119,7 @@ Mysql::repair() {
     # Parameters
     if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
         String::error "Usage: Mysql::repair <user> <password> <database>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -143,7 +141,7 @@ Mysql::dump() {
     # Parameters
     if (($# != 5)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
         String::error "Usage: Mysql::dump <user> <password> <database> <error log file> <result file>"
-        exit 1
+        return 1
     fi
 
     # Init"$4"
