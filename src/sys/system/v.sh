@@ -24,7 +24,7 @@ Service::disable() {
 
     # Do the job
     String::notice -n "Disabling '${sService}' service:"
-    if [[ -x "${SERVICEDIR}/${SERVICE}" ]]; then
+    if [[ -x "/etc/init.d/${sService}" ]]; then
         update-rc.d -f "${sService}" remove > /dev/null 2>&1
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}

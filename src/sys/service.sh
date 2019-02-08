@@ -32,12 +32,15 @@ Service::stop() {
 
     # Do the job
     String::notice -n "Stopping '${sService}' service:"
-    if service --status-all | grep --word-regexp --quiet "${sService}$"; then
+    (service --status-all | grep --word-regexp "${sService}$") > /dev/null 2>&1
+    iReturn=$?
+    if ((iReturn == 0)); then
         service "${sService}" stop > /dev/null 2>&1
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
         String::notice "not loaded"
+        iReturn=0
     fi
 
     return ${iReturn}
@@ -110,8 +113,10 @@ Service::start() {
     local sService="$1"
 
     # Do the job
-    String::notice -n "starting '${sService}' service:"
-    if service --status-all | grep --word-regexp --quiet "${sService}$"; then
+    String::notice -n "Starting '${sService}' service:"
+    (service --status-all | grep --word-regexp "${sService}$") > /dev/null 2>&1
+    iReturn=$?
+    if ((iReturn == 0)); then
         service "${sService}" start > /dev/null 2>&1
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
