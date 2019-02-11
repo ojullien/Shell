@@ -1,36 +1,51 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Clean logs.
 ##
-## @category Linux Scripts
-## @package clean
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/src/bin
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/clean/inc/clean.inc.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/service.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/clean/app.sh"
+Config::load "manageservices"
+Config::load "clean"
 
 ## -----------------------------------------------------------------------------
-## Load common configuration
+## Trace
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
-. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
+Constant::trace
+Clean::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
