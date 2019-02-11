@@ -210,6 +210,6 @@ Test::filesystem::main() {
 ## End
 ## -----------------------------------------------------------------------------
 Test::FileSystem::finish() {
-  rm -Rf "${m_TEST_DIR_TEMP}"
+    rm -Rf "${m_TEST_DIR_TEMP:?}"
 }
 trap Test::FileSystem::finish EXIT SIGQUIT ERR

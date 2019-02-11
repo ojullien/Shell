@@ -156,7 +156,7 @@ FileSystem::removeDirectory() {
 
     # Do the job
     String::notice -n "Removing '${sPath}':"
-    rm --recursive --force "${sPath}"
+    rm --recursive --force "${sPath:?}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 

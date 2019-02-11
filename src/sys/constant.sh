@@ -15,17 +15,21 @@ readonly m_DATE="$(date +"%Y%m%d")_$(date +"%H%M")"
 ## Defines main directories
 ## -----------------------------------------------------------------------------
 
-# Shell scripts directory, eg: /root/work/Shell
-readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 # Directory holds system files
-readonly m_DIR_SYS="${m_DIR_REALPATH}/sys/inc"
+readonly m_DIR_SYS="$(realpath "${m_DIR_REALPATH}/../sys")"
 # Directory holds apps
-readonly m_DIR_APP="${m_DIR_REALPATH}/app"
+readonly m_DIR_APP="$(realpath "${m_DIR_REALPATH}/../app")"
 
 ## -----------------------------------------------------------------------------
 ## Defines main files
 ## -----------------------------------------------------------------------------
-readonly m_LOGFILE="/var/log/${m_DATE}_$(basename "$0").log"
+if [[ ! -d "/var/log" ]]; then
+    readonly m_LOGDIR="/tmp"
+    readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
+else
+    readonly m_LOGDIR="/var/log"
+    readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
+fi
 
 ## -----------------------------------------------------------------------------
 ## Defines colors
