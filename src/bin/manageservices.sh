@@ -25,7 +25,7 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Includes sources & configuration
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
-#. "${m_DIR_SYS}/runasroot.sh"
+. "${m_DIR_SYS}/runasroot.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/string.sh"
 # shellcheck source=/dev/null
@@ -57,36 +57,34 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Parse the app options and arguments
 ## -----------------------------------------------------------------------------
-declare -i iReturn
+declare -i iReturn=1
 
-while (( "$#" )); do
+if (( "$#" )); then
     case "$1" in
     stop)
         String::separateLine
-        Service::stopServices "${m_SERVICES_STOP}"
+        Service::stopServices ${m_SERVICES_STOP}
         iReturn=$?
-        shift
         ;;
     start)
         String::separateLine
-        Service::startServices "${m_SERVICES_START}"
+        Service::startServices ${m_SERVICES_START}
         iReturn=$?
-        shift
         ;;
     disable)
         String::separateLine
-        Service::disableServices "${m_SERVICES_DISABLE}"
+        Service::disableServices ${m_SERVICES_DISABLE}
         iReturn=$?
-        shift
         ;;
     *) # unknown option
-        shift
         String::separateLine
         ManageServices::help
-        exit 1
         ;;
     esac
-done
+else
+        String::separateLine
+        ManageServices::help
+fi
 
 ## -----------------------------------------------------------------------------
 ## END
