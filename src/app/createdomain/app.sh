@@ -1,26 +1,24 @@
-## -----------------------------------------------------
-## Creates an apache user/group and a home directory in /var/www.
-## App functions
+## -----------------------------------------------------------------------------
+## Linux Scripts.
+## CreateDomain app functions
 ##
-## @category Linux Scripts
-## @package createDomain
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\app\createdomain
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
-Domain::showHelp() {
-    String::notice "Usage: $(basename $0) [options] <domain 1> [domain 2 ...]"
+CreateDomain::showHelp() {
+    String::notice "Usage: $(basename "$0") [options] <domain 1> [domain 2 ...]"
     String::notice "\tCreates an apache user/group and a home directory in /var/www"
     Option::showHelp
     String::notice "\t<domain 1>\tDomain name to create."
 }
 
-Domain::createGroup() {
+CreateDomain::createGroup() {
 
     # Parameters
     if (($# != 1)) || [ -z "$1" ]; then
-       String::error "Usage: Domain::createGroup <domain name>"
-        exit 1
+       String::error "Usage: CreateDomain::createGroup <domain name>"
+        return 1
     fi
 
     # Init
@@ -37,12 +35,12 @@ Domain::createGroup() {
     return ${iReturn}
 }
 
-Domain::createUser() {
+CreateDomain::createUser() {
 
     # Parameters
     if (($# != 1)) || [ -z "$1" ]; then
-       String::error "Usage: Domain::createUser <domain name>"
-        exit 1
+        String::error "Usage: CreateDomain::createUser <domain name>"
+        return 1
     fi
 
     # Init
@@ -51,7 +49,7 @@ Domain::createUser() {
 
     # Do the job
     String::notice "Creating '${sDomain}' user ..."
-    adduser --quiet --no-create-home --disabled-password --disabled-login --force-badname --home "/var/www/${sDomain}" --shell /bin/false --ingroup="${sDomain}" "${sDomain}"
+    adduser --quiet --no-create-home --disabled-password --disabled-login --force-badname --home "${m_APACHE2_DOCUMENTROOT:?}/${sDomain}" --shell /bin/false --ingroup="${sDomain}" "${sDomain}"
     iReturn=$?
     String::notice -n "Create '${sDomain}' user:"
     String::checkReturnValueForTruthiness ${iReturn}
@@ -59,12 +57,12 @@ Domain::createUser() {
     return ${iReturn}
 }
 
-Domain::createDirectories() {
+CreateDomain::createDirectories() {
 
     # Parameters
     if (($# != 1)) || [ -z "$1" ]; then
-       String::error "Usage: Domain::createDirectories <domain name>"
-        exit 1
+        String::error "Usage: CreateDomain::createDirectories <domain name>"
+        return 1
     fi
 
     # Init
@@ -74,22 +72,22 @@ Domain::createDirectories() {
 
     # Do the job
     for sDirectory in "${aDirectories[@]}"; do
-        FileSystem::createDirectory "/var/www/${sDomain}/${sDirectory}"
+        FileSystem::createDirectory "${m_APACHE2_DOCUMENTROOT:?}/${sDomain}/${sDirectory}"
         iReturn=$?
         ((0!=iReturn)) && return ${iReturn}
     done
-    FileSystem::createDirectory "/var/log/apache2/${sDomain}"
+    FileSystem::createDirectory "${m_APACHE2_LOGDIR:?}/${sDomain}"
     iReturn=$?
 
     return ${iReturn}
 }
 
-Domain::changeOwner() {
+CreateDomain::changeOwner() {
 
     # Parameters
     if (($# != 1)) || [ -z "$1" ]; then
-        String::error "Usage: Domain::changeOwner <domain name>"
-        exit 1
+        String::error "Usage: CreateDomain::changeOwner <domain name>"
+        return 1
     fi
 
     # Init
@@ -99,31 +97,31 @@ Domain::changeOwner() {
     # Change owner/group and access right
 
     String::notice -n "Change '${sDomain}' file access right:"
-    find "/var/www/${sDomain}/" -type f -exec chmod u=rw,g=r,o= {} \;
+    find "${m_APACHE2_DOCUMENTROOT:?}/${sDomain}/" -type f -exec chmod u=rw,g=r,o= {} \;
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
     ((0!=iReturn)) && return ${iReturn}
 
     String::notice -n "Change '${sDomain}' folder access right:"
-    find /var/www/${sDomain}/ -type d -exec chmod u=rwx,g=rx,o= {} \;
+    find "${m_APACHE2_DOCUMENTROOT}/${sDomain}/" -type d -exec chmod u=rwx,g=rx,o= {} \;
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
     ((0!=iReturn)) && return ${iReturn}
 
     String::notice -n "Change '${sDomain}' owner:"
-    chown -R $1:www-data /var/www/${sDomain}/
+    chown -R "${sDomain}":"${m_APACHE2_GROUP:?}" "${m_APACHE2_DOCUMENTROOT}/${sDomain}/"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}
 }
 
-Domain::create() {
+CreateDomain::create() {
 
     # Parameters
     if (($# != 1)) || [ -z "$1" ]; then
-       String::error "Usage: Domain::create <domain name>"
-        exit 1
+       String::error "Usage: CreateDomain::create <domain name>"
+        return 1
     fi
 
     # Init
@@ -131,19 +129,19 @@ Domain::create() {
     local -i iReturn=1
 
     # Do the job
-    Domain::createDirectories "${sDomain}"
+    CreateDomain::createDirectories "${sDomain}"
     iReturn=$?
     ((0!=iReturn)) && return ${iReturn}
 
-    Domain::createGroup "${sDomain}"
+    CreateDomain::createGroup "${sDomain}"
     iReturn=$?
     ((0!=iReturn)) && return ${iReturn}
 
-    Domain::createUser "${sDomain}"
+    CreateDomain::createUser "${sDomain}"
     iReturn=$?
     ((0!=iReturn)) && return ${iReturn}
 
-    Domain::changeOwner "${sDomain}"
+    CreateDomain::changeOwner "${sDomain}"
     iReturn=$?
 
     return ${iReturn}
