@@ -40,7 +40,7 @@ FillWithZeros::finish() {
 
     # Do the job
     for sMount in "${m_MOUNTPOINTS[@]}"; do
-        [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sDir}/${m_ZEROFILE:?}"
+        [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sMount}/${m_ZEROFILE:?}"
     done
 }
 trap FillWithZeros::finish EXIT SIGQUIT ERR
