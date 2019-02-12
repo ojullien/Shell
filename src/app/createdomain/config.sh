@@ -18,6 +18,6 @@ CreateDomain::trace() {
         String::notice "App configuration: createDomain"
         String::notice "\tApache2 document root:\t${m_APACHE2_DOCUMENTROOT}"
         String::notice "\tApache2 log dir:\t${m_APACHE2_LOGDIR}"
-        String::notice "\tApache2 group:\t${m_APACHE2_GROUP}"
+        String::notice "\tApache2 group:\t\t${m_APACHE2_GROUP}"
     return 0
 }
