@@ -3,7 +3,7 @@
 ## Linux Scripts.
 ## Fills disks with zero for compression.
 ##
-## @package ojullien\Shell\app\fillwithzeros
+## @package ojullien\Shell\bin
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 #set -o errexit
@@ -19,38 +19,38 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Load constants
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
-. "${m_DIR_REALPATH}/../app/fillwithzeros/app.sh"
-exit 0
-
-
-
-
-
-
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Load constants
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/service.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/clean/app.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/fillwithzeros/app.sh"
+Config::load "manageservices"
+Config::load "clean"
+Config::load "fillwithzeros"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Trace
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/clean/inc/clean.inc.sh"
-. "${m_DIR_APP}/fillwithzeros/inc/fillwithzeros.inc.sh"
-
-## -----------------------------------------------------------------------------
-## Load common configuration
-## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
-. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
-. "${m_DIR_APP}/fillwithzeros/inc/fillwithzeros.inc.sh"
+Constant::trace
+ManageServices::trace
+Clean::trace
+FillWithZeros::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -81,12 +81,8 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 
 declare sDisk="" sMount=""
-declare -a aDisks
 
-mapfile -t aDisks < <(lsblk --noheadings --nodeps --list --output NAME)
-
-for sDisk in "${aDisks[@]}"; do
-    if [[ ${sDisk} =~ ^sd(.*) ]]; then
+for sDisk in "${m_HARDDISKS[@]}"; do
         sMount=$(findmnt --noheadings --output TARGET "/dev/${sDisk}1")
         [[ -n ${sMount} ]] && FillWithZeros::fill "${sMount}"
     fi
@@ -98,5 +94,4 @@ done
 String::notice "Now is: $(date -R)"
 String::notice "Ready to shutdown!"
 Console::waitUser
-
 Service::shutdownSystem

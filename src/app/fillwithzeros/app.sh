@@ -1,0 +1,47 @@
+## -----------------------------------------------------------------------------
+## Linux Scripts.
+## fillWithZeros app functions
+##
+## @package ojullien\Shell\app\fillwithzeros
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
+
+FillWithZeros::fill() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: FillWithZeros::fill <mount point as string>"
+        return 1
+    fi
+
+    # Init
+    local sDir="$1"
+    local -i iReturn=1
+
+    # Do the job
+    String::notice "Filling '${sDir}' with zeros ..."
+    cat /dev/zero > "${sDir}/${m_ZEROFILE:?}"
+    sync
+    rm -f "${sDir}/${m_ZEROFILE:?}"
+    iReturn=$?
+    String::notice -n "Fill '${sDir}' with zeros:"
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## End
+## -----------------------------------------------------------------------------
+FillWithZeros::finish() {
+
+    # Init
+    declare sDisk="" sMount=""
+
+    # Do the job
+    for sDisk in "${m_HARDDISKS[@]}"; do
+        sMount=$(findmnt --noheadings --output TARGET "/dev/${sDisk}1")
+        [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sDir}/${m_ZEROFILE:?}"
+    done
+}
+trap FillWithZeros::finish EXIT SIGQUIT ERR
