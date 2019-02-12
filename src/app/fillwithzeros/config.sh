@@ -26,8 +26,8 @@ FillWithZeros::trace() {
     String::separateLine
     String::notice "App configuration: FillWithZeros"
     String::notice "\tHard disks:"
-    String::notice "\t\t${m_HARDDISKS[@]}"
+    String::notice "\t\t${m_HARDDISKS[*]}"
     String::notice "\tMount points:"
-    String::notice "\t\t${m_MOUNTPOINTS[@]}"
+    String::notice "\t\t${m_MOUNTPOINTS[*]}"
     return 0
 }
