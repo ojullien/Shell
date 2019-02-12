@@ -36,11 +36,10 @@ FillWithZeros::fill() {
 FillWithZeros::finish() {
 
     # Init
-    declare sDisk="" sMount=""
+    declare sMount=""
 
     # Do the job
-    for sDisk in "${m_HARDDISKS[@]}"; do
-        sMount=$(findmnt --noheadings --output TARGET "/dev/${sDisk}1")
+    for sMount in "${m_MOUNTPOINTS[@]}"; do
         [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sDir}/${m_ZEROFILE:?}"
     done
 }

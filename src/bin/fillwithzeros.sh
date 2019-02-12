@@ -80,12 +80,10 @@ Console::waitUser
 ## Fill
 ## -----------------------------------------------------------------------------
 
-declare sDisk="" sMount=""
+declare sMount=""
 
-for sDisk in "${m_HARDDISKS[@]}"; do
-        sMount=$(findmnt --noheadings --output TARGET "/dev/${sDisk}1")
-        [[ -n ${sMount} ]] && FillWithZeros::fill "${sMount}"
-    fi
+for sMount in "${m_MOUNTPOINTS[@]}"; do
+    [[ -n ${sMount} ]] && FillWithZeros::fill "${sMount}"
 done
 
 ## -----------------------------------------------------------------------------
