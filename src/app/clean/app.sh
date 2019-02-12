@@ -89,25 +89,3 @@ Clean::main() {
 
     return 0
 }
-
-## -----------------------------------------------------------------------------
-## Trace
-## -----------------------------------------------------------------------------
-Clean::trace() {
-
-    # Init
-    declare -i iIndex=0
-
-    # Do the job
-    String::separateLine
-    String::notice "App configuration: Clean"
-    String::notice "\tFiles to delete in /var/log:"
-    String::notice "\t\t${m_CLEAN_FILES}"
-    String::notice "\tDirectories to clean in /var/log:"
-    for iIndex in ${!m_CLEAN_SPEC_DIR[*]}
-    do
-        String::notice "\t\t${m_CLEAN_SPEC_DIR[$iIndex]}/${m_CLEAN_SPEC_FILES[$iIndex]}"
-    done
-
-    return 0
-}
