@@ -9,5 +9,5 @@
 ManageServices::help() {
     String::notice "Usage: $(basename "$0") <disable | start | stop>"
     String::notice "\tDisable, start or stop a list of services defined in the config.sh file"
+    Option::showHelp
 }
-
