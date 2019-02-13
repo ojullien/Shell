@@ -7,7 +7,7 @@
 ## -----------------------------------------------------------------------------
 
 # Remove these 3 lines once you have configured this file
-echo "The 'app/savesite/cfg/savesite.cfg.sh' file is not configured !!!"
+echo "The 'app/savesite/config.sh' file is not configured !!!"
 String::error "The 'app/savesite/config.sh' file is not configured !!!"
 exit 3
 
