@@ -34,7 +34,7 @@ Package::upgrade() {
     local sOption=""
 
     # Parameters
-    if (($# == 1)) || [[ -n "$1" ]] || [[ "--simulate" == "$1" ]]; then
+    if (($# == 1)) && [[ "--simulate" == "$1" ]]; then
         sOption="--simulate"
     fi
 
