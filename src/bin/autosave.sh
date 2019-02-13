@@ -1,43 +1,56 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## AutoSave.
+## Auto save.
 ##
-## @category Linux Scripts
-## @package AutoSave
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/src/bin
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/ftp.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/clean/inc/clean.inc.sh"
-. "${m_DIR_APP}/autosave/inc/autosave.inc.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/ftp.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/service.sh"
+Config::load "manageservices"
+Config::load "clean"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/clean/app.sh"
+Config::load "autosave"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/autosave/app.sh"
 
 ## -----------------------------------------------------------------------------
-## Load common configuration
+## Trace
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
-. "${m_DIR_APP}/clean/cfg/clean.cfg.sh"
-if [[ -f "${m_DIR_APP}/autosave/cfg/priv-autosave.cfg.sh" ]]; then
-    . "${m_DIR_APP}/autosave/cfg/priv-autosave.cfg.sh"
-else
-    . "${m_DIR_APP}/autosave/cfg/autosave.cfg.sh"
-fi
+Constant::trace
+ManageServices::trace
+Clean::trace
+AutoSave::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -51,9 +64,9 @@ Console::waitUser
 ## Creates directories
 ## -----------------------------------------------------------------------------
 String::separateLine
-FileSystem::removeDirectory "${m_APP_AUTOSAVE_DIR_CACHE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+FileSystem::removeDirectory "${m_AUTOSAVE_DIR_CACHE}"
+FileSystem::createDirectory "${m_AUTOSAVE_DIR_CACHE}/${m_DATE}"
+FileSystem::createDirectory "${m_AUTOSAVE_DIR_UPLOAD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -77,7 +90,7 @@ Console::waitUser
 ## System: save
 ## -----------------------------------------------------------------------------
 String::separateLine
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}/log-${m_DATE}" "/var/log"
+FileSystem::compressFile "${m_AUTOSAVE_DIR_CACHE}/${m_DATE}/log-${m_DATE}" "/var/log"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -99,21 +112,24 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 String::separateLine
 FileSystem::syncFile
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_CACHE}/${m_DATE}/$(uname -n)-start" "/var/log"
+FileSystem::compressFile "${m_AUTOSAVE_DIR_CACHE}/${m_DATE}/$(uname -n)-start" "/var/log"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Prepare to upload and ftp
 ## -----------------------------------------------------------------------------
 String::separateLine
-declare -i iReturn
-String::notice "Prepare to upload and upload"
-cd "${m_APP_AUTOSAVE_DIR_CACHE}" || exit 18
-FileSystem::compressFile "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}" "${m_DATE}"
-cd "${m_DIR_SCRIPT}" || exit 18
+declare -i iReturn=1
+declare sPWD
+sPWD=$(pwd)
 
-if [[ -f "${m_APP_AUTOSAVE_DIR_UPLOAD}/${m_DATE}.tar.bz2" ]]; then
-    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}.tar.bz2" "." "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+String::notice "Prepare to upload and upload"
+cd "${m_AUTOSAVE_DIR_CACHE}" || exit 18
+FileSystem::compressFile "${m_AUTOSAVE_DIR_UPLOAD}/${m_DATE}" "${m_DATE}"
+cd "${sPWD}" || exit 18
+
+if [[ -f "${m_AUTOSAVE_DIR_UPLOAD}/${m_DATE}.tar.bz2" ]]; then
+    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}.tar.bz2" "." "${m_AUTOSAVE_DIR_UPLOAD}"
     iReturn=$?
     String::notice -n "FTP ${m_DATE}.tar.bz2:"
     String::checkReturnValueForTruthiness ${iReturn}
@@ -128,14 +144,14 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 m_OPTION_LOG=0
 if [[ -f ${m_LOGWATCH_FILE} ]]; then
-    FileSystem::copyFile "${m_LOGWATCH_FILE}" "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+    FileSystem::copyFile "${m_LOGWATCH_FILE}" "${m_AUTOSAVE_DIR_UPLOAD}"
 fi
 if [[ -f ${m_LOGFILE} ]]; then
-    $(mv "${m_LOGFILE}" "${m_APP_AUTOSAVE_DIR_UPLOAD}")
+    mv "${m_LOGFILE:?}" "${m_AUTOSAVE_DIR_UPLOAD:?}"
 fi
 
 String::notice -n "Changing upload directory owner:"
-chown -R "${UPLOAD_DIRECTORY_OWNER}":"${UPLOAD_DIRECTORY_OWNER}" "${m_APP_AUTOSAVE_DIR_UPLOAD}"
+chown -R "${m_AUTOSAVE_UPLOAD_DIRECTORY_OWNER}":"${m_AUTOSAVE_UPLOAD_DIRECTORY_OWNER}" "${m_AUTOSAVE_DIR_UPLOAD}"
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 

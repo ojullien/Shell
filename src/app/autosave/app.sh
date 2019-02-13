@@ -1,19 +1,18 @@
-## -----------------------------------------------------
-## Autosave
-## App functions
+## -----------------------------------------------------------------------------
+## Linux Scripts.
+## AutoSave app functions
 ##
-## @category Linux Scripts
-## @package Autosave
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\app\autosave
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
+
 
 AutoSave::watchLog() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
         String::error "Usage: AutoSave::watchLog <logwatch file>"
-        exit 1
+        return 1
     fi
 
     # Init

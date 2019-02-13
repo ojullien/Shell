@@ -7,8 +7,8 @@
 ## -----------------------------------------------------------------------------
 
 # Remove these 3 lines once you have configured this file
-echo "The 'app/savesystemconf/config.sh' file is not configured !!!"
-String::error "The 'app/savesystemconf/config.sh' file is not configured !!!"
+echo "The 'app/savedb/config.sh' file is not configured !!!"
+String::error "The 'app/savedb/config.sh' file is not configured !!!"
 exit 3
 
 ## -----------------------------------------------------------------------------
