@@ -32,9 +32,9 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/config.sh"
+Config::load "savesystemconf"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/savesystemconf/app.sh"
-Config::load "savesystemconf"
 
 ## -----------------------------------------------------------------------------
 ## Trace
