@@ -147,7 +147,7 @@ if [[ -f ${m_LOGWATCH_FILE} ]]; then
     FileSystem::copyFile "${m_LOGWATCH_FILE}" "${m_AUTOSAVE_DIR_UPLOAD}"
 fi
 if [[ -f ${m_LOGFILE} ]]; then
-    mv "${m_LOGFILE:?}" "${m_AUTOSAVE_DIR_UPLOAD:?}"
+    mv "${m_LOGFILE}" "${m_AUTOSAVE_DIR_UPLOAD}"
 fi
 
 String::notice -n "Changing upload directory owner:"
