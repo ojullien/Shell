@@ -59,7 +59,7 @@ declare -i iReturn=1
 declare sPWD sDestination="${m_SAVESITE_DESTINATION_DEFAULT}"
 sPWD=$(pwd)
 
-(( 0==$# )) && SaveSite::showHelp && exit 0
+(( 0==$# )) && SaveSite::showHelp && exit 1
 
 while (( "$#" )); do
     case "$1" in
