@@ -34,9 +34,9 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/config.sh"
+Config::load "savesite"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/savesite/app.sh"
-Config::load "savesite"
 
 ## -----------------------------------------------------------------------------
 ## Trace
