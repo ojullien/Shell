@@ -121,7 +121,7 @@ UpdateSystem::finish() {
     Service::startServices ${m_SERVICES_START}
     String::notice "Now is: $(date -R)"
 }
-trap UpdateSystem::finish EXIT SIGQUIT ERR
+trap UpdateSystem::finish EXIT SIGQUIT SIGTERM SIGINT ERR
 
 ## -----------------------------------------------------------------------------
 ## END

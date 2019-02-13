@@ -76,4 +76,4 @@ Test::Config::finish() {
     rm -Rf "${m_DIR_APP:?}/${m_TEST_DIR_TEMP_02:?}"
     rm -Rf "${m_DIR_APP:?}/${m_TEST_DIR_TEMP_03:?}"
 }
-trap Test::Config::finish EXIT SIGQUIT ERR
+trap Test::Config::finish EXIT SIGQUIT SIGTERM SIGINT ERR

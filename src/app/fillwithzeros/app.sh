@@ -43,4 +43,4 @@ FillWithZeros::finish() {
         [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sMount}/${m_ZEROFILE:?}"
     done
 }
-trap FillWithZeros::finish EXIT SIGQUIT ERR
+trap FillWithZeros::finish EXIT SIGQUIT SIGTERM SIGINT ERR

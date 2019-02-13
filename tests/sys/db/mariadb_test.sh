@@ -180,4 +180,4 @@ Test::mariadb::main() {
 Test::DB::finish() {
   rm -Rf "${m_TEST_DIR_TEMP}"
 }
-trap Test::DB::finish EXIT SIGQUIT ERR
+trap Test::DB::finish EXIT SIGQUIT SIGTERM SIGINT ERR

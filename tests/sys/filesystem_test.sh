@@ -212,4 +212,4 @@ Test::filesystem::main() {
 Test::FileSystem::finish() {
     rm -Rf "${m_TEST_DIR_TEMP:?}"
 }
-trap Test::FileSystem::finish EXIT SIGQUIT ERR
+trap Test::FileSystem::finish EXIT SIGQUIT SIGTERM SIGINT ERR
