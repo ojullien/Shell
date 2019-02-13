@@ -38,9 +38,9 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/service.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/clean/app.sh"
+Config::load "createdomain"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/createdomain/app.sh"
-Config::load "createdomain"
 
 ## -----------------------------------------------------------------------------
 ## Trace
