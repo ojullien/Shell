@@ -22,6 +22,7 @@ readonly m_DIR_APP="$(realpath "${m_DIR_REALPATH}/../app")"
 
 ## -----------------------------------------------------------------------------
 ## Defines main files
+## Log file cannot be in /var/log 'cause few apps clean this directory
 ## -----------------------------------------------------------------------------
 readonly m_LOGDIR="$(realpath "${m_DIR_REALPATH}/../log")"
 readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
