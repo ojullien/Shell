@@ -8,11 +8,11 @@
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
-Mysql::flush() {
+DB::flush() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: Mysql::flush <user> <password>"
+        String::error "Usage: DB::flush <user> <password>"
         return 1
     fi
 
@@ -30,11 +30,11 @@ Mysql::flush() {
     return ${iReturn}
 }
 
-Mysql::check() {
+DB::check() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: Mysql::check <user> <password> [database]"
+        String::error "Usage: DB::check <user> <password> [database]"
         return 1
     fi
 
@@ -58,11 +58,11 @@ Mysql::check() {
     return ${iReturn}
 }
 
-Mysql::analyse() {
+DB::analyse() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: Mysql::analyse <user> <password> [database]"
+        String::error "Usage: DB::analyse <user> <password> [database]"
         return 1
     fi
 
@@ -86,11 +86,11 @@ Mysql::analyse() {
     return ${iReturn}
 }
 
-Mysql::optimize() {
+DB::optimize() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: Mysql::optimize <user> <password> [database]"
+        String::error "Usage: DB::optimize <user> <password> [database]"
         return 1
     fi
 
@@ -114,11 +114,11 @@ Mysql::optimize() {
     return ${iReturn}
 }
 
-Mysql::repair() {
+DB::repair() {
 
     # Parameters
     if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: Mysql::repair <user> <password> <database>"
+        String::error "Usage: DB::repair <user> <password> <database>"
         return 1
     fi
 
@@ -136,11 +136,11 @@ Mysql::repair() {
     return ${iReturn}
 }
 
-Mysql::dump() {
+DB::dump() {
 
     # Parameters
     if (($# != 5)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
-        String::error "Usage: Mysql::dump <user> <password> <database> <error log file> <result file>"
+        String::error "Usage: DB::dump <user> <password> <database> <error log file> <result file>"
         return 1
     fi
 

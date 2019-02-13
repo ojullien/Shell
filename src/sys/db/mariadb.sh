@@ -1,6 +1,6 @@
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Mysql database functions
+## MariaDB database functions
 ##
 ## Requires MariaDB 10.1 at least
 ##
@@ -8,11 +8,11 @@
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
-MariaDB::flush() {
+DB::flush() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: MariaDB::flush <user> <password>"
+        String::error "Usage: DB::flush <user> <password>"
         return 1
     fi
 
@@ -30,11 +30,11 @@ MariaDB::flush() {
     return ${iReturn}
 }
 
-MariaDB::check() {
+DB::check() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: MariaDB::check <user> <password> [database]"
+        String::error "Usage: DB::check <user> <password> [database]"
         return 1
     fi
 
@@ -58,11 +58,11 @@ MariaDB::check() {
     return ${iReturn}
 }
 
-MariaDB::analyse() {
+DB::analyse() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: MariaDB::analyse <user> <password> [database]"
+        String::error "Usage: DB::analyse <user> <password> [database]"
         return 1
     fi
 
@@ -86,11 +86,11 @@ MariaDB::analyse() {
     return ${iReturn}
 }
 
-MariaDB::optimize() {
+DB::optimize() {
 
     # Parameters
     if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: MariaDB::optimize <user> <password> [database]"
+        String::error "Usage: DB::optimize <user> <password> [database]"
         return 1
     fi
 
@@ -114,11 +114,11 @@ MariaDB::optimize() {
     return ${iReturn}
 }
 
-MariaDB::repair() {
+DB::repair() {
 
     # Parameters
     if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: MariaDB::repair <user> <password> <database>"
+        String::error "Usage: DB::repair <user> <password> <database>"
         return 1
     fi
 
@@ -136,11 +136,11 @@ MariaDB::repair() {
     return ${iReturn}
 }
 
-MariaDB::dump() {
+DB::dump() {
 
     # Parameters
     if (($# != 5)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
-        String::error "Usage: MariaDB::dump <user> <password> <database> <error log file> <result file>"
+        String::error "Usage: DB::dump <user> <password> <database> <error log file> <result file>"
         return 1
     fi
 

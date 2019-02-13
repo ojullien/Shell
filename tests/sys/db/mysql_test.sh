@@ -14,122 +14,122 @@
 ## -----------------------------------------------------------------------------
 readonly m_TEST_DIR_TEMP="$(mktemp --directory -t shell.db.test.XXXXXXXXXX)"
 
-Test::Mysql::flush() {
+Test::DB::flush() {
     local sUser="${1}"
     local sPassword="${2}"
-    Mysql::flush "${sUser}" "${sPassword}"
+    DB::flush "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::flushError() {
+Test::DB::flushError() {
     local sUser="${1}"
     local sPassword="${2}"
-    Mysql::flush "${sUser}" "${sPassword}"
+    DB::flush "${sUser}" "${sPassword}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::check() {
+Test::DB::check() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::check "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::check "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::checkAll() {
+Test::DB::checkAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    Mysql::check "${sUser}" "${sPassword}"
+    DB::check "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::checkError() {
+Test::DB::checkError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::check "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::check "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::analyse() {
+Test::DB::analyse() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::analyseAll() {
+Test::DB::analyseAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    Mysql::analyse "${sUser}" "${sPassword}"
+    DB::analyse "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::analyseError() {
+Test::DB::analyseError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::optimize() {
+Test::DB::optimize() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::optimizeAll() {
+Test::DB::optimizeAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    Mysql::optimize "${sUser}" "${sPassword}"
+    DB::optimize "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::optimizeError() {
+Test::DB::optimizeError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::repair() {
+Test::DB::repair() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::repairError() {
+Test::DB::repairError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    Mysql::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::dump() {
+Test::DB::dump() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
     local sErrorLogFile="${4}"
     local sResultFile="${5}"
-    Mysql::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::Mysql::dumpError() {
+Test::DB::dumpError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
     local sErrorLogFile="${4}"
     local sResultFile="${5}"
-    Mysql::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -151,33 +151,33 @@ Test::mysql::main() {
     String::separateLine
     String::notice "Testing: sys/db/mysql ..."
 
-    Test::Mysql::flush "${sUser}" "${sPassword}"
-    Test::Mysql::flushError "${sUser}" "notvalid"
+    Test::DB::flush "${sUser}" "${sPassword}"
+    Test::DB::flushError "${sUser}" "notvalid"
 
-    Test::Mysql::check "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::Mysql::checkAll "${sUser}" "${sPassword}"
-    Test::Mysql::checkError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::check "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::checkAll "${sUser}" "${sPassword}"
+    Test::DB::checkError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::Mysql::analyse "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::Mysql::analyseAll "${sUser}" "${sPassword}"
-    Test::Mysql::analyseError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::analyseAll "${sUser}" "${sPassword}"
+    Test::DB::analyseError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::Mysql::optimize "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::Mysql::optimizeAll "${sUser}" "${sPassword}"
-    Test::Mysql::optimizeError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::optimizeAll "${sUser}" "${sPassword}"
+    Test::DB::optimizeError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::Mysql::repair "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::Mysql::repairError "${sUser}" "${sPassword}" "doesnotexist"
+    Test::DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::repairError "${sUser}" "${sPassword}" "doesnotexist"
 
-    Test::Mysql::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
-    Test::Mysql::dumpError "${sUser}" "${sPassword}" "doesnotexist" "${sErrorLogFile}" "${sResultFile}"
+    Test::DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    Test::DB::dumpError "${sUser}" "${sPassword}" "doesnotexist" "${sErrorLogFile}" "${sResultFile}"
 
 }
 
 ## -----------------------------------------------------------------------------
 ## End
 ## -----------------------------------------------------------------------------
-Test::Mysql::finish() {
+Test::DB::finish() {
   rm -Rf "${m_TEST_DIR_TEMP}"
 }
-trap Test::Mysql::finish EXIT SIGQUIT ERR
+trap Test::DB::finish EXIT SIGQUIT ERR

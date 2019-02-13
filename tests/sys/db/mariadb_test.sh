@@ -14,122 +14,122 @@
 ## -----------------------------------------------------------------------------
 readonly m_TEST_DIR_TEMP="$(mktemp --directory -t shell.db.test.XXXXXXXXXX)"
 
-Test::MariaDB::flush() {
+Test::DB::flush() {
     local sUser="${1}"
     local sPassword="${2}"
-    MariaDB::flush "${sUser}" "${sPassword}"
+    DB::flush "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::flushError() {
+Test::DB::flushError() {
     local sUser="${1}"
     local sPassword="${2}"
-    MariaDB::flush "${sUser}" "${sPassword}"
+    DB::flush "${sUser}" "${sPassword}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::check() {
+Test::DB::check() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::check "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::check "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::checkAll() {
+Test::DB::checkAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    MariaDB::check "${sUser}" "${sPassword}"
+    DB::check "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::checkError() {
+Test::DB::checkError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::check "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::check "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::analyse() {
+Test::DB::analyse() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::analyseAll() {
+Test::DB::analyseAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    MariaDB::analyse "${sUser}" "${sPassword}"
+    DB::analyse "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::analyseError() {
+Test::DB::analyseError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::optimize() {
+Test::DB::optimize() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::optimizeAll() {
+Test::DB::optimizeAll() {
     local sUser="${1}"
     local sPassword="${2}"
-    MariaDB::optimize "${sUser}" "${sPassword}"
+    DB::optimize "${sUser}" "${sPassword}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::optimizeError() {
+Test::DB::optimizeError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::repair() {
+Test::DB::repair() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::repairError() {
+Test::DB::repairError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
-    MariaDB::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::dump() {
+Test::DB::dump() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
     local sErrorLogFile="${4}"
     local sResultFile="${5}"
-    MariaDB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
     Test::assertTrue "${FUNCNAME[0]}" "$?"
 }
 
-Test::MariaDB::dumpError() {
+Test::DB::dumpError() {
     local sUser="${1}"
     local sPassword="${2}"
     local sDatabase="${3}"
     local sErrorLogFile="${4}"
     local sResultFile="${5}"
-    MariaDB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
     Test::assertFalse "${FUNCNAME[0]}" "$?"
 }
 
@@ -151,33 +151,33 @@ Test::mariadb::main() {
     String::separateLine
     String::notice "Testing: sys/db/mysql ..."
 
-    Test::MariaDB::flush "${sUser}" "${sPassword}"
-    Test::MariaDB::flushError "${sUser}" "notvalid"
+    Test::DB::flush "${sUser}" "${sPassword}"
+    Test::DB::flushError "${sUser}" "notvalid"
 
-    Test::MariaDB::check "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::MariaDB::checkAll "${sUser}" "${sPassword}"
-    Test::MariaDB::checkError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::check "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::checkAll "${sUser}" "${sPassword}"
+    Test::DB::checkError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::MariaDB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::MariaDB::analyseAll "${sUser}" "${sPassword}"
-    Test::MariaDB::analyseError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::analyse "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::analyseAll "${sUser}" "${sPassword}"
+    Test::DB::analyseError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::MariaDB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::MariaDB::optimizeAll "${sUser}" "${sPassword}"
-    Test::MariaDB::optimizeError "${sUser}" "notvalid" "${sDatabase}"
+    Test::DB::optimize "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::optimizeAll "${sUser}" "${sPassword}"
+    Test::DB::optimizeError "${sUser}" "notvalid" "${sDatabase}"
 
-    Test::MariaDB::repair "${sUser}" "${sPassword}" "${sDatabase}"
-    Test::MariaDB::repairError "${sUser}" "${sPassword}" "doesnotexist"
+    Test::DB::repair "${sUser}" "${sPassword}" "${sDatabase}"
+    Test::DB::repairError "${sUser}" "${sPassword}" "doesnotexist"
 
-    Test::MariaDB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
-    Test::MariaDB::dumpError "${sUser}" "${sPassword}" "doesnotexist" "${sErrorLogFile}" "${sResultFile}"
+    Test::DB::dump "${sUser}" "${sPassword}" "${sDatabase}" "${sErrorLogFile}" "${sResultFile}"
+    Test::DB::dumpError "${sUser}" "${sPassword}" "doesnotexist" "${sErrorLogFile}" "${sResultFile}"
 
 }
 
 ## -----------------------------------------------------------------------------
 ## End
 ## -----------------------------------------------------------------------------
-Test::MariaDB::finish() {
+Test::DB::finish() {
   rm -Rf "${m_TEST_DIR_TEMP}"
 }
-trap Test::MariaDB::finish EXIT SIGQUIT ERR
+trap Test::DB::finish EXIT SIGQUIT ERR
