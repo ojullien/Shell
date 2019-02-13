@@ -38,11 +38,11 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/service.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/clean/app.sh"
-# shellcheck source=/dev/null
-. "${m_DIR_APP}/fillwithzeros/app.sh"
 Config::load "manageservices"
 Config::load "clean"
 Config::load "fillwithzeros"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/fillwithzeros/app.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
