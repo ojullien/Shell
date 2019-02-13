@@ -1,13 +1,10 @@
-## -----------------------------------------------------
-## Update system
-## App functions
+## -----------------------------------------------------------------------------
+## Linux Scripts.
+## UpdateSystem app functions
 ##
-## @category Linux Scripts
-## @package Update system
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
-
+## @package ojullien\Shell\app\updatesystem
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
 ## Deborphan

@@ -1,37 +1,54 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Update system.
 ##
-## @category Linux Scripts
-## @package Update system
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/src/bin
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/apt.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/update-system/inc/update-system.inc.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/package.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/service.sh"
+Config::load "manageservices"
+Config::load "updatesystem"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/updatesystem/app.sh"
 
 ## -----------------------------------------------------------------------------
-## Load common configuration
+## Trace
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-. "${m_DIR_APP}/disableservices/cfg/disableservices.cfg.sh"
-. "${m_DIR_APP}/update-system/inc/update-system.inc.sh"
+Constant::trace
+ManageServices::trace
+UpdateSystem::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -54,21 +71,21 @@ Console::waitUser
 ## Update and upgrade
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::updateAndUpgrade
+Package::upgrade
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Clean
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::cleanAndPurge
+Package::clean
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Display Linux selections
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::displayLinuxSelections
+Package::displayLinuxSelections
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -99,11 +116,14 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 ## Start services
 ## -----------------------------------------------------------------------------
-String::separateLine
-Service::startServices ${m_SERVICES_START}
+UpdateSystem::finish() {
+    String::separateLine
+    Service::startServices ${m_SERVICES_START}
+    String::notice "Now is: $(date -R)"
+}
+trap UpdateSystem::finish EXIT SIGQUIT ERR
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
-String::notice "Now is: $(date -R)"
 exit 0
