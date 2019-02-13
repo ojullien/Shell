@@ -24,7 +24,7 @@ SaveDB::save() {
 
     # Init
     local sUser="$1" sPwd="$2" sDatabase="$4" sDestination="$3"
-    local m_Save="/$(uname -n)-${sDatabase}-$(date +"%Y%m%d")"
+    local m_Save="$(uname -n)-${sDatabase}-$(date +"%Y%m%d")"
     local -i iReturn=1
 
     # Destination does not exist
@@ -47,7 +47,7 @@ SaveDB::save() {
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
-        rm --force "${m_Save}-error.log" "${m_Save}.sql" > /dev/null 2>&1
+        rm --force "${m_Save:?}-error.log" "${m_Save:?}.sql" > /dev/null 2>&1
     fi
 
     return ${iReturn}
