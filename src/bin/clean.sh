@@ -36,10 +36,10 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/config.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/service.sh"
-# shellcheck source=/dev/null
-. "${m_DIR_APP}/clean/app.sh"
 Config::load "manageservices"
 Config::load "clean"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/clean/app.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
