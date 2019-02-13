@@ -1,23 +1,13 @@
-## -----------------------------------------------------
-## Save database
-## App functions
+## -----------------------------------------------------------------------------
+## Linux Scripts.
+## SaveDB app functions
 ##
-## @category Linux Scripts
-## @package SaveDB
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
-
-declare -i m_APP_AUTOSAVEDB_ISMARIADB=$(mysql --version | grep -i "MariaDB" | wc -l)
-
-if ((m_APP_AUTOSAVEDB_ISMARIADB)); then
-    . "${m_DIR_SYS_INC}/mariadb.inc.sh"
-else
-    . "${m_DIR_SYS_INC}/mysql.inc.sh"
-fi
+## @package ojullien\Shell\app\savesystemconf
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
 SaveDB::showHelp() {
-    String::notice "Usage: $(basename $0) [options] <database 1> [database 2 ...]"
+    String::notice "Usage: $(basename "$0") [options] <database 1> [database 2 ...]"
     String::notice "\tSave a database"
     Option::showHelp
     String::notice "\t-d | --destination\tDestination folder. The default is /home/<user>/out"
@@ -29,7 +19,7 @@ SaveDB::save() {
     # Parameters
     if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
         String::error "Usage: SaveDB::save <user> <password> <destination as folder path> <database name>"
-        exit 1
+        return 1
     fi
 
     # Init
@@ -39,12 +29,12 @@ SaveDB::save() {
 
     # Destination does not exist
     if [[ ! -d "${sDestination}" ]]; then
-        String::error "ERROR: Directory ${sDestination} does not exist!"
+        String::error "ERROR: Directory '${sDestination}' does not exist!"
         return 1
     fi
 
     # Saving
-    MariaDB::dump "${sUser}" "${sPwd}" "${sDatabase}" "${sDestination}/${m_Save}-error.log" "${sDestination}/${m_Save}.sql"
+    DB::dump "${sUser}" "${sPwd}" "${sDatabase}" "${sDestination}/${m_Save}-error.log" "${sDestination}/${m_Save}.sql"
     iReturn=$?
     ((0!=iReturn)) || return ${iReturn}
 
