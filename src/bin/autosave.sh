@@ -116,18 +116,24 @@ FileSystem::compressFile "${m_AUTOSAVE_DIR_CACHE}/${m_DATE}/$(uname -n)-start" "
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## Prepare to upload and ftp
+## Compressing
 ## -----------------------------------------------------------------------------
 String::separateLine
-declare -i iReturn=1
 declare sPWD
 sPWD=$(pwd)
 
-String::notice "Prepare to upload and upload"
+String::notice "Compressing ..."
 cd "${m_AUTOSAVE_DIR_CACHE}" || exit 18
 FileSystem::compressFile "${m_AUTOSAVE_DIR_UPLOAD}/${m_DATE}" "${m_DATE}"
 cd "${sPWD}" || exit 18
+Console::waitUser
 
+## -----------------------------------------------------------------------------
+## Upload
+## -----------------------------------------------------------------------------
+String::separateLine
+declare -i iReturn=1
+String::notice "Uploading ..."
 if [[ -f "${m_AUTOSAVE_DIR_UPLOAD}/${m_DATE}.tar.bz2" ]]; then
     FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}.tar.bz2" "." "${m_AUTOSAVE_DIR_UPLOAD}"
     iReturn=$?

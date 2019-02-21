@@ -1,39 +1,55 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Save databases.
+## Auto save database.
 ##
-## @category Linux Scripts
-## @package AutoSavedb
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/src/bin
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/ftp.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_APP}/autosavedb/inc/autosavedb.inc.sh"
-
-## -----------------------------------------------------------------------------
-## Load common configuration
-## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-if [[ -f "${m_DIR_APP}/autosavedb/cfg/priv-autosavedb.cfg.sh" ]]; then
-    . "${m_DIR_APP}/autosavedb/cfg/priv-autosavedb.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/ftp.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/autosavedb/app.sh"
+Config::load "autosavedb"
+if ((m_AUTOSAVEDB_ISMARIADB)); then
+    # shellcheck source=/dev/null
+    . "${m_DIR_SYS}/db/mariadb.sh"
 else
-    . "${m_DIR_APP}/autosavedb/cfg/autosavedb.cfg.sh"
+    # shellcheck source=/dev/null
+    . "${m_DIR_SYS}/db/mysql.sh"
 fi
+
+## -----------------------------------------------------------------------------
+## Trace
+## -----------------------------------------------------------------------------
+Constant::trace
+AutoSaveDB::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -47,9 +63,9 @@ Console::waitUser
 ## Creates directories
 ## -----------------------------------------------------------------------------
 String::separateLine
-FileSystem::removeDirectory "${m_APP_AUTOSAVEDB_DIR_CACHE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}"
-FileSystem::createDirectory "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
+FileSystem::removeDirectory "${m_AUTOSAVEDB_DIR_CACHE}"
+FileSystem::createDirectory "${m_AUTOSAVEDB_DIR_CACHE}/${m_DATE}"
+FileSystem::createDirectory "${m_AUTOSAVEDB_DIR_UPLOAD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -57,49 +73,55 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 String::separateLine
 FileSystem::syncFile
-MariaDB::flush "${m_DB_USR}" "${m_DB_PWD}"
+DB::flush "${m_DB_USR}" "${m_DB_PWD}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## For each databases
 ## -----------------------------------------------------------------------------
-for sDatabase in ${m_APP_AUTOSAVEDB_DATABASES[@]}; do
+for sDatabase in "${m_AUTOSAVEDB_DATABASES[@]}"; do
 
     ## -----------------------------------------------------------------------------
     ## Check before saving
     ## -----------------------------------------------------------------------------
     String::separateLine
     FileSystem::syncFile
-    MariaDB::check "${m_DB_USR}" "${m_DB_PWD}" "${sDatabase}"
+    DB::check "${m_DB_USR}" "${m_DB_PWD}" "${sDatabase}"
     Console::waitUser
 
     ## -----------------------------------------------------------------------------
     ## Save database
     ## -----------------------------------------------------------------------------
     String::separateLine
-    MariaDB::dump "${m_DB_USR}" "${m_DB_PWD}" "${sDatabase}" "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}-error.log" "${m_APP_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}.sql"
+    DB::dump "${m_DB_USR}"\
+    "${m_DB_PWD}" "${sDatabase}"\
+    "${m_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}-error.log"\
+    "${m_AUTOSAVEDB_DIR_CACHE}/${m_DATE}/${sDatabase}-${m_DATE}.sql"
     Console::waitUser
 
 done
 
 ## -----------------------------------------------------------------------------
-## Prepare to upload
+## Compressing
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Preparing to upload ..."
-cd "${m_APP_AUTOSAVEDB_DIR_CACHE}" || exit 18
-FileSystem::compressFile "${m_APP_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db" "${m_DATE}"
-cd "${m_DIR_SCRIPT}" || exit 18
+declare sPWD
+sPWD=$(pwd)
+
+String::notice "Compressing ..."
+cd "${m_AUTOSAVEDB_DIR_CACHE}" || exit 18
+FileSystem::compressFile "${m_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db" "${m_DATE}"
+cd "${sPWD}" || exit 18
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Upload
 ## -----------------------------------------------------------------------------
 String::separateLine
-declare -i iReturn
+declare -i iReturn=1
 String::notice "Uploading ..."
-if [[ -f "${m_APP_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db.tar.bz2" ]]; then
-    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}-db.tar.bz2" "." "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
+if [[ -f "${m_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db.tar.bz2" ]]; then
+    FTP::put "${m_FTP_SRV}" "${m_FTP_USR}" "${m_FTP_PWD}" "${m_DATE}-db.tar.bz2" "." "${m_AUTOSAVEDB_DIR_UPLOAD}"
     iReturn=$?
     String::notice -n "FTP ${m_DATE}-db.tar.bz2:"
     String::checkReturnValueForTruthiness ${iReturn}
@@ -114,11 +136,11 @@ Console::waitUser
 ## -----------------------------------------------------------------------------
 m_OPTION_LOG=0
 if [[ -f ${m_LOGFILE} ]]; then
-    $(mv "${m_LOGFILE}" "${m_APP_AUTOSAVEDB_DIR_UPLOAD}")
+    mv "${m_LOGFILE}" "${m_AUTOSAVEDB_DIR_UPLOAD}"
 fi
 
 String::notice -n "Changing upload directory owner:"
-chown -R "${UPLOAD_DIRECTORY_OWNER}":"${UPLOAD_DIRECTORY_OWNER}" "${m_APP_AUTOSAVEDB_DIR_UPLOAD}"
+chown -R "${m_AUTOSAVEDB_UPLOAD_DIRECTORY_OWNER}":"${m_AUTOSAVEDB_UPLOAD_DIRECTORY_OWNER}" "${m_AUTOSAVEDB_DIR_UPLOAD}"
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 
