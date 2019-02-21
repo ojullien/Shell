@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## SaveDB app configuration file.
 ##
-## @package ojullien\Shell\app\savesystemconf
+## @package ojullien\Shell\app\savedb
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
