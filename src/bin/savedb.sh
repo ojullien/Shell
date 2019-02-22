@@ -44,6 +44,12 @@ else
 fi
 
 ## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && SaveDB::showHelp && exit 0
+(( 0==$# )) && SaveDB::showHelp && exit 1
+
+## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
 Constant::trace
@@ -72,8 +78,6 @@ declare -i iReturn=1
 declare sPWD sDestination="${m_SAVEDB_DESTINATION_DEFAULT}"
 sPWD=$(pwd)
 
-(( 0==$# )) && SaveDB::showHelp && exit 1
-
 while (( "$#" )); do
     case "$1" in
     -d|--destination) # app option
@@ -81,7 +85,7 @@ while (( "$#" )); do
         shift 2
         FileSystem::checkDir "The destination directory is set to:\t${sDestination}" "${sDestination}"
         ;;
-    --*|-*=) # unknown option
+    --*|-*) # unknown option
         shift
         String::separateLine
         SaveDB::showHelp

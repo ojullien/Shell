@@ -1,17 +1,22 @@
 #!/bin/bash
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Clean logs.
+## Run option tests
 ##
-## @package ojullien\Shell\bin
+## @package ojullien\Shell\tests
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 #set -o errexit
 set -o nounset
 set -o pipefail
 
+if [[ ${BASH_VERSINFO[0]} -lt 4 ]]; then
+    echo "At least Bash version 4 is needed!" >&2
+    exit 4
+fi
+
 ## -----------------------------------------------------------------------------
-## Shell scripts directory, eg: /root/work/Shell/src/bin
+## Shell scripts directory, eg: /root/work/Shell/tests
 ## -----------------------------------------------------------------------------
 readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
@@ -19,13 +24,11 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Load constants
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
-. "${m_DIR_REALPATH}/../sys/constant.sh"
+. "${m_DIR_REALPATH}/framework/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes sources & configuration
+## Includes sources
 ## -----------------------------------------------------------------------------
-# shellcheck source=/dev/null
-. "${m_DIR_SYS}/runasroot.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/string.sh"
 # shellcheck source=/dev/null
@@ -33,58 +36,21 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
-. "${m_DIR_SYS}/config.sh"
-# shellcheck source=/dev/null
-. "${m_DIR_SYS}/service.sh"
-Config::load "manageservices"
-Config::load "clean"
-# shellcheck source=/dev/null
-. "${m_DIR_APP}/clean/app.sh"
-
-## -----------------------------------------------------------------------------
-## Help
-## -----------------------------------------------------------------------------
-((m_OPTION_SHOWHELP)) && Option::showHelp && exit 0
+. "${m_DIR_REALPATH}/framework/library.sh"
 
 ## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
-Constant::trace
-ManageServices::trace
-Clean::trace
+Test::Constant::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Today is: $(date -R)"
-String::notice "The PID for $(basename "$0") process is: $$"
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Disable & stop services
-## -----------------------------------------------------------------------------
-String::separateLine
-Service::disableServices ${m_SERVICES_DISABLE}
-String::separateLine
-Service::stopServices ${m_SERVICES_STOP}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Clean logs
-## -----------------------------------------------------------------------------
-String::separateLine
-Clean::main
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Start services
-## -----------------------------------------------------------------------------
-String::separateLine
-Service::startServices ${m_SERVICES_START}
+String::notice "The arguments length is: $#"
+String::notice "The arguments are: $@"
 
 ## -----------------------------------------------------------------------------
 ## END
 ## -----------------------------------------------------------------------------
 String::notice "Now is: $(date -R)"
-exit 0

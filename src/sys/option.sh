@@ -9,6 +9,7 @@
 declare -i m_OPTION_DISPLAY=1
 declare -i m_OPTION_LOG=0
 declare -i m_OPTION_WAIT=0
+declare -i m_OPTION_SHOWHELP=0
 declare m_APP_ARGUMENTS=""
 
 Option::showHelp() {
@@ -16,6 +17,14 @@ Option::showHelp() {
     String::notice "\t-n | --no-display\tdisplay mode. Contents are not displayed."
     String::notice "\t-l | --active-log\tlog mode. Contents are logged."
     String::notice "\t-w | --wait\t\twait user. Wait for user input between actions."
+    String::notice "\t-h | --help\t\tShow the help."
+    String::notice "\t-v | --version\t\tShow the version."
+    return 0
+}
+
+Option::showVersion() {
+    String::notice "\tVersion: 20180822"
+    return 0
 }
 
 ## -----------------------------------------------------------------------------
@@ -37,25 +46,16 @@ while (( "$#" )); do
         shift
         ;;
     -h|--help)
-        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
-            m_APP_ARGUMENTS="$1"
-        else
-            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1"
-        fi
+        m_OPTION_SHOWHELP=1
         shift
-
+        ;;
+    -v|--version)
+        Option::showVersion
+        exit 0
         ;;
     --) # end argument parsing
         shift
         break
-        ;;
-    --*|-*=) # app options
-        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
-            m_APP_ARGUMENTS="$1 $2"
-        else
-            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1 $2"
-        fi
-        shift 2
         ;;
     *) # preserve positional app arguments
         if [[ -z "${m_APP_ARGUMENTS}" ]]; then
@@ -91,6 +91,10 @@ if ((m_OPTION_DISPLAY)); then
         Console::display "Wait mode is ON. Wait for user input between actions."
     else
         Console::display "Wait mode is OFF. Do not wait for user input between actions."
+    fi
+
+    if ((m_OPTION_SHOWHELP)); then
+        Console::display "Will show the help."
     fi
 
 fi

@@ -12,6 +12,7 @@ SaveSystemConf::showHelp() {
     Option::showHelp
     String::notice "\t-d | --destination\tDestination folder. The default is /home/<user>"
     String::notice "\t<directory 1>\tConfiguration directory located in /etc/"
+    return 0
 }
 
 SaveSystemConf::save() {

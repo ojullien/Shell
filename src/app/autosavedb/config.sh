@@ -60,4 +60,5 @@ AutoSaveDB::trace() {
     FileSystem::checkDir "\tCache directory:\t${m_AUTOSAVEDB_DIR_CACHE}" "${m_AUTOSAVEDB_DIR_CACHE}"
     FileSystem::checkDir "\tUpload directory:\t${m_AUTOSAVEDB_DIR_UPLOAD}" "${m_AUTOSAVEDB_DIR_UPLOAD}"
     String::notice "\tDatabases:\t\t${m_AUTOSAVEDB_DATABASES[*]}"
+    return 0
 }

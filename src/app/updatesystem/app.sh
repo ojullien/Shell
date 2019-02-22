@@ -12,11 +12,13 @@
 UpdateSystem::findOrphan() {
     String::notice "Find orphan"
     deborphan
+    return $?
 }
 
 UpdateSystem::findOrphanConfig() {
     String::notice "Find orphan config"
     deborphan --find-config
+    return $?
 }
 
 UpdateSystem::purgeLocales() {

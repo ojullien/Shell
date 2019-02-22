@@ -11,6 +11,7 @@ CreateDomain::showHelp() {
     String::notice "\tCreates an apache user/group and a home directory in /var/www"
     Option::showHelp
     String::notice "\t<domain 1>\tDomain name to create."
+    return 0
 }
 
 CreateDomain::createGroup() {

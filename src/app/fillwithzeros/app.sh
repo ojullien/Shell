@@ -42,5 +42,6 @@ FillWithZeros::finish() {
     for sMount in "${m_MOUNTPOINTS[@]}"; do
         [[ -n ${sMount} ]] && [[ -f "${sMount}/${m_ZEROFILE:?}" ]] && rm -f "${sMount}/${m_ZEROFILE:?}"
     done
+    return 0
 }
 trap FillWithZeros::finish EXIT SIGQUIT SIGTERM SIGINT ERR

@@ -41,6 +41,11 @@ Config::load "manageservices"
 . "${m_DIR_APP}/manageservices/app.sh"
 
 ## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && ManageServices::showHelp && exit 0
+
+## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
 Constant::trace
@@ -78,12 +83,12 @@ if (( "$#" )); then
         ;;
     *) # unknown option
         String::separateLine
-        ManageServices::help
+        ManageServices::showHelp
         ;;
     esac
 else
         String::separateLine
-        ManageServices::help
+        ManageServices::showHelp
 fi
 
 ## -----------------------------------------------------------------------------

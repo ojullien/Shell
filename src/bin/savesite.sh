@@ -39,6 +39,12 @@ Config::load "savesite"
 . "${m_DIR_APP}/savesite/app.sh"
 
 ## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && SaveSite::showHelp && exit 0
+(( 0==$# )) && SaveSite::showHelp && exit 1
+
+## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
 Constant::trace
@@ -59,8 +65,6 @@ declare -i iReturn=1
 declare sPWD sDestination="${m_SAVESITE_DESTINATION_DEFAULT}"
 sPWD=$(pwd)
 
-(( 0==$# )) && SaveSite::showHelp && exit 1
-
 while (( "$#" )); do
     case "$1" in
     -d|--destination) # app option
@@ -68,7 +72,7 @@ while (( "$#" )); do
         shift 2
         FileSystem::checkDir "The destination directory is set to:\t${sDestination}" "${sDestination}"
         ;;
-    --*|-*=) # unknown option
+    --*|-*) # unknown option
         shift
         String::separateLine
         SaveSite::showHelp

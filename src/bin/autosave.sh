@@ -25,6 +25,8 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Includes sources & configuration
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
 . "${m_DIR_SYS}/string.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/filesystem.sh"
@@ -43,6 +45,11 @@ Config::load "clean"
 Config::load "autosave"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/autosave/app.sh"
+
+## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && Option::showHelp && exit 0
 
 ## -----------------------------------------------------------------------------
 ## Trace

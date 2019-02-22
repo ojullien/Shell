@@ -12,6 +12,7 @@ SaveSite::showHelp() {
     Option::showHelp
     String::notice "\t-d | --destination\tDestination folder. The default is /home/<user>"
     String::notice "\t<directory 1>\tConfiguration directory located in /var/www/"
+    return 0
 }
 
 SaveSite::save() {

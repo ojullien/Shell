@@ -43,6 +43,12 @@ Config::load "createdomain"
 . "${m_DIR_APP}/createdomain/app.sh"
 
 ## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && CreateDomain::showHelp && exit 0
+(( 0==$# )) && CreateDomain::showHelp && exit 1
+
+## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
 Constant::trace
@@ -63,7 +69,7 @@ declare -i iReturn
 
 while (( "$#" )); do
     case "$1" in
-    --*|-*=) # unknown option
+    --*|-*) # unknown option
         shift
         String::separateLine
         CreateDomain::showHelp

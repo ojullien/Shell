@@ -25,6 +25,8 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Includes sources & configuration
 ## -----------------------------------------------------------------------------
 # shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
 . "${m_DIR_SYS}/string.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/filesystem.sh"
@@ -35,6 +37,12 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 Config::load "savesystemconf"
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/savesystemconf/app.sh"
+
+## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && SaveSystemConf::showHelp && exit 0
+(( 0==$# )) && SaveSystemConf::showHelp && exit 1
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -57,8 +65,6 @@ declare -i iReturn=1
 declare sPWD sDestination="${m_SAVESYSTEMCONF_DESTINATION_DEFAULT}"
 sPWD=$(pwd)
 
-(( 0==$# )) && SaveSystemConf::showHelp && exit 1
-
 while (( "$#" )); do
     case "$1" in
     -d|--destination) # app option
@@ -66,7 +72,7 @@ while (( "$#" )); do
         shift 2
         FileSystem::checkDir "The destination directory is set to:\t${sDestination}" "${sDestination}"
         ;;
-    --*|-*=) # unknown option
+    --*|-*) # unknown option
         shift
         String::separateLine
         SaveSystemConf::showHelp

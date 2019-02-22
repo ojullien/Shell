@@ -12,6 +12,7 @@ SaveDB::showHelp() {
     Option::showHelp
     String::notice "\t-d | --destination\tDestination folder. The default is /home/<user>/out"
     String::notice "\t<database 1>\tDatabase name"
+    return 0
 }
 
 SaveDB::save() {
@@ -23,9 +24,10 @@ SaveDB::save() {
     fi
 
     # Init
-    local sUser="$1" sPwd="$2" sDatabase="$4" sDestination="$3"
-    local m_Save="$(uname -n)-${sDatabase}-$(date +"%Y%m%d")"
     local -i iReturn=1
+    local sUser="$1" sPwd="$2" sDatabase="$4" sDestination="$3"
+    local m_Save
+    m_Save="$(uname -n)-${sDatabase}-$(date +"%Y%m%d")"
 
     # Destination does not exist
     if [[ ! -d "${sDestination}" ]]; then
