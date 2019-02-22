@@ -10,7 +10,7 @@ declare -i m_OPTION_DISPLAY=1
 declare -i m_OPTION_LOG=0
 declare -i m_OPTION_WAIT=0
 declare -i m_OPTION_SHOWHELP=0
-declare m_APP_ARGUMENTS=""
+declare -a m_APP_ARGUMENTS=()
 
 Option::showHelp() {
     String::notice "Options:"
@@ -58,11 +58,7 @@ while (( "$#" )); do
         break
         ;;
     *) # preserve positional app arguments
-        if [[ -z "${m_APP_ARGUMENTS}" ]]; then
-            m_APP_ARGUMENTS="$1"
-        else
-            m_APP_ARGUMENTS="${m_APP_ARGUMENTS} $1"
-        fi
+        m_APP_ARGUMENTS+=("$1")
         shift
         ;;
   esac
@@ -70,8 +66,8 @@ done
 
 # Keep the options and the arguments for the app.
 # set positional arguments in their proper place
-eval set -- "${m_APP_ARGUMENTS}"
-m_APP_ARGUMENTS=""
+eval set -- "${m_APP_ARGUMENTS[@]}"
+m_APP_ARGUMENTS=()
 
 ## -----------------------------------------------------------------------------
 ## Trace
