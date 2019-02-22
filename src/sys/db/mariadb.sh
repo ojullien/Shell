@@ -151,7 +151,7 @@ DB::dump() {
     # Do the job
     # TODO: Add  --add-drop-trigger for MariaDB 10.2
     String::notice "Dumping '${sDatabase}' to '${sResultFile}' with error in '${sErrorLog}' ..."
-    mysqldump --user="${sUser}" --password="${sPwd}" --log-error="${sErrorLog}" --result-file="${sResultFile}" --host=localhost --flush-logs --flush-privileges --add-drop-database --allow-keywords --comments --complete-insert --dump-date --opt --force --hex-blob --single-transaction --log-queries --max_allowed_packet=50M --quick --quote-names --routines --triggers --tz-utc "${sDatabase}"
+    mysqldump --user="${sUser}" --password="${sPwd}" --log-error="${sErrorLog}" --result-file="${sResultFile}" --host=localhost --flush-logs --flush-privileges --add-drop-database --databases --allow-keywords --comments --complete-insert --dump-date --opt --force --hex-blob --single-transaction --log-queries --max_allowed_packet=50M --quick --quote-names --routines --triggers --tz-utc "${sDatabase}"
     iReturn=$?
     String::notice -n "Dump '${sDatabase}':"
     String::checkReturnValueForTruthiness ${iReturn}

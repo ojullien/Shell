@@ -151,7 +151,7 @@ DB::dump() {
     # Do the job
     String::notice "Dumping '${sDatabase}' to '${sResultFile}' with error in '${sErrorLog}' ..."
     mysqldump --user="${sUser}" --password="${sPwd}" --log-error="${sErrorLog}" --result-file="${sResultFile}" \
-        --host=localhost --add-drop-database --add-drop-table --add-locks --allow-keywords --comments \
+        --host=localhost --add-drop-database --databases --add-drop-table --add-locks --allow-keywords --comments \
         --complete-insert --create-options --dump-date --extended-insert --flush-logs --flush-privileges --force \
         --hex-blob --single-transaction --max_allowed_packet=50M --quick --quote-names --routines --triggers \
         --tz-utc "${sDatabase}"
