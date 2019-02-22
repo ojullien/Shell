@@ -41,7 +41,7 @@ SaveDB::save() {
     ((0!=iReturn)) || return ${iReturn}
 
     # Change directory
-    cd "${sDestination}" || return 1
+    cd "${sDestination}" || return 18
 
     String::notice -n "Compress to '${m_Save}.tar.bz2':"
     tar --create --bzip2 -f "${m_Save}.tar.bz2" "${m_Save}-error.log" "${m_Save}.sql" > /dev/null 2>&1
@@ -51,6 +51,9 @@ SaveDB::save() {
     if ((0==iReturn)); then
         rm --force "${m_Save:?}-error.log" "${m_Save:?}.sql" > /dev/null 2>&1
     fi
+
+    # Go to previous directory
+    cd - || return 18
 
     return ${iReturn}
 }

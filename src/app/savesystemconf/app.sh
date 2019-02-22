@@ -41,7 +41,7 @@ SaveSystemConf::save() {
     fi
 
     # Change directory
-    cd "${m_SYSTEM_CONFIGURATION_FOLDER}" || return 1
+    cd "${m_SYSTEM_CONFIGURATION_FOLDER}" || return 18
 
     # Saving
     m_Save="${sDestination}/$(uname -n)-${sSource}-$(date +"%Y%m%d").tar.bz2"
@@ -49,6 +49,9 @@ SaveSystemConf::save() {
     tar cjf "${m_Save}" "${sSource}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
+
+    # Go to previous directory
+    cd - || return 18
 
     return ${iReturn}
 }

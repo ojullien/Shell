@@ -75,8 +75,7 @@ Console::waitUser
 ## Parse the app options and arguments
 ## -----------------------------------------------------
 declare -i iReturn=1
-declare sPWD sDestination="${m_SAVEDB_DESTINATION_DEFAULT}"
-sPWD=$(pwd)
+declare sDestination="${m_SAVEDB_DESTINATION_DEFAULT}"
 
 while (( "$#" )); do
     case "$1" in
@@ -95,7 +94,6 @@ while (( "$#" )); do
         String::separateLine
         SaveDB::save "${m_DB_USR}" "${m_DB_PWD}" "${sDestination}" "$1"
         iReturn=$?
-        cd "${sPWD}" || exit 18
         ((0!=iReturn)) && exit ${iReturn}
         shift
         Console::waitUser

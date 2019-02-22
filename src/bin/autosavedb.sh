@@ -110,13 +110,10 @@ done
 ## Compressing
 ## -----------------------------------------------------------------------------
 String::separateLine
-declare sPWD
-sPWD=$(pwd)
-
 String::notice "Compressing ..."
 cd "${m_AUTOSAVEDB_DIR_CACHE}" || exit 18
 FileSystem::compressFile "${m_AUTOSAVEDB_DIR_UPLOAD}/${m_DATE}-db" "${m_DATE}"
-cd "${sPWD}" || exit 18
+cd - || exit 18
 Console::waitUser
 
 ## -----------------------------------------------------------------------------

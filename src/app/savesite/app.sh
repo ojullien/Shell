@@ -41,7 +41,7 @@ SaveSite::save() {
     fi
 
     # Change directory
-    cd "${m_APACHE2_DOCUMENTROOT}" || return 1
+    cd "${m_APACHE2_DOCUMENTROOT}" || return 18
 
     # Saving
     m_Save="${sDestination}/$(uname -n)-${sSource}-$(date +"%Y%m%d").tar.bz2"
@@ -49,6 +49,9 @@ SaveSite::save() {
     tar cjf "${m_Save}" "${sSource}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
+
+    # Go to previous directory
+    cd - || return 18
 
     return ${iReturn}
 }

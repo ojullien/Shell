@@ -82,7 +82,6 @@ while (( "$#" )); do
         String::separateLine
         SaveSystemConf::save "$1" "${sDestination}"
         iReturn=$?
-        cd "${sPWD}" || exit 18
         ((0!=iReturn)) && exit ${iReturn}
         shift
         Console::waitUser
