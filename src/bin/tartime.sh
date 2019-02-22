@@ -1,32 +1,32 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Tar and timestamp an archive
 ##
-## @category Linux Scripts
-## @package tarTime
-## @version 20180820
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
 
 # At least two arguments
 if (($# < 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-    echo "Usage: $(basename $0) <destination> <source1>"
+    echo "Usage: $(basename "$0") <destination> <source1> [source2] ..."
     echo -e "\tCompress the source into a timestamped bz2 archive."
     echo -e "\t<destination>\tDestination archive."
     echo -e "\t<source>\tSource to compress"
     exit 1
 fi
 
-# Build and save the destination filename.
-declare sDestination="${1}-$(uname -n)-$(date +"%Y%m%d")_$(date +"%H%M").tar.bz2"
+# Build and save the destination filename. The first argument is the destination file
+readonly sDestination="${1}-$(uname -n)-$(date +"%Y%m%d")_$(date +"%H%M").tar.bz2"
 
 # Remove the destination from the arguments
 shift
 
 # Save the sources
-declare sSources="$@"
+readonly sSources=$*
 
 # Do the job
 declare -i iReturn=0
