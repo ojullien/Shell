@@ -1,79 +1,116 @@
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Install.
-## App functions.
+## Install App functions.
 ##
-## @category Linux Scripts
-## @package Install
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
-## -----------------------------------------------------
+## @package ojullien\Shell\app\clean
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
+## -----------------------------------------------------------------------------
 
-## -----------------------------------------------------
-## BASHRC
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
+## Sources list
+## -----------------------------------------------------------------------------
 
-Install::configureBashrc() {
+Install::getRelease() {
+    local sRelease
+    sRelease="$(lsb_release --short --codename)"
+    if [[ -z "${sRelease}" ]] || [[ "n/a" = "${sRelease}" ]]; then
+        sRelease='testing'
+    fi
+    return "${sRelease}"
+}
+
+Install::configureSourcesList() {
 
     # Parameters
     if (( $# != 3 )) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: Install::configureBashrc <source path> <save path> <user>"
-        exit 1
+        String::error "Usage: Install::configureSourcesList <current file> <saved file> <new file>"
+        return 1
     fi
 
     # Init
-    local sSource="$1" sSave="$2" sUser="$3"
-    local -i iReturn=1
+    local sSaved="$2" sNew="$3" sCurrent="$1"
+    local -i iReturn=0
 
     # Do the job
-    String::notice "Configuring '.bashrc' for 'root' ..."
-    FileSystem::moveFile "/root/.bashrc" "${sSave}/.bashrc.root.${m_DATE}"
-    FileSystem::copyFile "${sSource}/.bashrc.root" "/root/.bashrc"
+    String::notice "Saving current source.list ..."
+    FileSystem::moveFile "${sCurrent}" "${sSaved}"
+    ((iReturn+=$?))
 
-    String::notice "Configuring '.bashrc' for '${sUser}' ..."
-    FileSystem::moveFile "/home/${sUser}/.bashrc" "${sSave}/.bashrc.${sUser}.${m_DATE}"
-    FileSystem::copyFile "${sSource}/.bashrc.user" "/home/${sUser}/.bashrc"
+    String::notice "Installing new source.list ..."
+    FileSystem::copyFile "${sNew}" "${sCurrent}"
+    ((iReturn+=$?))
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## BASHRC
+## -----------------------------------------------------------------------------
+
+Install::configureBashRC() {
+
+    # Parameters
+    if (( $# != 4 )) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
+        String::error "Usage: Install::configureBashRC <current file> <saved file> <new file> <user>"
+        return 1
+    fi
+
+    # Init
+    local sSaved="$2" sNew="$3" sCurrent="$1" sUser="$4"
+    local -i iReturn=0
+
+    # Do the job
+    String::notice "Saving current ${sUser}/.bashrc file ..."
+    FileSystem::moveFile "${sCurrent}" "${sSaved}"
+    ((iReturn+=$?))
+
+    String::notice "Installing new .bashrc file ..."
+    FileSystem::copyFile "${sNew}" "${sCurrent}"
+    ((iReturn+=$?))
 
     String::notice -n "Changing owner:"
-    chown "${sUser}":"${sUser}" "/home/${sUser}/.bashrc"
-    iReturn=$?
+    chown "${sUser}":"${sUser}" "${sCurrent}"
+    ((iReturn+=$?))
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}
 }
+
+## -----------------------------------------------------------------------------
+## BashAlias
+## -----------------------------------------------------------------------------
 
 Install::configureBashAliases() {
 
     # Parameters
     if (( $# != 1 )) || [[ -z "$1" ]]; then
         String::error "Usage: Install::configureBashAliases <user>"
-        exit 1
+        return 1
     fi
 
     # Init
-    local sUser="$1" sFile=""
+    local sUser="$1"
     local -i iReturn=1
     local -a aFiles=( "/root/.bash_aliases" "/home/${sUser}/.bash_aliases" )
 
     # Do the job
-    String::notice -n "Configure .bash_aliases:"
-    for sFile in "${aFiles[@]}"; do
-        echo "alias rm=\"rm -i\"" | tee "${sFile}"
-        echo "alias cp=\"cp -i\"" | tee -a "${sFile}"
-        echo "alias mv=\"mv -i\"" | tee -a "${sFile}"
-    done
+    String::notice -n "Configure ${sUser}/.bash_aliases:"
+    echo "alias rm=\"rm -i\"" | tee "${sUser}/.bash_aliases"
+    echo "alias cp=\"cp -i\"" | tee -a "${sUser}/.bash_aliases"
+    echo "alias mv=\"mv -i\"" | tee -a "${sUser}/.bash_aliases"
     String::success "OK"
 
     String::notice -n "Changing owner:"
-    chown "${sUser}":"${sUser}" "/home/${sUser}/.bash_aliases"
+    chown "${sUser}":"${sUser}" "${sUser}/.bash_aliases"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}
 }
 
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## SWAP
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 
 Install::configureSwap() {
     String::notice "Configuring swap ..."
@@ -96,9 +133,9 @@ Install::configureSwap() {
     return 0
 }
 
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## SSD
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 
 Install::isSSD() {
 
@@ -167,9 +204,9 @@ Install::optimizeSSD() {
     return ${iReturn}
 }
 
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## Logwatch
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 Install::configureLogwatch() {
 
     # Parameters
@@ -212,9 +249,9 @@ Install::configureLogwatch() {
     return ${iReturn}
 }
 
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 ## mlocate
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
 Install::updateMlocate() {
 
     # Init

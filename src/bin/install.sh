@@ -1,40 +1,58 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Install system.
 ##
-## @category  Linux Scripts
-## @package   Scripts
-## @version   20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell\bin
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
+
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /root/work/Shell/src/bin
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 
 ## -----------------------------------------------------------------------------
 ## Load constants
 ## -----------------------------------------------------------------------------
-. "./sys/cfg/constant.cfg.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_REALPATH}/../sys/constant.sh"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Includes sources & configuration
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
-. "${m_DIR_SYS_INC}/apt.inc.sh"
-. "${m_DIR_SYS_INC}/service.inc.sh"
-. "${m_DIR_APP}/install/inc/install.inc.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/package.sh"
+# shellcheck source=/dev/null
+#. "${m_DIR_SYS}/service.sh"
+#Config::load "manageservices"
+Config::load "install"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/app.sh"
 
 ## -----------------------------------------------------------------------------
-## Load common configuration
+## Help
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
-if [[ -f "${m_DIR_APP}/install/cfg/priv-install.cfg.sh" ]]; then
-    . "${m_DIR_APP}/install/cfg/priv-install.cfg.sh"
-else
-    . "${m_DIR_APP}/install/cfg/install.cfg.sh"
-fi
+((m_OPTION_SHOWHELP)) && Option::showHelp && exit 0
+
+## -----------------------------------------------------------------------------
+## Trace
+## -----------------------------------------------------------------------------
+Constant::trace
+Install::trace
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -45,43 +63,51 @@ String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## Initial update and upgrade
+## Configures sources file
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Updating source.list ..."
-FileSystem::copyFile "${m_SOURCELIST_SYS_PATH}" "${m_SOURCELIST_SAVE_PATH}.${m_DATE}"
-declare sRelease="$(lsb_release --short --codename)"
-if [[ -z "${sRelease}" ]] || [[ "n/a" = "${sRelease}" ]]; then
-    sRelease='testing'
-fi
-FileSystem::copyFile "${m_SOURCELIST_WRK_PATH}.${sRelease}" "${m_SOURCELIST_SYS_PATH}"
-Console::waitUser
-
-declare -i iReturn
-
-String::separateLine
-Apt::isInstalled "aptitude"
-iReturn=$?
-if ((0 == iReturn )); then
-    Apt::updateAndUpgrade
-else
-    Apt::upgradeWithAptget
-    String::separateLine
-    String::notice "Installing aptitude ..."
-    apt-get install -qqy "aptitude"
-    iReturn=$?
-    String::notice -n "Install aptitude:"
-    String::checkReturnValueForTruthiness ${iReturn}
-fi
+declare sSaved="" sNew="" sRelease="" sUser=""
+sRelease=$(Install::getRelease)
+printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_SOURCELIST_FILENAME}" "${m_INSTALL_SOURCELIST_FILENAME}_${m_DATE}"
+printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_SOURCELIST_FILENAME}" "${sRelease}"
+Install::configureSourcesList "${m_INSTALL_SOURCELIST_SYS}" "${sSaved}" "${sNew}"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## Install or modify Bashrc files
+## Updates & upgrades
 ## -----------------------------------------------------------------------------
 String::separateLine
-Install::configureBashrc "${m_APP_INSTALL_WRK_DIR}" "${m_APP_INSTALL_SAVE_DIR}" "${m_APP_INSTALL_USER}"
+Package::upgrade
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Configures .bashrc
+## -----------------------------------------------------------------------------
 String::separateLine
-Install::configureBashAliases "${m_APP_INSTALL_USER}"
+String::notice "Configuring root .bashrc ..."
+printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_BASHRC_FILENAME}" ".${m_INSTALL_BASHRC_FILENAME}_root_${m_DATE}"
+printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_BASHRC_FILENAME}" "root"
+Install::configureBashRC "/root/.${m_INSTALL_BASHRC_FILENAME}" "${sSaved}" "${sNew}" "root"
+Console::waitUser
+
+String::separateLine
+String::notice "Configuring users .bashrc ..."
+for sUser in "${m_INSTALL_USERS[@]}"; do
+    printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_BASHRC_FILENAME}" ".${m_INSTALL_BASHRC_FILENAME}_${sUser}_${m_DATE}"
+    printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_BASHRC_FILENAME}" "user"
+    Install::configureBashRC "/home/${sUser}/.${m_INSTALL_BASHRC_FILENAME}" "${sSaved}" "${sNew}" "${sUser}"
+done
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Configures .bash_alias
+## -----------------------------------------------------------------------------
+String::separateLine
+Install::configureBashAliases "/root"
+Console::waitUser
+for sUser in "${m_INSTALL_USERS[@]}"; do
+    Install::configureBashAliases "/home/${sUser}"
+done
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
