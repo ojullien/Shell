@@ -17,44 +17,13 @@ exit 3
 ## -----------------------------------------------------------------------------
 readonly m_INSTALL_USERS=("<user>")
 
-## -----------------------------------------------------------------------------
-## Directories
-## -----------------------------------------------------------------------------
-
-# Directory holds new configuration files
-readonly m_INSTALL_CONFIGURATION_NEW="${m_DIR_APP}/install/conf/%s/new/%s"
-# Directory holds old configuration files
-readonly m_INSTALL_CONFIGURATION_OLD="${m_DIR_APP}/install/conf/%s/old/%s"
-
-## -----------------------------------------------------------------------------
-## Sources list files
-## -----------------------------------------------------------------------------
-readonly m_INSTALL_SOURCELIST_FILENAME="sources.list"
-readonly m_INSTALL_SOURCELIST_SYS="/etc/apt/${m_INSTALL_SOURCELIST_FILENAME}"
-
-## -----------------------------------------------------
-## Bashrc files
-## -----------------------------------------------------
-readonly m_INSTALL_BASHRC_FILENAME="bashrc"
-
-
-
-
-
-
-
-
-
-
-
 ## -----------------------------------------------------
 ## Packages
 ## -----------------------------------------------------
-readonly m_PACKAGES_PURGE="vim-tiny"
-readonly m_PACKAGES_SYSTEM="dkms build-essential util-linux deborphan localepurge hdparm ntp tzdata ntpdate debsums"
-readonly m_PACKAGES_SYSTEM_NORECOMMENDS="--without-recommends smartmontools"
-readonly m_PACKAGES_APP="aptitude vim fail2ban ftp mlocate chkrootkit logwatch"
-
+readonly m_INSTALL_PACKAGES_PURGE="vim-tiny"
+readonly m_INSTALL_PACKAGES_SYSTEM="dkms build-essential util-linux deborphan localepurge hdparm htop ntp tzdata ntpdate debsums"
+readonly m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS="--without-recommends smartmontools"
+readonly m_INSTALL_PACKAGES_APP="vim fail2ban ftp mlocate chkrootkit logwatch"
 
 
 
@@ -68,8 +37,6 @@ readonly m_INSTALL_VIMRCLOCAL_PATH_SYS="/etc/vim/${m_INSTALL_VIMRCLOCAL_FILENAME
 
 readonly m_FSTRIM_CRON="/etc/cron.weekly/fstrim"
 
-readonly m_LOGWATCH_SOURCE="${m_INSTALL_WRK_DIR}/logwatch"
-readonly m_LOGWATCH_DESTINATION="/etc/logwatch/conf"
 
 ## -----------------------------------------------------
 ## Trace

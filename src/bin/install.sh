@@ -36,8 +36,6 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/config.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/package.sh"
-# shellcheck source=/dev/null
-#. "${m_DIR_SYS}/service.sh"
 #Config::load "manageservices"
 Config::load "install"
 # shellcheck source=/dev/null
@@ -66,11 +64,16 @@ Console::waitUser
 ## Configures sources file
 ## -----------------------------------------------------------------------------
 String::separateLine
-declare sSaved="" sNew="" sRelease="" sUser=""
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/sources.list/pkg.sh"
+declare sReleaseCodename=""
+declare -i iReturn=0
 sRelease=$(Install::getRelease)
-printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_SOURCELIST_FILENAME}" "${m_INSTALL_SOURCELIST_FILENAME}_${m_DATE}"
-printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_SOURCELIST_FILENAME}" "${sRelease}"
-Install::configureSourcesList "${m_INSTALL_SOURCELIST_SYS}" "${sSaved}" "${sNew}"
+String::notice "Configuring sources.list ..."
+SourcesList::configure "${sRelease}"
+iReturn=$?
+String::notice -n "Configure sources.list:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -84,72 +87,78 @@ Console::waitUser
 ## Configures .bashrc
 ## -----------------------------------------------------------------------------
 String::separateLine
-String::notice "Configuring root .bashrc ..."
-printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_BASHRC_FILENAME}" ".${m_INSTALL_BASHRC_FILENAME}_root_${m_DATE}"
-printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_BASHRC_FILENAME}" "root"
-Install::configureBashRC "/root/.${m_INSTALL_BASHRC_FILENAME}" "${sSaved}" "${sNew}" "root"
-Console::waitUser
-
-String::separateLine
-String::notice "Configuring users .bashrc ..."
-for sUser in "${m_INSTALL_USERS[@]}"; do
-    printf -v sSaved "${m_INSTALL_CONFIGURATION_OLD}" "${m_INSTALL_BASHRC_FILENAME}" ".${m_INSTALL_BASHRC_FILENAME}_${sUser}_${m_DATE}"
-    printf -v sNew "${m_INSTALL_CONFIGURATION_NEW}" "${m_INSTALL_BASHRC_FILENAME}" "user"
-    Install::configureBashRC "/home/${sUser}/.${m_INSTALL_BASHRC_FILENAME}" "${sSaved}" "${sNew}" "${sUser}"
-done
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/bashrc/pkg.sh"
+String::notice "Configuring .bashrc ..."
+BashRC::configure
+iReturn=$?
+String::notice -n "Configure .bashrc:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
-## Configures .bash_alias
+## Configures .bash_aliases
 ## -----------------------------------------------------------------------------
 String::separateLine
-Install::configureBashAliases "/root"
-Console::waitUser
-for sUser in "${m_INSTALL_USERS[@]}"; do
-    Install::configureBashAliases "/home/${sUser}"
-done
+String::notice "Configuring .bash_aliases ..."
+BashRC::configureAliases
+iReturn=$?
+String::notice -n "Configure .bash_aliases:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Configure swap
 ## -----------------------------------------------------------------------------
 String::separateLine
-Install::configureSwap
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/swap/pkg.sh"
+String::notice "Configuring swap ..."
+Swap::configure
+iReturn=$?
+String::notice -n "Configure swap:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Uninstall packages
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::uninstallPackage ${m_PACKAGES_PURGE}
+Package::uninstall ${m_INSTALL_PACKAGES_PURGE}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::installPackage ${m_PACKAGES_SYSTEM}
+Package::install ${m_INSTALL_PACKAGES_SYSTEM}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system without recommanded
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::installPackage ${m_PACKAGES_SYSTEM_NORECOMMENDS}
+Package::install ${m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages apps
 ## -----------------------------------------------------------------------------
 String::separateLine
-Apt::installPackage ${m_PACKAGES_APP}
+Package::install ${m_INSTALL_PACKAGES_APP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Logwatch
 ## -----------------------------------------------------------------------------
 String::separateLine
-Install::configureLogwatch "${m_LOGWATCH_SOURCE}" "${m_LOGWATCH_DESTINATION}"
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/logwatch/pkg.sh"
+String::notice "Configuring logwatch ..."
+LogWatch::configure
+iReturn=$?
+String::notice -n "Configure logwatch:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
