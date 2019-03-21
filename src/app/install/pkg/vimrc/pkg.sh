@@ -1,39 +1,32 @@
 ## -----------------------------------------------------------------------------
-## Install.
-## Install App functions.
+## vimrc.
+## vimrc install package functions.
 ##
-## @package ojullien\Shell\app\clean
+## @package ojullien\Shell\app\install\pkg\vimrc
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
 ## Constants
 ## -----------------------------------------------------------------------------
-readonly m_INSTALL_DIR_REALPATH="${m_DIR_APP}/install"
+readonly m_INSTALL_VIMRC_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/vimrc"
+readonly m_INSTALL_VIMRC_FILENAME="vimrc.local"
+readonly m_INSTALL_VIMRC_SYS="/etc/vim/${m_INSTALL_VIMRC_FILENAME}"
 
 ## -----------------------------------------------------------------------------
-## functions
+## Functions
 ## -----------------------------------------------------------------------------
-Install::showHelp() {
-    String::notice "Usage: $(basename "$0") [options]"
-    String::notice "\tConfigure a fresh install."
-    Option::showHelp
-    return 0
-}
-
-## -----------------------------------------------------------------------------
-## mlocate
-## -----------------------------------------------------------------------------
-Install::updateMlocate() {
+VimRC::configure() {
 
     # Init
     local -i iReturn=1
 
-    # Do the job
-    String::notice -n "Update a database for mlocate:"
-    updatedb
+    # Save current conf
+    FileSystem::moveFile "${m_INSTALL_VIMRC_SYS}" "${m_INSTALL_VIMRC_DIR_REALPATH}/conf_saved/${m_DATE}_${m_INSTALL_VIMRC_FILENAME}"
+
+    # Install new one
+    FileSystem::copyFile "${m_INSTALL_VIMRC_DIR_REALPATH}/conf_new/${m_INSTALL_VIMRC_FILENAME}" "${m_INSTALL_VIMRC_SYS}"
     iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}
 }

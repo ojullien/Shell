@@ -9,7 +9,7 @@
 ## -----------------------------------------------------------------------------
 ## Constants
 ## -----------------------------------------------------------------------------
-readonly m_INSTALL_SOURCESLIST_DIR_REALPATH="$(realpath "$(dirname "$0")")"
+readonly m_INSTALL_SOURCESLIST_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/sources.list"
 readonly m_INSTALL_SOURCESLIST_FILENAME="sources.list"
 readonly m_INSTALL_SOURCESLIST_SYS="/etc/apt/${m_INSTALL_SOURCESLIST_FILENAME}"
 

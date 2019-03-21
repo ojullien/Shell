@@ -9,7 +9,7 @@
 ## -----------------------------------------------------------------------------
 ## Constants
 ## -----------------------------------------------------------------------------
-readonly m_INSTALL_LOGWATCH_DIR_REALPATH="$(realpath "$(dirname "$0")")"
+readonly m_INSTALL_LOGWATCH_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/logwatch"
 readonly m_INSTALL_LOGWATCH_FILENAME="logwatch.conf"
 readonly m_INSTALL_LOGWATCH_SYS="/etc/logwatch/conf"
 
@@ -32,7 +32,7 @@ LogWatch::configure() {
     ((0!=iReturn)) && return ${iReturn}
 
     # save current logfiles conf & install new ones
-    mapfile -t aFiles < <(find "${m_INSTALL_LOGWATCH_SYS}/logfiles" -type f -iname '*.conf' -printf "%f\n")
+    mapfile -t aFiles < <(find "${m_INSTALL_LOGWATCH_DIR_REALPATH}/conf_new/logfiles" -type f -iname '*.conf' -printf "%f\n")
     iReturn=$?
     ((0!=iReturn)) && return ${iReturn}
 

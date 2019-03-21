@@ -9,7 +9,7 @@
 ## -----------------------------------------------------------------------------
 ## Constants
 ## -----------------------------------------------------------------------------
-readonly m_INSTALL_BASHRC_DIR_REALPATH="$(realpath "$(dirname "$0")")"
+readonly m_INSTALL_BASHRC_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/bashrc"
 readonly m_INSTALL_BASHRC_FILENAME="bashrc"
 readonly m_INSTALL_BASHALIASES_FILENAME="bash_aliases"
 

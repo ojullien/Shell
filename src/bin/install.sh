@@ -44,7 +44,7 @@ Config::load "install"
 ## -----------------------------------------------------------------------------
 ## Help
 ## -----------------------------------------------------------------------------
-((m_OPTION_SHOWHELP)) && Option::showHelp && exit 0
+((m_OPTION_SHOWHELP)) && Install::showHelp && exit 0
 
 ## -----------------------------------------------------------------------------
 ## Trace
@@ -61,16 +61,23 @@ String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
+## Release codename
+## -----------------------------------------------------------------------------
+declare -i iReturn=0
+declare sReleaseCodename=""
+sReleaseCodename="$(lsb_release --short --codename)"
+if [[ -z "${sReleaseCodename}" ]] || [[ "n/a" = "${sReleaseCodename}" ]]; then
+    sReleaseCodename='testing'
+fi
+
+## -----------------------------------------------------------------------------
 ## Configures sources file
 ## -----------------------------------------------------------------------------
 String::separateLine
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/install/pkg/sources.list/pkg.sh"
-declare sReleaseCodename=""
-declare -i iReturn=0
-sRelease=$(Install::getRelease)
 String::notice "Configuring sources.list ..."
-SourcesList::configure "${sRelease}"
+SourcesList::configure "${sReleaseCodename}"
 iReturn=$?
 String::notice -n "Configure sources.list:"
 String::checkReturnValueForTruthiness ${iReturn}
@@ -165,8 +172,13 @@ Console::waitUser
 ## Vim
 ## -----------------------------------------------------------------------------
 String::separateLine
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/vimrc/pkg.sh"
 String::notice "Updating vimrc.local ..."
-FileSystem::copyFile "${m_VIMRCLOCAL_WRK_PATH}" "${m_VIMRCLOCAL_SYS_PATH}"
+VimRC::configure
+iReturn=$?
+String::notice -n "Configure vimrc.local:"
+String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -180,14 +192,16 @@ Console::waitUser
 ## Optimize SSD
 ## -----------------------------------------------------------------------------
 String::separateLine
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/ssd/pkg.sh"
 String::notice "Optimizing SSD ..."
-Install::isSSD
+SSD::isSSD
 iReturn=$?
 if ((0 == iReturn )); then
-    Install::supportTRIM
+    SSD::supportTRIM
     iReturn=$?
     if ((0 == iReturn )); then
-        Install::optimizeSSD ${m_FSTRIM_CRON}
+        SSD::optimizeSSD ${m_INSTALL_SSD_FSTRIM_CRON}
         iReturn=$?
     fi
 else

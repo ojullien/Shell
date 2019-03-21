@@ -9,7 +9,7 @@
 ## -----------------------------------------------------------------------------
 ## Constants
 ## -----------------------------------------------------------------------------
-readonly m_INSTALL_SWAP_DIR_REALPATH="$(realpath "$(dirname "$0")")"
+readonly m_INSTALL_SWAP_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/swap"
 readonly m_INSTALL_SWAP_FILENAME="99-swappiness.conf"
 
 ## -----------------------------------------------------------------------------

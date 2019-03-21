@@ -1,67 +1,104 @@
 #!/bin/bash
-
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Install the Shell project into the /root/work directory.
+## Install the Shell project into the /opt/Shell directory.
 ##
-## @category Linux Scripts
-## @package installShell
-## @version 20180811
-## @copyright (©) 2018, Olivier Jullien <https://github.com/ojullien>
+## @package ojullien\Shell
+## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
+#set -o errexit
+set -o nounset
+set -o pipefail
 
-## -----------------------------------------------------
-## Date
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
+## Shell scripts directory, eg: /opt/Shell/scripts/
+## -----------------------------------------------------------------------------
+readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
+
+## -----------------------------------------------------------------------------
+## Defines current date
+## -----------------------------------------------------------------------------
 readonly m_DATE="$(date +"%Y%m%d")_$(date +"%H%M")"
 
-## -----------------------------------------------------
-## Constants
-## -----------------------------------------------------
+## -----------------------------------------------------------------------------
+## Defines main directories
+## -----------------------------------------------------------------------------
 
-# Directory holds scripts
-readonly m_DIR_SCRIPT="$(pwd)"
-# Working directory
-readonly m_DIR="$(dirname "${m_DIR_SCRIPT}")"
-# Directory source
-readonly m_DIR_SRC="${m_DIR}/src"
 # Directory holds system files
-readonly m_DIR_SYS="${m_DIR_SRC}/sys"
-# Directory holds configuration system files
-readonly m_DIR_SYS_CFG="${m_DIR_SYS}/cfg"
-# Directory holds include system files
-readonly m_DIR_SYS_INC="${m_DIR_SYS}/inc"
-# Directory holds app files
-readonly m_DIR_APP="${m_DIR_SRC}/app"
+readonly m_DIR_SYS="$(realpath "${m_DIR_REALPATH}/../src/sys")"
+# Directory holds apps
+readonly m_DIR_APP="$(realpath "${m_DIR_REALPATH}/../src/app")"
 # Directory destination
-readonly m_DIR_DEST="/root/work"
+readonly m_INSTALLSHELL_DIR_SOURCE="$(realpath "${m_DIR_REALPATH}/../src")"
+# Directory destination
+readonly m_INSTALLSHELL_DIR_DESTINATION="/opt/oju"
 # Directory to install
-readonly m_PROJECT_NAME="Shell"
-
-## -----------------------------------------------------
-## Main Files
-## -----------------------------------------------------
-readonly m_LOGFILE="${m_DIR_SCRIPT}/${m_DATE}_$(basename "$0").log"
-declare -i iReturn
+readonly m_INSTALLSHELL_PROJECT_NAME="Shell"
 
 ## -----------------------------------------------------------------------------
-## Includes
+## Defines main files
+## Log file cannot be in /var/log 'cause few apps clean this directory
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_INC}/string.inc.sh"
-. "${m_DIR_SYS_INC}/filesystem.inc.sh"
-. "${m_DIR_SYS_INC}/option.inc.sh"
+readonly m_LOGDIR="$(realpath "${m_DIR_REALPATH}/../src/log")"
+readonly m_LOGFILE="${m_LOGDIR}/${m_DATE}_$(basename "$0").log"
 
 ## -----------------------------------------------------------------------------
-## Load common configuration
+## Defines colors
 ## -----------------------------------------------------------------------------
-. "${m_DIR_SYS_CFG}/root.cfg.sh"
-. "${m_DIR_SYS_CFG}/main.cfg.sh"
+readonly COLORRED="$(tput -Txterm setaf 1)"
+readonly COLORGREEN="$(tput -Txterm setaf 2)"
+readonly COLORRESET="$(tput -Txterm sgr0)"
 
+## -----------------------------------------------------------------------------
+## Functions
+## -----------------------------------------------------------------------------
+Constant::trace() {
+    String::separateLine
+    String::notice "Main configuration"
+    FileSystem::checkDir "\tScript directory:\t\t${m_DIR_REALPATH}" "${m_DIR_REALPATH}"
+    FileSystem::checkDir "\tSystem directory:\t\t${m_DIR_SYS}" "${m_DIR_SYS}"
+    FileSystem::checkDir "\tApp directory:\t\t\t${m_DIR_APP}" "${m_DIR_APP}"
+    FileSystem::checkFile "\tLog file is:\t\t\t${m_LOGFILE}" "${m_LOGFILE}"
+    String::notice "Distribution"
+    (( m_OPTION_DISPLAY )) && lsb_release --all
+    return 0
+}
+
+## -----------------------------------------------------------------------------
+## Includes sources & configuration
+## -----------------------------------------------------------------------------
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/runasroot.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/string.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/filesystem.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/option.sh"
+# shellcheck source=/dev/null
+. "${m_DIR_SYS}/config.sh"
+
+## -----------------------------------------------------------------------------
+## Help
+## -----------------------------------------------------------------------------
+((m_OPTION_SHOWHELP)) && Option::showHelp && exit 0
+
+## -----------------------------------------------------------------------------
+## Install packages system
+## -----------------------------------------------------------------------------
+String::separateLine
+apt-get install "lsb-release"
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Trace
+## -----------------------------------------------------------------------------
+Constant::trace
 String::separateLine
 String::notice "App configuration: installShell"
-FileSystem::checkDir "\tSource directory:\t${m_DIR_SRC}" "${m_DIR_SRC}"
-FileSystem::checkDir "\tDestination directory:\t${m_DIR_DEST}" "${m_DIR_DEST}"
-String::notice "\tProject name:\t\t${m_PROJECT_NAME}"
+FileSystem::checkDir "\tSource directory:\t${m_INSTALLSHELL_DIR_SOURCE}" "${m_INSTALLSHELL_DIR_SOURCE}"
+FileSystem::checkDir "\tDestination directory:\t${m_INSTALLSHELL_DIR_DESTINATION}" "${m_INSTALLSHELL_DIR_DESTINATION}"
+String::notice "\tProject name:\t\t${m_INSTALLSHELL_PROJECT_NAME}"
 
 ## -----------------------------------------------------------------------------
 ## Start
@@ -71,38 +108,44 @@ String::notice "Today is: $(date -R)"
 String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
-FileSystem::removeDirectory "${m_DIR_DEST}/${m_PROJECT_NAME}"
+FileSystem::removeDirectory "${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}"
 iReturn=$?
 ((0!=iReturn)) && return ${iReturn}
 
-FileSystem::createDirectory "${m_DIR_DEST}"
+FileSystem::createDirectory "${m_INSTALLSHELL_DIR_DESTINATION}"
 iReturn=$?
 ((0!=iReturn)) && return ${iReturn}
 
-FileSystem::moveFile "${m_DIR_SRC}" "${m_DIR_DEST}/${m_PROJECT_NAME}"
+FileSystem::moveFile "${m_INSTALLSHELL_DIR_SOURCE}" "${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}"
 iReturn=$?
 ((0!=iReturn)) && return ${iReturn}
 
 String::notice -n "Change owner:"
-chown -R root:root "${m_DIR_DEST}/${m_PROJECT_NAME}"
+chown -R root:root "${m_INSTALLSHELL_DIR_DESTINATION}"
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 ((0!=iReturn)) && return ${iReturn}
 
-String::notice -n "Change directories access rights:"
-find "${m_DIR_DEST}/${m_PROJECT_NAME}" -type d -exec chmod u=rwx,g=rx,o= {} \;
+String::notice -n "Change common directories access rights:"
+find "${m_INSTALLSHELL_DIR_DESTINATION}" -type d -exec chmod u=rwx,g=rx,o=rx {} \;
+iReturn=$?
+String::checkReturnValueForTruthiness ${iReturn}
+((0!=iReturn)) && return ${iReturn}
+
+String::notice -n "Change log directory access rights:"
+find "${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}/log" -type d -exec chmod u=rwx,g=rwx,o=rwx {} \;
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 ((0!=iReturn)) && return ${iReturn}
 
 String::notice -n "Change files access rights:"
-find "${m_DIR_DEST}/${m_PROJECT_NAME}" -type f -exec chmod u=rw,g=r,o= {} \;
+find "${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}" -type f -exec chmod u=rw,g=r,o=r {} \;
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 ((0!=iReturn)) && return ${iReturn}
 
 String::notice -n "Change sh files access rights:"
-chmod u+x ${m_DIR_DEST}/${m_PROJECT_NAME}/*.sh
+chmod +x ${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}/bin/*.sh
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 ((0!=iReturn)) && return ${iReturn}
