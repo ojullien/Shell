@@ -1,13 +1,13 @@
 #!/bin/sh
 MAILTO=""
 touch /root/work/Shell/log/cron.run
-if [ -f /root/work/Shell/autosave.sh ]; then
-    cd /root/work/Shell || exit 1
+if [ -f /opt/oju/Shell/autosave.sh ]; then
+    cd /opt/oju/Shell || exit 1
     bash autosave.sh --active-log --no-display
     cd /etc/cron.daily 2>/dev/null;
 fi
-if [ -f /root/work/Shell/autosavedb.sh ]; then
-    cd /root/work/Shell || exit 1
+if [ -f /opt/oju/Shell/autosavedb.sh ]; then
+    cd /opt/oju/Shell || exit 1
     bash autosavedb.sh --active-log --no-display
     cd /etc/cron.daily 2>/dev/null;
 fi
