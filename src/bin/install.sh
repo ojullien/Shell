@@ -74,7 +74,7 @@ fi
 ## Configures sources file
 ## -----------------------------------------------------------------------------
 String::separateLine
-# shellcheck source=/dev/null
+shellcheck source=/dev/null
 . "${m_DIR_APP}/install/pkg/sources.list/pkg.sh"
 String::notice "Configuring sources.list ..."
 SourcesList::configure "${sReleaseCodename}"
@@ -115,6 +115,19 @@ String::checkReturnValueForTruthiness ${iReturn}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
+## Configures .profile
+## -----------------------------------------------------------------------------
+String::separateLine
+# shellcheck source=/dev/null
+. "${m_DIR_APP}/install/pkg/profile/pkg.sh"
+String::notice "Configuring .profile ..."
+Profile::configure
+iReturn=$?
+String::notice -n "Configure .profile:"
+String::checkReturnValueForTruthiness ${iReturn}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
 ## Configure swap
 ## -----------------------------------------------------------------------------
 String::separateLine
@@ -131,28 +144,28 @@ Console::waitUser
 ## Uninstall packages
 ## -----------------------------------------------------------------------------
 String::separateLine
-Package::uninstall ${m_INSTALL_PACKAGES_PURGE}
+Package::uninstall --yes --quiet ${m_INSTALL_PACKAGES_PURGE}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system
 ## -----------------------------------------------------------------------------
 String::separateLine
-Package::install ${m_INSTALL_PACKAGES_SYSTEM}
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages system without recommanded
 ## -----------------------------------------------------------------------------
 String::separateLine
-Package::install ${m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS}
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
 ## Install packages apps
 ## -----------------------------------------------------------------------------
 String::separateLine
-Package::install ${m_INSTALL_PACKAGES_APP}
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_APP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------

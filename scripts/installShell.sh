@@ -34,6 +34,10 @@ readonly m_INSTALLSHELL_DIR_SOURCE="$(realpath "${m_DIR_REALPATH}/../src")"
 readonly m_INSTALLSHELL_DIR_DESTINATION="/opt/oju"
 # Directory to install
 readonly m_INSTALLSHELL_PROJECT_NAME="Shell"
+# Cron.daily file destination
+readonly m_INSTALLCRON_DESTINATION="/etc/cron.daily/priv-autosave"
+# Cron.daily file source
+readonly m_INSTALLCRON_SOURCE="${m_DIR_REALPATH}/cron/priv-autosave"
 
 ## -----------------------------------------------------------------------------
 ## Defines main files
@@ -87,7 +91,7 @@ Constant::trace() {
 ## Install packages system
 ## -----------------------------------------------------------------------------
 String::separateLine
-apt-get install "lsb-release"
+apt-get install "lsb-release" --yes --quiet
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
@@ -146,6 +150,19 @@ String::checkReturnValueForTruthiness ${iReturn}
 
 String::notice -n "Change sh files access rights:"
 chmod +x ${m_INSTALLSHELL_DIR_DESTINATION}/${m_INSTALLSHELL_PROJECT_NAME}/bin/*.sh
+iReturn=$?
+String::checkReturnValueForTruthiness ${iReturn}
+((0!=iReturn)) && return ${iReturn}
+
+String::notice "Configuring cron.daily ..."
+FileSystem::copyFile "${m_INSTALLCRON_SOURCE}" "${m_INSTALLCRON_DESTINATION}"
+iReturn=$?
+String::notice -n "Configure cron.daily:"
+String::checkReturnValueForTruthiness ${iReturn}
+((0!=iReturn)) && return ${iReturn}
+
+String::notice -n "Change cron.daily access rights:"
+chmod u=rwx,g=rx,o=rx "${m_INSTALLCRON_DESTINATION}"
 iReturn=$?
 String::checkReturnValueForTruthiness ${iReturn}
 ((0!=iReturn)) && return ${iReturn}

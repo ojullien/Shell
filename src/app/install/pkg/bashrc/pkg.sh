@@ -64,10 +64,11 @@ BashRC::configureUserAliases() {
     FileSystem::moveFile "${sCurrent}" "${m_INSTALL_BASHRC_DIR_REALPATH}/conf_saved/${m_DATE}_${sUser}_${m_INSTALL_BASHALIASES_FILENAME}"
 
     # Do the job
-    String::notice -n "Configure ${sCurrent}:"
+    String::notice "Configuring ${sCurrent} ..."
     echo "alias rm=\"rm -i\"" | tee "${sCurrent}"
     echo "alias cp=\"cp -i\"" | tee -a "${sCurrent}"
     echo "alias mv=\"mv -i\"" | tee -a "${sCurrent}"
+    String::notice -n "Configure ${sCurrent}:"
     String::success "OK"
 
     String::notice -n "Changing owner:"
@@ -86,11 +87,13 @@ BashRC::configureAliases() {
 
     # Configure bash_aliases for root
     BashRC::configureUserAliases "root" "/root"
+    iReturn=$?
     ((0!=iReturn)) && return ${iReturn}
 
     # Configure bash_aliases for users
     for sUser in "${m_INSTALL_USERS[@]}"; do
         BashRC::configureUserAliases "${sUser}" "/home/${sUser}"
+        iReturn=$?
         ((0!=iReturn)) && return ${iReturn}
     done
 
