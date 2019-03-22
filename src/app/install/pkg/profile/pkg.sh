@@ -33,7 +33,7 @@ Profile::configureUser() {
     # Do the job
     String::notice "Configuring ${sCurrent} ..."
     echo "if [ -d \"/opt/oju/Shell/bin\" ] ; then" | tee -a "${sCurrent}"
-    echo "    PATH=\"$PATH:/opt/oju/Shell/bin\"" | tee -a "${sCurrent}"
+    echo '    PATH="$PATH:/opt/oju/Shell/bin"' | tee -a "${sCurrent}"
     echo "fi" | tee -a "${sCurrent}"
     String::notice -n "Configure ${sCurrent}:"
     String::success "OK"

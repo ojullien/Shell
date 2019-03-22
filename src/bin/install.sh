@@ -91,6 +91,34 @@ Package::upgrade
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
+## Uninstall packages
+## -----------------------------------------------------------------------------
+String::separateLine
+Package::uninstall --yes --quiet ${m_INSTALL_PACKAGES_PURGE}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Install packages system
+## -----------------------------------------------------------------------------
+String::separateLine
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Install packages system without recommanded
+## -----------------------------------------------------------------------------
+String::separateLine
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
+## Install packages apps
+## -----------------------------------------------------------------------------
+String::separateLine
+Package::install --yes --quiet ${m_INSTALL_PACKAGES_APP}
+Console::waitUser
+
+## -----------------------------------------------------------------------------
 ## Configures .bashrc
 ## -----------------------------------------------------------------------------
 String::separateLine
@@ -138,34 +166,6 @@ Swap::configure
 iReturn=$?
 String::notice -n "Configure swap:"
 String::checkReturnValueForTruthiness ${iReturn}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Uninstall packages
-## -----------------------------------------------------------------------------
-String::separateLine
-Package::uninstall --yes --quiet ${m_INSTALL_PACKAGES_PURGE}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Install packages system
-## -----------------------------------------------------------------------------
-String::separateLine
-Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Install packages system without recommanded
-## -----------------------------------------------------------------------------
-String::separateLine
-Package::install --yes --quiet ${m_INSTALL_PACKAGES_SYSTEM_NORECOMMENDS}
-Console::waitUser
-
-## -----------------------------------------------------------------------------
-## Install packages apps
-## -----------------------------------------------------------------------------
-String::separateLine
-Package::install --yes --quiet ${m_INSTALL_PACKAGES_APP}
 Console::waitUser
 
 ## -----------------------------------------------------------------------------
