@@ -28,9 +28,9 @@ Profile::addLines() {
 
     # Do the job
     String::notice "Configuring ${sFile} ..."
-    echo "if [ -d \"/opt/oju/Shell/bin\" ] ; then" | tee --append "${sFile}"
-    echo '    PATH="$PATH:/opt/oju/Shell/bin"' | tee --append "${sFile}"
-    echo "fi" | tee -a "${sFile}"
+    echo "if [ -d \"/opt/oju/Shell/bin\" ]; then" | tee --append "${sFile}" > /dev/null 2>&1
+    echo '    PATH="$PATH:/opt/oju/Shell/bin"' | tee --append "${sFile}" > /dev/null 2>&1
+    echo "fi" | tee -a "${sFile}" > /dev/null 2>&1
     String::notice -n "Configure ${sFile}:"
     String::success "OK"
 
@@ -47,7 +47,7 @@ Profile::configureFile() {
 
     # Init
     local sUser="$1" sPathFile="$2/.$3"
-    local -i iReturn=1
+    local -i iReturn=0
 
     # Save current files
     FileSystem::copyFile "${sPathFile}" "${m_INSTALL_PROFILE_DIR_REALPATH}/conf_saved/${m_DATE}_${sUser}_$3"
@@ -68,7 +68,7 @@ Profile::configure() {
 
     # Init
     local sUser=""
-    local -i iReturn=1
+    local -i iReturn=0
 
     # Configure .profile for root
     Profile::configureFile "root" "/root" "profile"
