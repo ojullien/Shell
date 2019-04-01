@@ -65,9 +65,9 @@ BashRC::configureUserAliases() {
 
     # Do the job
     String::notice "Configuring ${sCurrent} ..."
-    echo "alias rm=\"rm -i\"" | tee "${sCurrent}"
-    echo "alias cp=\"cp -i\"" | tee -a "${sCurrent}"
-    echo "alias mv=\"mv -i\"" | tee -a "${sCurrent}"
+    echo "alias rm=\"rm -i\"" | tee -a "${sCurrent}" > /dev/null 2>&1
+    echo "alias cp=\"cp -i\"" | tee -a "${sCurrent}" > /dev/null 2>&1
+    echo "alias mv=\"mv -i\"" | tee -a "${sCurrent}" > /dev/null 2>&1
     String::notice -n "Configure ${sCurrent}:"
     String::success "OK"
 

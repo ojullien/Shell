@@ -10,36 +10,54 @@
 ## Constants
 ## -----------------------------------------------------------------------------
 readonly m_INSTALL_PROFILE_DIR_REALPATH="${m_INSTALL_DIR_REALPATH}/pkg/profile"
-readonly m_INSTALL_PROFILE_FILENAME="profile"
 
 ## -----------------------------------------------------------------------------
 ## Functions
 ## -----------------------------------------------------------------------------
-Profile::configureUser() {
+Profile::addLines() {
 
     # Parameters
-    if (( $# != 2 )) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: Profile::configureUser <user> <home path>"
+    if (( $# != 1 )) || [[ -z "$1" ]]; then
+        String::error "Usage: Profile::addLines <full filename and path>"
         return 1
     fi
 
     # Init
-    local sUser="$1" sCurrent="$2/.${m_INSTALL_PROFILE_FILENAME}"
-    local -i iReturn=1
-
-    # Save current file
-    FileSystem::copyFile "${sCurrent}" "${m_INSTALL_PROFILE_DIR_REALPATH}/conf_saved/${m_DATE}_${sUser}_${m_INSTALL_PROFILE_FILENAME}"
+    local sFile="$1"
+    local -i iReturn=0
 
     # Do the job
-    String::notice "Configuring ${sCurrent} ..."
-    echo "if [ -d \"/opt/oju/Shell/bin\" ] ; then" | tee -a "${sCurrent}"
-    echo '    PATH="$PATH:/opt/oju/Shell/bin"' | tee -a "${sCurrent}"
-    echo "fi" | tee -a "${sCurrent}"
-    String::notice -n "Configure ${sCurrent}:"
+    String::notice "Configuring ${sFile} ..."
+    echo "if [ -d \"/opt/oju/Shell/bin\" ]; then" | tee --append "${sFile}" > /dev/null 2>&1
+    echo '    PATH="$PATH:/opt/oju/Shell/bin"' | tee --append "${sFile}" > /dev/null 2>&1
+    echo "fi" | tee -a "${sFile}" > /dev/null 2>&1
+    String::notice -n "Configure ${sFile}:"
     String::success "OK"
 
+    return ${iReturn}
+}
+
+Profile::configureFile() {
+
+    # Parameters
+    if (( $# != 3 )) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
+        String::error "Usage: Profile::configureFile <user> <home path> <file>"
+        return 1
+    fi
+
+    # Init
+    local sUser="$1" sPathFile="$2/.$3"
+    local -i iReturn=0
+
+    # Save current files
+    FileSystem::copyFile "${sPathFile}" "${m_INSTALL_PROFILE_DIR_REALPATH}/conf_saved/${m_DATE}_${sUser}_$3"
+
+    # Add lines
+    Profile::addLines "${sPathFile}"
+
+    # Changing owner
     String::notice -n "Changing owner:"
-    chown "${sUser}":"${sUser}" "${sCurrent}"
+    chown "${sUser}":"${sUser}" "${sPathFile}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -50,18 +68,25 @@ Profile::configure() {
 
     # Init
     local sUser=""
-    local -i iReturn=1
+    local -i iReturn=0
 
-    # Configure bash_aliases for root
-    Profile::configureUser "root" "/root"
-    iReturn=$?
-    ((0!=iReturn)) && return ${iReturn}
+    # Configure .profile for root
+    Profile::configureFile "root" "/root" "profile"
+    ((iReturn+=$?))
 
-    # Configure bash_aliases for users
+    # Configure .bash_profile for root
+    Profile::configureFile "root" "/root" "bash_profile"
+    ((iReturn+=$?))
+
+    # Configure files for users
     for sUser in "${m_INSTALL_USERS[@]}"; do
-        Profile::configureUser "${sUser}" "/home/${sUser}"
-        iReturn=$?
-        ((0!=iReturn)) && return ${iReturn}
+            # Configure .profile
+            Profile::configureFile "${sUser}" "/home/${sUser}" "profile"
+            ((iReturn+=$?))
+
+            # Configure .bash_profile
+            Profile::configureFile "${sUser}" "/home/${sUser}" "bash_profile"
+            ((iReturn+=$?))
     done
 
     return ${iReturn}
