@@ -1,14 +1,57 @@
-#!/bin/sh
+#!/bin/bash
 MAILTO=""
 touch /opt/oju/Shell/log/cron.run
+
+# Running in a different process
+
 if [ -f /opt/oju/Shell/bin/autosave.sh ]; then
-    cd /opt/oju/Shell/bin || exit 1
-    bash autosave.sh --active-log --no-display
-    cd /etc/cron.daily 2>/dev/null;
+
+    # call the other script using absolute path
+    /opt/oju/Shell/bin/autosave.sh --active-log --no-display
+
+    # or using the relative path (in the same folder)
+    # cd /opt/oju/Shell/bin || exit 1
+    # ./autosave.sh --active-log --no-display
+    # cd /etc/cron.daily 2>/dev/null;
+
 fi
+
 if [ -f /opt/oju/Shell/bin/autosavedb.sh ]; then
-    cd /opt/oju/Shell/bin || exit 1
-    bash autosavedb.sh --active-log --no-display
-    cd /etc/cron.daily 2>/dev/null;
+
+    # call the other script using absolute path
+    /opt/oju/Shell/bin/autosavedb.sh --active-log --no-display
+
+    # or using the relative path (in the same folder)
+    # cd /opt/oju/Shell/bin || exit 1
+    # ./autosavedb.sh --active-log --no-display
+    # cd /etc/cron.daily 2>/dev/null;
+
 fi
+
+# Or running in a different process
+
+# if [ -f /opt/oju/Shell/bin/autosave.sh ]; then
+
+#     # call the other script using absolute path, using source
+#     source /opt/oju/Shell/bin/autosave.sh --active-log --no-display
+
+#     ## or using the relative path (in the same folder) using the dot (.) operator
+#     #cd /opt/oju/Shell/bin || exit 1
+#     #. ./autosave.sh --active-log --no-display
+#     #cd /etc/cron.daily 2>/dev/null;
+
+# fi
+
+# if [ -f /opt/oju/Shell/bin/autosavedb.sh ]; then
+
+#     # call the other script using absolute path, using source
+#     source /opt/oju/Shell/bin/autosavedb.sh --active-log --no-display
+
+#     ## or using the relative path (in the same folder) using the dot (.) operator
+#     #cd /opt/oju/Shell/bin || exit 1
+#     #. ./autosavedb.sh --active-log --no-display
+#     #cd /etc/cron.daily 2>/dev/null;
+
+# fi
+
 exit 0
