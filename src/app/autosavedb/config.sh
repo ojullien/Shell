@@ -14,8 +14,7 @@ exit 3
 ## -----------------------------------------------------------------------------
 ## Test mariadb installed
 ## -----------------------------------------------------------------------------
-readonly m_AUTOSAVEDB_ISMARIADB
-m_AUTOSAVEDB_ISMARIADB=$(mysql --version | grep -c "MariaDB")
+readonly m_AUTOSAVEDB_ISMARIADB=$(mysql --version | grep -c "MariaDB")
 
 ## -----------------------------------------------------------------------------
 ## App Directories

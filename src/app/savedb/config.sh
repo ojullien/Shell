@@ -14,8 +14,7 @@ exit 3
 ## -----------------------------------------------------------------------------
 ## Test mariadb installed
 ## -----------------------------------------------------------------------------
-readonly m_SAVEDB_ISMARIADB
-m_SAVEDB_ISMARIADB=$(mysql --version | grep -c "MariaDB")
+readonly m_SAVEDB_ISMARIADB=$(mysql --version | grep -c "MariaDB")
 
 ## -----------------------------------------------------------------------------
 ## Destination folder
