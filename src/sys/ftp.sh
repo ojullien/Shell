@@ -28,7 +28,7 @@ FTP::put() {
     # Do the job
     if ((m_OPTION_LOG)); then
 
-        ftp -pin "${sHost}" <<'END_SCRIPT' >> "${m_LOGFILE}" 2> ftp.err.$$
+        ftp -pin "${sHost}" <<END_SCRIPT >> "${m_LOGFILE}" 2> ftp.err.$$
 quote USER ${sUser}
 quote PASS ${sPass}
 binary
@@ -40,7 +40,7 @@ quit
 END_SCRIPT
 
     else
-        ftp -pin "${sHost}" <<'END_SCRIPT' 2> ftp.err.$$
+        ftp -pin "${sHost}" <<END_SCRIPT 2> ftp.err.$$
 quote USER ${sUser}
 quote PASS ${sPass}
 binary
