@@ -39,6 +39,7 @@ All the main app scripts can take, at least, the following options:
     - package.sh: package manager (dpkg, apt, aptitude)
     - runasroot.sh: Tests the user credentials.
     - service.sh: service manager (use system/d.sh or system/v.sh)
+    - ssh.sh: SSH functions.
     - string.sh: string functions.
     - system/d.sh: System V service manager.
     - system/v.sh: systemd service manager.
@@ -55,7 +56,7 @@ All the main app scripts can take, at least, the following options:
       - update source.list
       - update system
       - upgrade system
-    - Install or modify .bashrc, .bash_alias, .profile files
+    - Install or modify .bashrc, .bash_alias, .bash_profile, .profile files
     - Configure swap
     - Uninstall packages (vim-tiny, ...)
     - Install system packages (dkms, build-essential, util-linux, deborphan, localepurge, hdparm, smartmontools, ...)
