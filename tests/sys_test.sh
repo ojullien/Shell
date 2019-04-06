@@ -47,8 +47,8 @@ Test::Constant::trace
 ## Start
 ## -----------------------------------------------------------------------------
 
-declare aPackages=("config" "filesystem" "string" "package" "service" "mysql" "mariadb")
-declare aFiles=("config" "filesystem" "string" "package" "service" "db/mysql" "db/mariadb")
+declare aPackages=("config" "filesystem" "string" "package" "service" "mysql" "mariadb" "ssh")
+declare aFiles=("config" "filesystem" "string" "package" "service" "db/mysql" "db/mariadb" "ssh")
 declare -i iChoice=-1
 
 while ((iChoice>=${#aPackages[*]})) || ((iChoice<0)); do
