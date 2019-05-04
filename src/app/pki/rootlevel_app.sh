@@ -145,7 +145,7 @@ PKI::RootLevel::createPasswordedKeypairFile() {
 #    String::checkReturnValueForTruthiness ${iReturn}
 
     String::notice -n "Generate the '${sPath}' private key:"
-    openssl genpkey -out "${sKeyFile}.p1.${m_SSL_EXTENTION_KEY}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
+    openssl genpkey -out "${sKeyFile}.${m_SSL_EXTENTION_KEY}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -170,7 +170,8 @@ PKI::RootLevel::createPasswordedKeypairFile() {
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        for sFormat in {"p1","p8","p5","p12"}; do
+        openssl pkey -inform PEM -in "${sKeyFile}.${m_SSL_EXTENTION_KEY}" -passin file:"${sPassFile}" -text -noout
+        for sFormat in {"p8","p5","p12"}; do
             openssl pkey -inform PEM -in "${sKeyFile}.${sFormat}.${m_SSL_EXTENTION_KEY}" -passin file:"${sPassFile}" -text -noout
         done
    fi
