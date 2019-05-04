@@ -22,6 +22,12 @@ readonly -A m_PKI_CA_CERTS_DIRNAMES=( [certificate]="crt" [revokelist]="crl" [si
 readonly -A m_PKI_CA_NAMES=( [root]="root-ca" [tls]="tls-ca" );
 
 ## -----------------------------------------------------------------------------
+## Main names
+## -----------------------------------------------------------------------------
+readonly m_SSL_EXTENTION_PASSWD="pass"
+readonly m_SSL_EXTENTION_KEY="key.pem"
+
+## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
 PKI::trace() {

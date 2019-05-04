@@ -8,9 +8,9 @@
 
 PKI::showHelp() {
     String::notice "Usage: $(basename "$0") [options] [command]"
-    String::notice "\tOpenSSL toolkit"
+    String::notice "\tPKI toolkit"
     Option::showHelp
     String::notice "Available Commands:"
-    String::notice "\tca\tSample minimal CA application."
+    String::notice "\trootlevel\tSample minimal PKI Root level application."
     return 0
 }

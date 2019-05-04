@@ -64,11 +64,11 @@ Console::waitUser
 declare -i iReturn=1
 
 case "$1" in
-    ca) # CA tools
+    rootlevel) # Root level tools
         shift
         # shellcheck source=/dev/null
-        . "${m_DIR_APP}/pki/ca_app.sh"
-        PKI::CA::main "$@"
+        . "${m_DIR_APP}/pki/rootlevel_app.sh"
+        PKI::RootLevel::main "$@"
         ;;
     *)
         String::error "argument error: missing or incorrect command."
