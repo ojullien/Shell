@@ -77,11 +77,12 @@ PKI::RootLevel::createPasswordFile() {
     fi
 
     # Init
-    local sFile="$1/${m_PKI_CA_DIRNAMES[private]}/$2.${m_SSL_EXTENTION_PASSWD}"
+    local sPath="$1" sName="$2"
+    local sFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}.${m_SSL_EXTENTION_PASSWD}"
     local -i iReturn=1
 
     # Do the job
-    String::notice -n "Generate '${sFile}' password file:"
+    String::notice -n "Generate '${sName}' password file:"
     openssl rand -out "${sFile}" -base64 16
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
@@ -109,7 +110,7 @@ PKI::RootLevel::createDatabases() {
     local -i iReturn=0
 
     # Do the job
-    String::notice -n "Creating '${sPath}/${sName} databases :"
+    String::notice -n "Creating '${sName}' databases :"
     cp /dev/null "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.db"
     cp /dev/null "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.db.attr"
     echo 01 > "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.crt.srl"
@@ -132,25 +133,46 @@ PKI::RootLevel::createPasswordedKeypairFile() {
     fi
 
     # Init
-    local sPassFile="$1/${m_PKI_CA_DIRNAMES[private]}/$2.${m_SSL_EXTENTION_PASSWD}"
-    local sKeyFile="$1/${m_PKI_CA_DIRNAMES[private]}/$2.${m_SSL_EXTENTION_KEY}"
+    local sPath="$1" sName="$2"
+    local sPassFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}.${m_SSL_EXTENTION_PASSWD}"
+    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}"
     local -i iReturn=1
 
     # Do the job
-    String::notice -n "Generate the private key:"
-    openssl genpkey -out "${sKeyFile}" -outform PEM -pass file:"${sPassFile}" -aes-256-cbc -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
+#    String::notice -n "Generate the encrypted '${sPath}' private key:"
+#    openssl genpkey -out "${sKeyFile}" -outform PEM -pass file:"${sPassFile}" -aes-256-cbc -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
+#    iReturn=$?
+#    String::checkReturnValueForTruthiness ${iReturn}
+
+    String::notice -n "Generate the '${sPath}' private key:"
+    openssl genpkey -out "${sKeyFile}.p1.${m_SSL_EXTENTION_KEY}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
-    if ((0==iReturn)); then
-        String::notice -n "Changing mode:"
-        chmod 400 "${sKeyFile}"
-        iReturn=$?
-        String::checkReturnValueForTruthiness ${iReturn}
-    fi
+    String::notice -n "Convert the private key to PKCS#8 format using default parameters (AES with 256 bit key and hmacWithSHA256):"
+    openssl pkcs8 -in "${sKeyFile}.${m_SSL_EXTENTION_KEY}" -topk8 -out "${sKeyFile}.p8.${m_SSL_EXTENTION_KEY}" -passout file:"${sPassFile}"
+    iReturn+=$?
+    String::checkReturnValueForTruthiness ${iReturn}
 
-    if ((0==iReturn)); then
-        openssl pkey -inform PEM -in "${sKeyFile}" -passin file:"${sPassFile}" -text -noout
+    String::notice -n "Convert the private key to PKCS#5 v2.0 format:"
+    openssl pkcs8 -in "${sKeyFile}.${m_SSL_EXTENTION_KEY}" -topk8 -v2 aes-256-cbc -v2prf hmacWithSHA256 -out "${sKeyFile}.p5.${m_SSL_EXTENTION_KEY}" -passout file:"${sPassFile}"
+    iReturn+=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    String::notice -n "Convert the private key to PKCS#8 using a PKCS#12 compatible algorithm:"
+    openssl pkcs8 -in "${sKeyFile}.${m_SSL_EXTENTION_KEY}" -topk8 -v1 PBE-SHA1-3DES -out "${sKeyFile}.p12.${m_SSL_EXTENTION_KEY}" -passout file:"${sPassFile}"
+    iReturn+=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    String::notice -n "Change mode:"
+    chmod 400 "${sKeyFile}"
+    iReturn+=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+        for sFormat in {"p1","p8","p5","p12"}; do
+            openssl pkey -inform PEM -in "${sKeyFile}.${sFormat}.${m_SSL_EXTENTION_KEY}" -passin file:"${sPassFile}" -text -noout
+        done
    fi
 
     return ${iReturn}
@@ -159,16 +181,35 @@ PKI::RootLevel::createPasswordedKeypairFile() {
 PKI::RootLevel::createSelfSignedRootCertificateFile() {
 
     # Parameters
-    if (($# != 2)) || [[ -z "$1" ]]; then
-        String::error "Usage: PKI::RootLevel::createPasswordedKeypairFile <out filename>"
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: PKI::RootLevel::createSelfSignedRootCertificateFile <CA path> <CA name>"
         return 1
     fi
 
     # Init
-    local sFilename="$1"
+    local sPath="$1" sName="$2"
+    local sPassFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}.${m_SSL_EXTENTION_PASSWD}"
+    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}.${m_SSL_EXTENTION_KEY}"
+    local sCertFile="${sPath}/${m_PKI_CA_DIRNAMES[private]}/${sName}.${m_SSL_EXTENTION_KEY}"
     local -i iReturn=1
 
     # Do the job
+    String::notice -n "Generate the '${sPath}' private key:"
+    openssl genpkey -out "${sKeyFile}" -outform PEM -pass file:"${sPassFile}" -aes-256-cbc -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve
+    iReturn=$?
+    String::checkReturnValueForTruthiness ${iReturn}
+
+    if ((0==iReturn)); then
+        String::notice -n "Change mode:"
+        chmod 400 "${sKeyFile}"
+        iReturn=$?
+        String::checkReturnValueForTruthiness ${iReturn}
+    fi
+
+    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+        openssl pkey -inform PEM -in "${sKeyFile}" -passin file:"${sPassFile}" -text -noout
+   fi
+
     return ${iReturn}
 }
 
