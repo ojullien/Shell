@@ -53,7 +53,7 @@ PKI::RootLevel::initFolders() {
     local -i iReturn=1
 
     # Do the job
-    String::notice -n "Creating '${sPath}/*' directories: "
+    String::notice -n "Create '${sPath}/*' directories: "
     mkdir --parents ${sPath}/{${m_PKI_CA_DIRNAMES[archive]},${m_PKI_CA_DIRNAMES[private]},${m_PKI_CA_DIRNAMES[databases]},${m_PKI_CA_DIRNAMES[certificates]}/{${m_PKI_CA_CERTS_DIRNAMES[certificate]},${m_PKI_CA_CERTS_DIRNAMES[revokelist]},${m_PKI_CA_CERTS_DIRNAMES[signingrequest]}}}
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
@@ -81,14 +81,14 @@ PKI::RootLevel::createPasswordFile() {
     local -i iReturn=1
 
     # Do the job
-    String::notice -n "Generating '${sFile}' password file:"
+    String::notice -n "Generate '${sFile}' password file:"
     openssl rand -out "${sFile}" -base64 16
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
     if ((0==iReturn)); then
         String::notice -n "Changing mode:"
-        chmod 400 "${sKeyFile}"
+        chmod 400 "${sFile}"
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     fi
