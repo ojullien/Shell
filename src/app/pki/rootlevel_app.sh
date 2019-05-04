@@ -54,7 +54,7 @@ PKI::RootLevel::initFolders() {
 
     # Do the job
     String::notice -n "Creating '${sPath}/*' directories: "
-    mkdir --parents "${sPath}/{${m_PKI_CA_DIRNAMES[archive]},${m_PKI_CA_DIRNAMES[private]},${m_PKI_CA_DIRNAMES[databases]},${m_PKI_CA_DIRNAMES[certificates]}/{${m_PKI_CA_CERTS_DIRNAMES[certificate]},${m_PKI_CA_CERTS_DIRNAMES[revokelist]},${m_PKI_CA_CERTS_DIRNAMES[signingrequest]}}}"
+    mkdir --parents ${sPath}/{${m_PKI_CA_DIRNAMES[archive]},${m_PKI_CA_DIRNAMES[private]},${m_PKI_CA_DIRNAMES[databases]},${m_PKI_CA_DIRNAMES[certificates]}/{${m_PKI_CA_CERTS_DIRNAMES[certificate]},${m_PKI_CA_CERTS_DIRNAMES[revokelist]},${m_PKI_CA_CERTS_DIRNAMES[signingrequest]}}}
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
