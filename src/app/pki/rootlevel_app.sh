@@ -165,7 +165,7 @@ PKI::RootLevel::createPasswordedKeypairFile() {
     String::checkReturnValueForTruthiness ${iReturn}
 
     String::notice -n "Change mode:"
-    chmod 400 "${sKeyFile}"
+    chmod 400 *.${m_SSL_EXTENTION_KEY}
     iReturn+=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
