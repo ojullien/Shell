@@ -68,10 +68,16 @@ PKI::RootLevel::main() {
             iReturn=$?
             ;;
         init) # Create the CA repository, create the CA database files and create the password file for the CA private key.
-            PKI::createRepository "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}" &&\
-                PKI::createDatabases "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"\
-                PKI::createPasswordFile "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
+            PKI::createRepository "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
             iReturn=$?
+            if ((0==iReturn)); then
+                PKI::createDatabases "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
+                iReturn=$?
+            fi
+            if ((0==iReturn)); then
+                PKI::createPasswordFile "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
+                iReturn=$?
+            fi
             ;;
         create) # Create the Root Certificate
             PKI::generateKeypair "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}" &&\
