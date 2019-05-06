@@ -24,7 +24,12 @@ readonly -A m_PKI_CA_NAMES=( [root]="root-ca" [tls]="tls-ca" );
 ## -----------------------------------------------------------------------------
 ## Main names
 ## -----------------------------------------------------------------------------
-readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest)]="csr.pem");
+readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest]="csr.pem");
+
+## -----------------------------------------------------------------------------
+## Main options
+## -----------------------------------------------------------------------------
+readonly m_PKI_OPTION_ENCRYPTKEY=0
 
 ## -----------------------------------------------------------------------------
 ## Trace

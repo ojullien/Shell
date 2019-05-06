@@ -74,17 +74,17 @@ PKI::RootLevel::main() {
                 PKI::createDatabases "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
                 iReturn=$?
             fi
-            if ((0==iReturn)); then
-                PKI::createPasswordFile "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
-                iReturn=$?
-            fi
             ;;
-        create) # Create the Root Certificate
-            PKI::generateKeypair "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}" &&\
-            PKI::generatePasswordedKeypair "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
+        key) # Generate a private and public key
+            OpenSSL::generateKeypair "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}"
+            iReturn=$?
+            ;;
+        request) # Generates a new PKCS#10 certificate request
+            OpenSSL::createRequest "${m_PKI_CA_DIR}/${m_PKI_CA_NAMES[root]}" "${m_PKI_CA_NAMES[root]}" "rootlevel.web01.conf"
+            iReturn=$?
             ;;
         *)
-            PKI::Simple::showHelp
+            PKI::RootLevel::showHelp
             iReturn=$?
             ;;
     esac

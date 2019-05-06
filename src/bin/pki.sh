@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Public Key Infrastructure (PKI) management toolkit.
@@ -34,7 +35,18 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/config.sh"
+# Load PKI configuration
 Config::load "pki"
+# Load OpenSSL wrapper
+if ((m_PKI_OPTION_ENCRYPTKEY)); then
+    #Passworded key
+    # shellcheck source=/dev/null
+    . "${m_DIR_APP}/pki/opensslAES256.sh"
+else
+    # No passworded key
+    # shellcheck source=/dev/null
+    . "${m_DIR_APP}/pki/openssl.sh"
+fi
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/pki/app.sh"
 
@@ -61,7 +73,6 @@ Console::waitUser
 ## -----------------------------------------------------
 ## Parse the app options and arguments
 ## -----------------------------------------------------
-declare -i iReturn=1
 
 case "$1" in
     rootlevel) # Simple PKI

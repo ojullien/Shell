@@ -84,109 +84,11 @@ PKI::createDatabases() {
 }
 
 ## -----------------------------------------------------------------------------
-## Create a password file for a CA private key.
-## -----------------------------------------------------------------------------
-PKI::createPasswordFile() {
-
-    # Parameters
-    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: PKI::createPasswordFile <CA path> <CA name>"
-        return 1
-    fi
-
-    # Init
-    local sPath="$1" sName="$2"
-    local sFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[passwd]}"
-    local -i iReturn=1
-
-    # Do the job
-    String::notice -n "Generate '${sName}' password file:"
-    openssl rand -out "${sFile}" -base64 16 && chmod 400 "${sFile}"
-    iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
-
-    return ${iReturn}
-}
-
-## -----------------------------------------------------------------------------
-## generate a private and public key using elliptic curves algorithm.
-## -----------------------------------------------------------------------------
-PKI::generateKeypair() {
-
-    # Parameters
-    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: PKI::generatePrivateKeypair <CA path> <CA name>"
-        return 1
-    fi
-
-    # Init
-    local sPath="$1" sName="$2"
-    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[key]}"
-    local -i iReturn=1
-
-    # Do the job
-    String::notice -n "generate '${sName}' keypair using elliptic curves algorithm:"
-    openssl genpkey -out "${sKeyFile}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve\
-        && chmod 400 "${sKeyFile}"
-    iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
-
-    # Inspecting the key's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        String::separateLine
-        openssl pkey -inform PEM -in "${sKeyFile}" -text -noout
-        String::separateLine
-    fi
-
-    return ${iReturn}
-}
-
-## -----------------------------------------------------------------------------
-## generate an encrypted private and public key using elliptic curves algorithm
-## and 128 bit AES
-## -----------------------------------------------------------------------------
-PKI::generatePasswordedKeypair() {
-
-    # Parameters
-    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: PKI::generatePasswordedKeypair <CA path> <CA name>"
-        return 1
-    fi
-
-    # Init
-    local sPath="$1" sName="$2"
-    local sPassFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[passwd]}"
-    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[key]}"
-    local -i iReturn=1
-
-    if [[ ! -f "${sPassFile}" ]]; then
-        String::error "The password file does not exist."
-        return 1
-    fi
-
-    # Do the job
-    String::notice -n "generate encrypted '${sName}' keypair using elliptic curves algorithm:"
-    openssl genpkey -out "${sKeyFile}" -outform PEM -pass file:"${sPassFile}" -aes-256-cbc -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve\
-        && chmod 400 "${sKeyFile}"
-    iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
-
-    # Inspecting the key's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        String::separateLine
-        openssl pkey -inform PEM -in "${sKeyFile}" -text -noout
-        String::separateLine
-    fi
-
-    return ${iReturn}
-}
-
-## -----------------------------------------------------------------------------
 ## Generates a new certificate request and a new RSA private key using
 ## information specified in the configuration file.
 ## -----------------------------------------------------------------------------
 
-OpenSSL::createRequest () {
+OldOpenSSL::createRequest () {
     if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
         error "Usage: createsRequest <configuration file> <certificate signing request> <private key> [-passout arg]"
         exit 1
@@ -204,7 +106,7 @@ OpenSSL::createRequest () {
 ## specified in the configuration file.
 ## -----------------------------------------------------------------------------
 
-OpenSSL::createCertificate () {
+OldOpenSSL::createCertificate () {
     if [ $# -lt 5 -o -z "$1" -o -z "$2" -o -z "$3"  -o -z "$4" -o -z "$5" ]; then
         error "Usage: createsCertificate <configuration file> <certificate signing request to be signed> <private key to sign requests with> <certificate> <section of the configuration file containing certificate extensions> [-selfsign] [-key password] [-policy arg]"
         exit 1
@@ -222,7 +124,7 @@ OpenSSL::createCertificate () {
 ## All published certificates must be in DER format.
 ## -----------------------------------------------------------------------------
 
-OpenSSL::publishCertificate () {
+OldOpenSSL::publishCertificate () {
     if [ $# -lt 2 -o -z "$1" -o -z "$2" ]; then
         error "Usage: publishCertificate <input filename to read a certificate from> <output filename to write to>"
         exit 1
@@ -235,7 +137,7 @@ OpenSSL::publishCertificate () {
 ## Pack the private key and the certificate into a PKCS#12 bundle
 ## -----------------------------------------------------------------------------
 
-OpenSSL::bundleCertificate () {
+OldOpenSSL::bundleCertificate () {
     if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
        error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
         exit 1
@@ -257,7 +159,7 @@ OpenSSL::bundleCertificate () {
 ##    With the openssl crl command we generate a CRL in DER format
 ## -----------------------------------------------------------------------------
 
-OpenSSL::createCRL () {
+OldOpenSSL::createCRL () {
     if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
         error "Usage: createCRL <configuration file> <private key to sign certificate with> <certificate revocation list>"
         exit 1
@@ -279,7 +181,7 @@ OpenSSL::createCRL () {
 ## Revokes a certificate
 ## -----------------------------------------------------------------------------
 
-OpenSSL::revokeCertificate () {
+OldOpenSSL::revokeCertificate () {
     if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
         error "Usage: revokeCertificate <configuration file> <certificate to revoke> <revocation reason>"
         exit 1
@@ -296,7 +198,7 @@ OpenSSL::revokeCertificate () {
 ## Mysql 5.5 needs key in PKCS #1 format.
 ## -----------------------------------------------------------------------------
 
-OpenSSL::convertToPKCS1 () {
+OldOpenSSL::convertToPKCS1 () {
     if [ $# -lt 2 -o -z "$1" -o -z "$2" ]; then
         error "Usage: removePassphrase <input filename to read a key from> <output filename to write a key to> [-passin arg] [output file pass phrase source]"
         exit 1
@@ -312,7 +214,7 @@ OpenSSL::convertToPKCS1 () {
 ## Display the contents of CSR file in a human-readable output format
 ## -----------------------------------------------------------------------------
 
-OpenSSL::viewRequest () {
+OldOpenSSL::viewRequest () {
     if [ $# -lt 1 -o -z "$1" ]; then
         error "Usage: viewRequest <CSR file> "
         exit 1
@@ -327,7 +229,7 @@ OpenSSL::viewRequest () {
 ## Verify key consistency
 ## -----------------------------------------------------------------------------
 
-OpenSSL::checkKey () {
+OldOpenSSL::checkKey () {
     if [ $# -lt 1 -o -z "$1" ]; then
         error "Usage: checkKey <input file>"
         exit 1
@@ -342,7 +244,7 @@ OpenSSL::checkKey () {
 ## Display the contents of a certificate file in a human-readable output format
 ## -----------------------------------------------------------------------------
 
-OpenSSL::viewCertificate () {
+OldOpenSSL::viewCertificate () {
     if [ $# -lt 1 -o -z "$1" ]; then
         error "Usage: viewCertificate <certificate> "
         exit 1
@@ -353,7 +255,7 @@ OpenSSL::viewCertificate () {
     return $?
 }
 
-OpenSSL::viewCRL () {
+OldOpenSSL::viewCRL () {
     if [ $# -lt 1 -o -z "$1" ]; then
         error "Usage: viewCRL <CRL file>"
         exit 1
@@ -364,7 +266,7 @@ OpenSSL::viewCRL () {
     return $?
 }
 
-OpenSSL::viewP12 () {
+OldOpenSSL::viewP12 () {
     if [ $# -lt 1 -o -z "$1" ]; then
         error "Usage: viewP12 <P12 certificate>"
         exit 1
