@@ -84,24 +84,6 @@ PKI::createDatabases() {
 }
 
 ## -----------------------------------------------------------------------------
-## Generates a new certificate request and a new RSA private key using
-## information specified in the configuration file.
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::createRequest () {
-    if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
-        error "Usage: createsRequest <configuration file> <certificate signing request> <private key> [-passout arg]"
-        exit 1
-    fi
-    openssl req -new \
-                -config $1 \
-                -out $2 \
-                -keyout $3 \
-                -outform PEM $4 $5
-    return $?
-}
-
-## -----------------------------------------------------------------------------
 ## Signes a certificate request using a RSA private key and information
 ## specified in the configuration file.
 ## -----------------------------------------------------------------------------
@@ -210,50 +192,8 @@ OldOpenSSL::convertToPKCS1 () {
     return $?
 }
 
-## -----------------------------------------------------------------------------
-## Display the contents of CSR file in a human-readable output format
-## -----------------------------------------------------------------------------
 
-OldOpenSSL::viewRequest () {
-    if [ $# -lt 1 -o -z "$1" ]; then
-        error "Usage: viewRequest <CSR file> "
-        exit 1
-    fi
-    if [ -f $1 ]; then
-        openssl req -noout -text -verify -in $@
-    fi
-    return $?
-}
 
-## -----------------------------------------------------------------------------
-## Verify key consistency
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::checkKey () {
-    if [ $# -lt 1 -o -z "$1" ]; then
-        error "Usage: checkKey <input file>"
-        exit 1
-    fi
-    if [ -f $1 ]; then
-        openssl rsa -noout -check -in $@
-    fi
-    return $?
-}
-
-## -----------------------------------------------------------------------------
-## Display the contents of a certificate file in a human-readable output format
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::viewCertificate () {
-    if [ $# -lt 1 -o -z "$1" ]; then
-        error "Usage: viewCertificate <certificate> "
-        exit 1
-    fi
-    if [ -f $1 ]; then
-        openssl x509 -noout -text -purpose -in $@
-    fi
-    return $?
-}
 
 OldOpenSSL::viewCRL () {
     if [ $# -lt 1 -o -z "$1" ]; then
