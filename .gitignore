@@ -3,3 +3,4 @@ desktop.ini
 /src/installShell.sh
 priv-*.cfg.sh
 local.config.sh
+/src/bin/ca/

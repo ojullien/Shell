@@ -1,21 +1,21 @@
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
 ## Public Key Infrastructure (PKI) management toolkit.
-## Root CA level application. We use the root CA to issue subordinate signing CAs.
+## Intermediate signing level application. We use intermediate signing CA to issue
+## TLS certificates.
 ##
 ## @package ojullien\Shell\app\pki
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
-PKI::RootLevel::showHelp() {
-    String::notice "Usage: $(basename "$0") rootlevel <command>"
-    String::notice "\tRoot CA level application. We use the root CA to issue subordinate signing CAs."
+PKI::SigningLevel::showHelp() {
+    String::notice "Usage: $(basename "$0") SigningLevel <command> <intermediate signing CA name>"
+    String::notice "\tSigning CA level application. We use intermediate signing CA to issue TLS certificates."
     String::notice "Available Commands:"
-    String::notice "\tgenerate-key\t\tGenerate a private and public key."
-    String::notice "\tgenerate-request\tGenerate a new PKCS#10 certificate request from existing key."
-    String::notice "\thelp\t\t\tShow this help."
-    String::notice "\tinstall\t\t\tGenerate the keypair, the certificate signing request and the self-sign the root level certificate."
-    String::notice "\tselfsign\t\tCreate and self-sign the root CA certificate root based on the CSR."
+    String::notice "\thelp\tShow this help."
+    String::notice "\tkey\tGenerate a private and public key."
+    String::notice "\trequest\tGenerate a new PKCS#10 certificate request from existing key."
+    String::notice "\tselfsign\tCreate and self-sign the root CA certificate root based on the CSR."
     return 0
 }
 
@@ -23,29 +23,37 @@ PKI::RootLevel::showHelp() {
 ## Main CA commands
 ## -----------------------------------------------------------------------------
 
-PKI::RootLevel::main() {
+PKI::SigningLevel::main() {
 
     # Parameters
-    if (($# < 1)); then
-        PKI::RootLevel::showHelp
+    if (($# < 2)); then
+        PKI::SigningLevel::showHelp
         return 1
     fi
 
     # Init
-    local sCAName="${m_PKI_CA_ROOT[name]}"
-    local sCAConf="${m_PKI_CA_ROOT[conf]}"
+    local sArg2="${2:-""}"
+    if [[ -z "${sArg2}" ]]; then
+        PKI::SigningLevel::showHelp
+        return 1
+    fi
+    local sCAName="${m_PKI_CA_SIGNING[${sArg2}]}"
+    local sCAConf="${m_PKI_CA_CONF_NAMES[${sArg2}]}"
     local sCAPath="${m_PKI_CA_DIR}/${sCAName}"
+    local sRootCAName="${m_PKI_CA_ROOT[name]}"
+    local sRootCAConf="${m_PKI_CA_ROOT[conf]}"
+    local sRootCAPath="${m_PKI_CA_DIR}/${sRootCAName}"
     local -i iReturn=1
 
     # Do the job
     case "$1" in
 
-        remove) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
-            PKI::remove "${m_PKI_CA_DIR}"
+        remove) # Remove the PKI signing CA level repository.
+            PKI::remove "${sCAPath}"
             iReturn=$?
             ;;
 
-        initialize) # Create the root CA repository
+        initialize) # Create the CA repository and database files for the given CA (see app/pki/config.sh m_PKI_CA_NAMES constant )
             PKI::createRepository "${sCAPath}" "${sCAName}"
             iReturn=$?
             if ((0==iReturn)); then
@@ -79,11 +87,12 @@ PKI::RootLevel::main() {
             iReturn=$?
             ;;
 
-        selfsign) # Create and self-sign the root CA certificate root based on the CSR.
-            local sKeyFile="${sCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sCAName}.${m_SSL_EXTENTIONS[key]}"
+        generate-ca-certificate) # Create the Signing CA certificate based on the CSR.
+            local sCACert="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_EXTENTIONS[certificate]}"
+            local sCAKey="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_EXTENTIONS[key]}"
             local sCsrFile="${sCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sCAName}.${m_SSL_EXTENTIONS[certificatesigningrequest]}"
             local sCrtFile="${sCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sCAName}.${m_SSL_EXTENTIONS[certificate]}"
-            OpenSSL::createSelfSignedCertificate "${sCsrFile}" "${sKeyFile}" "${sCrtFile}" "${sCAConf}" "root_ca_ext" "${sCAName}"
+            OpenSSL::signCertificate "${sCsrFile}" "${sCACert}" "${sCAKey}" "${sCrtFile}" "${sRootCAConf}" "signing_ca_ext" "${sCAName}"
             iReturn=$?
             ;;
 

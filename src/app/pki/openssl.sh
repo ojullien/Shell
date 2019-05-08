@@ -153,12 +153,42 @@ OpenSSL::viewCertificate() {
     if [[ -f "${sCrtFile}" ]]; then
         if ((m_OPTION_DISPLAY)); then
             String::separateLine
-            openssl x509 -noout -text -purpose -inform PEM -in "${sCrtFile}"
+            openssl x509 -noout -text -purpose -nameopt multiline -inform PEM -in "${sCrtFile}"
             iReturn=$?
             String::separateLine
         fi
     else
         String::error "Cannot check certificate: the certificate file '${sCrtFile}' does not exist."
+    fi
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## Display the contents of a certificate file in a human-readable output format
+## -----------------------------------------------------------------------------
+OpenSSL::verifyCertificate() {
+
+    # Parameters
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$1" ]]; then
+        String::error "Usage: OpenSSL::verifyCertificate <CA crt file> <CRT file>"
+        return 1
+    fi
+
+    # Init
+    local sCACrtFile="$1" sCrtFile="$2"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sCACrtFile}" ]] && [[ -f "${sCrtFile}" ]]; then
+        if ((m_OPTION_DISPLAY)); then
+            String::separateLine
+            openssl verify -policy_check -x509_strict -verbose -CAfile "${sCACrtFile}" "${sCrtFile}"
+            iReturn=$?
+            String::separateLine
+        fi
+    else
+        String::error "Cannot verify certificate: the certificate file '${sCrtFile}' or '${sCACrtFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -171,32 +201,66 @@ OpenSSL::viewCertificate() {
 OpenSSL::createSelfSignedCertificate() {
 
     # Parameters
-    if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: OpenSSL::createSelfSignedCertificate <CA path> <CA name> <configuration file name>"
+    if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
+        String::error "Usage: OpenSSL::createSelfSignedCertificate <csr file> <key file> <crt file> <conf file> <extention> <CA name>"
         return 1
     fi
 
     # Init
-    local sPath="$1" sName="$2" sConf="$3"
-    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[key]}"
-    local sCsrFile="${sPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sName}.${m_SSL_EXTENTIONS[certificatesigningrequest]}"
-    local sCrtFile="${sPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sName}.${m_SSL_EXTENTIONS[certificate]}"
+    local sCsrFile="$1" sKeyFile="$2" sCrtFile="$3" sConf="${m_PKI_CNF_DIR}/$4" sExtention="$5" sName="$6"
+    local sSerial=$(openssl rand -hex 20)
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]]; then
+    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]]; then
         String::notice -n "Create the self-signed '${sName}' certificate:"
-        openssl ca -create_serial -selfsign -keyfile "${sKeyFile}" -keyform PEM -out "${sCrtFile}" -config "${m_PKI_CNF_DIR}/${sConf}" -in "${sCsrFile}"
-        #openssl ca -create_serial -selfsign -keyfile "${sKeyFile}" -keyform PEM -out "${sCrtFile}"  -in "${sCsrFile}"
+        openssl x509 -req -inform PEM -in "${sCsrFile}" -keyform PEM -signkey "${sKeyFile}" -days 365\
+         -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -set_serial 0x${sSerial}
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        String::error "The key file '${sKeyFile}' or the csr file '${sCsrFile}' does not exist."
+        String::error "The key file '${sKeyFile}', the csr file '${sCsrFile}' or the conf file '${sConf}' does not exist."
     fi
 
     # Inspecting the certificate's metadata
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
         OpenSSL::viewCertificate "${sCrtFile}"
+        OpenSSL::verifyCertificate "${sCrtFile}" "${sCrtFile}"
+    fi
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## Sign a certificate request using a CA certificate.
+## -----------------------------------------------------------------------------
+OpenSSL::signCertificate() {
+
+    # Parameters
+    if (($# != 7)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
+        String::error "Usage: OpenSSL::signCertificate <csr file> <CA crt file> <CA key file> <crt file> <conf file> <extention> <name>"
+        return 1
+    fi
+
+    # Init
+    local sCsrFile="$1" sCACert="$2" sKeyFile="$3" sCrtFile="$4" sConf="${m_PKI_CNF_DIR}/$5" sExtention="$6" sName="$7"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]]; then
+        String::notice -n "Create the self-signed '${sName}' certificate:"
+        openssl x509 -req -inform PEM -in "${sCsrFile}" -CA "${sCACert}" -CAkey "${sKeyFile}" -days 365\
+         -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -CAcreateserial
+        iReturn=$?
+        String::checkReturnValueForTruthiness ${iReturn}
+    else
+        String::error "The key file '${sKeyFile}', the csr file '${sCsrFile}', the CA crt file '${sCACert}' or the conf file '${sConf}' does not exist."
+    fi
+
+    # Inspecting the certificate's metadata
+    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+        OpenSSL::viewCertificate "${sCrtFile}"
+        OpenSSL::verifyCertificate "${sCACert}" "${sCrtFile}"
     fi
 
     return ${iReturn}

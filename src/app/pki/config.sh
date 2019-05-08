@@ -17,14 +17,21 @@ exit 3
 ## -----------------------------------------------------------------------------
 readonly m_SSL_DIR="/etc/ssl"
 readonly m_PKI_CNF_DIR="${m_DIR_APP}/pki/cnf"
+
 readonly m_PKI_CA_DIR="${m_SSL_DIR}/ca"
 readonly -A m_PKI_CA_DIRNAMES=( [privatekeys]="private" [databases]="db" [signedcertificates]="newcerts" [revokelist]="crl" [certificatesigningrequests]="csr");
-readonly -A m_PKI_CA_NAMES=( [root]="root-ca" [tls]="tls-ca" );
+
+# The PKI consists of one root CA
+readonly -A m_PKI_CA_ROOT=( [name]="root-ca" [conf]="rootca.simple.conf" );
+
+# and a layer of subordinate signing CAs.
+readonly -A m_PKI_CA_SIGNING=( [tls]="tls-ca" );
+readonly -A m_PKI_CA_CONF_NAMES=( [tls]="tlsca.simple.conf" );
 
 ## -----------------------------------------------------------------------------
 ## Main names
 ## -----------------------------------------------------------------------------
-readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest]="csr.pem");
+readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest]="csr.pem" [index]=".txt");
 
 ## -----------------------------------------------------------------------------
 ## Trace

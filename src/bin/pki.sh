@@ -65,25 +65,7 @@ Console::waitUser
 ## -----------------------------------------------------
 ## Parse the app options and arguments
 ## -----------------------------------------------------
-
-case "$1" in
-    rootlevel) # Simple PKI
-        shift
-        # shellcheck source=/dev/null
-        . "${m_DIR_APP}/pki/rootlevel_app.sh"
-        PKI::RootLevel::main "$@"
-        ;;
-    advanced) # Advanced PKI
-        String::notice "work in progress"
-        ;;
-    expert) # Expert PKI
-        String::notice "work in progress"
-        ;;
-    *)
-        String::error "argument error: missing or incorrect command."
-        PKI::showHelp
-        ;;
-esac
+PKI::main "$@"
 
 ## -----------------------------------------------------------------------------
 ## END

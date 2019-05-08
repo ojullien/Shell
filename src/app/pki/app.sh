@@ -8,18 +8,27 @@
 ## -----------------------------------------------------------------------------
 
 PKI::showHelp() {
-    String::notice "Usage: $(basename "$0") [options] [command]"
+    String::notice "Usage: $(basename "$0") [options] <command>"
     String::notice "\tPKI toolkit"
     Option::showHelp
     String::notice "Available Commands:"
+    String::notice "\tinitialize-all-levels\tCreate all the CA repositories and database files."
+    String::notice "\tinitialize-ca <CA name>\tCreate the CA repository and database files for the given CA."
+    String::notice "\tremove-root-level\tRemove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates."
+    String::notice "\tremove-ca <CA name>\tRemove the PKI signing CA level repositories."
     String::notice "\trootlevel\tRoot CA level application."
+    String::notice "\tsigninglevel\tIntermediate Signing CA level application."
+    String::notice "Available CA name:"
+    for KEY in "${!m_PKI_CA_NAMES[@]}"; do
+        String::notice "\t[$KEY]=\"${m_PKI_CA_NAMES[$KEY]}\""
+    done
     return 0
 }
 
 ## -----------------------------------------------------------------------------
 ## Remove the content of a CA repository.
 ## -----------------------------------------------------------------------------
-PKI::reset() {
+PKI::remove() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
@@ -76,143 +85,53 @@ PKI::createDatabases() {
 
     # Do the job
     String::notice -n "Create '${sName}' databases:"
-    touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index.txt"
+    touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}" "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}.attr"
     iReturn=$?
+    openssl rand -hex 20 > "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.serial"
+    iReturn+=$?
+    echo 00 >  "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.crlnum"
+    iReturn+=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
-## Signes a certificate request using a RSA private key and information
-## specified in the configuration file.
+## Main PKI commands
 ## -----------------------------------------------------------------------------
 
-OldOpenSSL::createCertificate () {
-    if [ $# -lt 5 -o -z "$1" -o -z "$2" -o -z "$3"  -o -z "$4" -o -z "$5" ]; then
-        error "Usage: createsCertificate <configuration file> <certificate signing request to be signed> <private key to sign requests with> <certificate> <section of the configuration file containing certificate extensions> [-selfsign] [-key password] [-policy arg]"
-        exit 1
-    fi
-    openssl ca -config $1 \
-               -in $2 \
-               -keyfile $3 \
-               -keyform PEM \
-               -out $4 \
-               -extensions $5 $6 $7 $8 $9 $10
-    return $?
-}
+PKI::main() {
 
-## -----------------------------------------------------------------------------
-## All published certificates must be in DER format.
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::publishCertificate () {
-    if [ $# -lt 2 -o -z "$1" -o -z "$2" ]; then
-        error "Usage: publishCertificate <input filename to read a certificate from> <output filename to write to>"
-        exit 1
-    fi
-    openssl x509 -inform PEM -outform DER -in $1 -out $2
-    return $?
-}
-
-## -----------------------------------------------------------------------------
-## Pack the private key and the certificate into a PKCS#12 bundle
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::bundleCertificate () {
-    if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
-       error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
-        exit 1
-    fi
-    openssl pkcs12 -export \
-                   -name "$1" \
-                   -in $2 \
-                   -inkey $3 \
-                   -passin $4 \
-                   -passout $5 \
-                   -out $6
-    return $?
-}
-
-## -----------------------------------------------------------------------------
-## Create a list of revoked certificates
-##    With the openssl ca -gencrl command we generate an
-##    initial (empty) CRL
-##    With the openssl crl command we generate a CRL in DER format
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::createCRL () {
-    if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
-        error "Usage: createCRL <configuration file> <private key to sign certificate with> <certificate revocation list>"
-        exit 1
+    # Parameters
+    if (($# < 1)); then
+        PKI::showHelp
+        return 1
     fi
 
-    openssl ca -gencrl \
-               -config $1 \
-               -keyfile $2 \
-               -out $3 $4 $5
+    # Init
+    local -i iReturn=1
 
-    openssl crl -in $3 \
-                -out $3 \
-                -outform der
+    # Do the job
+    case "$1" in
 
-    return $?
-}
+        rootlevel) # Simple PKI root CA level
+            shift
+            # shellcheck source=/dev/null
+            . "${m_DIR_APP}/pki/rootlevel_app.sh"
+            PKI::RootLevel::main "$@"
+            ;;
 
-## -----------------------------------------------------------------------------
-## Revokes a certificate
-## -----------------------------------------------------------------------------
+        signinglevel) # Simple PKI intermediate signing CA level
+            shift
+            # shellcheck source=/dev/null
+            . "${m_DIR_APP}/pki/signinglevel_app.sh"
+            PKI::SigningLevel::main "$@"
+            ;;
+        *)
+            String::error "argument error: missing or incorrect command."
+            PKI::showHelp
+            ;;
+    esac
 
-OldOpenSSL::revokeCertificate () {
-    if [ $# -lt 3 -o -z "$1" -o -z "$2" -o -z "$3" ]; then
-        error "Usage: revokeCertificate <configuration file> <certificate to revoke> <revocation reason>"
-        exit 1
-    fi
-    openssl ca -config $1 \
-               -revoke $2 \
-               -crl_reason $3 $4 $5
-    return $?
-}
-
-## -----------------------------------------------------------------------------
-## Converts the RSA key from PKCS #8 (OpenSSL 1.0 and newer) to the old PKCS #1
-## format .
-## Mysql 5.5 needs key in PKCS #1 format.
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::convertToPKCS1 () {
-    if [ $# -lt 2 -o -z "$1" -o -z "$2" ]; then
-        error "Usage: removePassphrase <input filename to read a key from> <output filename to write a key to> [-passin arg] [output file pass phrase source]"
-        exit 1
-    fi
-    openssl rsa -inform PEM \
-                -outform PEM \
-                -in $1\
-                -out $2 $3 $4 $5 $6
-    return $?
-}
-
-
-
-
-OldOpenSSL::viewCRL () {
-    if [ $# -lt 1 -o -z "$1" ]; then
-        error "Usage: viewCRL <CRL file>"
-        exit 1
-    fi
-    if [ -f $1 ]; then
-        openssl crl -noout -text -inform DER -in $@
-    fi
-    return $?
-}
-
-OldOpenSSL::viewP12 () {
-    if [ $# -lt 1 -o -z "$1" ]; then
-        error "Usage: viewP12 <P12 certificate>"
-        exit 1
-    fi
-    if [ -f $1 ]; then
-        openssl pkcs12 -nodes -info -in $@
-    fi
-    return $?
+    return ${iReturn}
 }
