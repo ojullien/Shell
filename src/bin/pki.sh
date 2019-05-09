@@ -32,13 +32,14 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/filesystem.sh"
 # shellcheck source=/dev/null
+. "${m_DIR_SYS}/openssl.sh"
+# shellcheck source=/dev/null
 . "${m_DIR_SYS}/option.sh"
 # shellcheck source=/dev/null
 . "${m_DIR_SYS}/config.sh"
 # Load PKI configuration
 Config::load "pki"
-# shellcheck source=/dev/null
-. "${m_DIR_APP}/pki/openssl.sh"
+
 # shellcheck source=/dev/null
 . "${m_DIR_APP}/pki/app.sh"
 
@@ -62,10 +63,38 @@ String::notice "Today is: $(date -R)"
 String::notice "The PID for $(basename "$0") process is: $$"
 Console::waitUser
 
-## -----------------------------------------------------
-## Parse the app options and arguments
-## -----------------------------------------------------
-PKI::main "$@"
+## -----------------------------------------------------------------------------
+## Main PKI commands
+## -----------------------------------------------------------------------------
+
+# Parameters
+if (($# < 1)); then
+    PKI::showHelp
+    return 1
+fi
+
+# Do the job
+case "$1" in
+
+    rootlevel) # Simple PKI root CA level
+        shift
+        # shellcheck source=/dev/null
+        . "${m_DIR_APP}/pki/rootlevel_app.sh"
+        PKI::RootLevel::main "$@"
+        ;;
+
+    signinglevel) # Simple PKI intermediate signing CA level
+        shift
+        # shellcheck source=/dev/null
+        . "${m_DIR_APP}/pki/signinglevel_app.sh"
+        PKI::SigningLevel::main "$@"
+        ;;
+
+    *)
+        String::error "argument error: missing or incorrect command."
+        PKI::showHelp
+        ;;
+esac
 
 ## -----------------------------------------------------------------------------
 ## END

@@ -1,20 +1,19 @@
 ## -----------------------------------------------------------------------------
 ## Linux Scripts.
-## Public Key Infrastructure (PKI) management toolkit.
 ## OpenSSL common wrapper functions.
 ##
-## @package ojullien\Shell\app\pki
+## @package ojullien\Shell\sys
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
 ## -----------------------------------------------------------------------------
 ## Verify key consistency
 ## -----------------------------------------------------------------------------
-OpenSSL::viewKey() {
+MyOpenSSL::viewKey() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: OpenSSL::viewKey <Key file>"
+        String::error "Usage: MyOpenSSL::viewKey <Key file>"
         return 1
     fi
 
@@ -25,32 +24,32 @@ OpenSSL::viewKey() {
     # Do the job
     if [[ -f "${sKeyFile}" ]]; then
         if ((m_OPTION_DISPLAY)); then
-            String::separateLine
-            openssl pkey -inform PEM -in "${sKeyFile}" -text_pub -noout -check
-            iReturn=$?
-            String::separateLine
+                String::separateLine
+                openssl pkey -inform PEM -in "${sKeyFile}" -text_pub -noout -check
+                iReturn=$?
+                String::separateLine
         fi
     else
-        String::error "Cannot check key: the key file '${sKeyFile}' does not exist."
+        String::error -n "MyOpenSSL::viewKey:"
+        PKI::doesNotExist "${sKeyFile}"
     fi
 
     return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
-## Generate a private and public key using elliptic curves algorithm.
+## Generate a PKCS#8 private and public key using elliptic curves algorithm.
 ## -----------------------------------------------------------------------------
-OpenSSL::generateKeypair() {
+MyOpenSSL::generateKeypair() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: OpenSSL::generatePrivateKeypair <CA path> <CA name>"
+        String::error "Usage: MyOpenSSL::generatePrivateKeypair <name> <key file>"
         return 1
     fi
 
     # Init
-    local sPath="$1" sName="$2"
-    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[key]}"
+    local sKeyFile="$2" sName="$1"
     local -i iReturn=1
 
     # Do the job
@@ -62,7 +61,7 @@ OpenSSL::generateKeypair() {
 
     # Inspecting the key's metadata
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        OpenSSL::viewKey "${sKeyFile}"
+        MyOpenSSL::viewKey "${sKeyFile}"
     fi
 
     return ${iReturn}
@@ -71,11 +70,11 @@ OpenSSL::generateKeypair() {
 ## -----------------------------------------------------------------------------
 ## Display the contents of CSR file in a human-readable output format
 ## -----------------------------------------------------------------------------
-OpenSSL::viewRequest() {
+MyOpenSSL::viewRequest() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: OpenSSL::viewRequest <CSR file>"
+        String::error "Usage: MyOpenSSL::viewRequest <CSR file>"
         return 1
     fi
 
@@ -92,7 +91,8 @@ OpenSSL::viewRequest() {
             String::separateLine
         fi
     else
-        String::error "Cannot view request: the csr file '${sCsrFile}' does not exist."
+        String::error -n "MyOpenSSL::viewRequest:"
+        PKI::doesNotExist "${sCsrFile}"
     fi
 
     return ${iReturn}
@@ -102,33 +102,32 @@ OpenSSL::viewRequest() {
 ## Generates a new PKCS#10 certificate request using information specified in
 ## the [req] section of the configuration file.
 ## -----------------------------------------------------------------------------
-OpenSSL::createRequest() {
+MyOpenSSL::createRequest() {
 
     # Parameters
-    if (($# != 3)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]]; then
-        String::error "Usage: OpenSSL::createRequest <CA path> <CA name> <configuration file name>"
+    if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
+        String::error "Usage: MyOpenSSL::createRequest <name> <key file> <configuration file> <csr file>"
         return 1
     fi
 
     # Init
-    local sPath="$1" sName="$2" sConf="$3"
-    local sKeyFile="${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sName}.${m_SSL_EXTENTIONS[key]}"
-    local sCsrFile="${sPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sName}.${m_SSL_EXTENTIONS[certificatesigningrequest]}"
+    local sKeyFile="$2" sName="$1" sConf="$3" sCsrFile="$4"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sKeyFile}" ]]; then
+    if [[ -f "${sKeyFile}" ]] && [[ -f "${sConf}" ]]; then
         String::notice -n "Create the '${sName}' certificate signing request:"
-        openssl req -new -outform PEM -out "${sCsrFile}" -config "${m_PKI_CNF_DIR}/${sConf}" -key "${sKeyFile}" -keyform PEM
+        openssl req -new -outform PEM -out "${sCsrFile}" -config "${sConf}" -key "${sKeyFile}" -keyform PEM
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        String::error "The key file does not exist: '${sKeyFile}'"
+        PKI::doesNotExist "${sKeyFile}"
+        PKI::doesNotExist "${sConf}"
     fi
 
     # Inspecting the certificate's metadata
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        OpenSSL::viewRequest "${sCsrFile}"
+        MyOpenSSL::viewRequest "${sCsrFile}"
     fi
 
     return ${iReturn}
@@ -137,11 +136,11 @@ OpenSSL::createRequest() {
 ## -----------------------------------------------------------------------------
 ## Display the contents of a certificate file in a human-readable output format
 ## -----------------------------------------------------------------------------
-OpenSSL::viewCertificate() {
+MyOpenSSL::viewCertificate() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: OpenSSL::viewCertificate <CRT file>"
+        String::error "Usage: MyOpenSSL::viewCertificate <CRT file>"
         return 1
     fi
 
@@ -158,7 +157,8 @@ OpenSSL::viewCertificate() {
             String::separateLine
         fi
     else
-        String::error "Cannot check certificate: the certificate file '${sCrtFile}' does not exist."
+        String::error -n "MyOpenSSL::viewCertificate:"
+        PKI::doesNotExist "${sCrtFile}"
     fi
 
     return ${iReturn}
@@ -167,11 +167,11 @@ OpenSSL::viewCertificate() {
 ## -----------------------------------------------------------------------------
 ## Display the contents of a certificate file in a human-readable output format
 ## -----------------------------------------------------------------------------
-OpenSSL::verifyCertificate() {
+MyOpenSSL::verifyCertificate() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$1" ]]; then
-        String::error "Usage: OpenSSL::verifyCertificate <CA crt file> <CRT file>"
+        String::error "Usage: MyOpenSSL::verifyCertificate <CA crt file> <CRT file>"
         return 1
     fi
 
@@ -188,7 +188,8 @@ OpenSSL::verifyCertificate() {
             String::separateLine
         fi
     else
-        String::error "Cannot verify certificate: the certificate file '${sCrtFile}' or '${sCACrtFile}' does not exist."
+        PKI::doesNotExist "${sCACrtFile}"
+        PKI::doesNotExist "${sCrtFile}"
     fi
 
     return ${iReturn}
@@ -198,16 +199,16 @@ OpenSSL::verifyCertificate() {
 ## Create and self-sign the root CA certificate root based on the CSR.
 ## The openssl ca command takes its configuration from the [ca] section of the configuration file.
 ## -----------------------------------------------------------------------------
-OpenSSL::createSelfSignedCertificate() {
+MyOpenSSL::createSelfSignedCertificate() {
 
     # Parameters
     if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
-        String::error "Usage: OpenSSL::createSelfSignedCertificate <csr file> <key file> <crt file> <conf file> <extention> <CA name>"
+        String::error "Usage: MyOpenSSL::createSelfSignedCertificate <csr file> <key file> <crt file> <conf file> <extention> <name>"
         return 1
     fi
 
     # Init
-    local sCsrFile="$1" sKeyFile="$2" sCrtFile="$3" sConf="${m_PKI_CNF_DIR}/$4" sExtention="$5" sName="$6"
+    local sCsrFile="$1" sKeyFile="$2" sCrtFile="$3" sConf="$4" sExtention="$5" sName="$6"
     local sSerial=$(openssl rand -hex 20)
     local -i iReturn=1
 
@@ -219,13 +220,15 @@ OpenSSL::createSelfSignedCertificate() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        String::error "The key file '${sKeyFile}', the csr file '${sCsrFile}' or the conf file '${sConf}' does not exist."
+        PKI::doesNotExist "${sKeyFile}"
+        PKI::doesNotExist "${sCsrFile}"
+        PKI::doesNotExist "${sConf}"
     fi
 
     # Inspecting the certificate's metadata
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        OpenSSL::viewCertificate "${sCrtFile}"
-        OpenSSL::verifyCertificate "${sCrtFile}" "${sCrtFile}"
+        MyOpenSSL::viewCertificate "${sCrtFile}"
+        MyOpenSSL::verifyCertificate "${sCrtFile}" "${sCrtFile}"
     fi
 
     return ${iReturn}
@@ -234,33 +237,36 @@ OpenSSL::createSelfSignedCertificate() {
 ## -----------------------------------------------------------------------------
 ## Sign a certificate request using a CA certificate.
 ## -----------------------------------------------------------------------------
-OpenSSL::signCertificate() {
+MyOpenSSL::signCertificate() {
 
     # Parameters
     if (($# != 7)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
-        String::error "Usage: OpenSSL::signCertificate <csr file> <CA crt file> <CA key file> <crt file> <conf file> <extention> <name>"
+        String::error "Usage: MyOpenSSL::signCertificate <csr file> <CA crt file> <CA key file> <crt file> <conf file> <extention> <name>"
         return 1
     fi
 
     # Init
-    local sCsrFile="$1" sCACert="$2" sKeyFile="$3" sCrtFile="$4" sConf="${m_PKI_CNF_DIR}/$5" sExtention="$6" sName="$7"
+    local sCsrFile="$1" sCACert="$2" sKeyFile="$3" sCrtFile="$4" sConf="$5" sExtention="$6" sName="$7"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]]; then
+    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]] && [[ -f "${sCACert}" ]]; then
         String::notice -n "Create the self-signed '${sName}' certificate:"
         openssl x509 -req -inform PEM -in "${sCsrFile}" -CA "${sCACert}" -CAkey "${sKeyFile}" -days 365\
          -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -CAcreateserial
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        String::error "The key file '${sKeyFile}', the csr file '${sCsrFile}', the CA crt file '${sCACert}' or the conf file '${sConf}' does not exist."
+        PKI::doesNotExist "${sCsrFile}"
+        PKI::doesNotExist "${sCACert}"
+        PKI::doesNotExist "${sKeyFile}"
+        PKI::doesNotExist "${sConf}"
     fi
 
     # Inspecting the certificate's metadata
     if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        OpenSSL::viewCertificate "${sCrtFile}"
-        OpenSSL::verifyCertificate "${sCACert}" "${sCrtFile}"
+        MyOpenSSL::viewCertificate "${sCrtFile}"
+        MyOpenSSL::verifyCertificate "${sCACert}" "${sCrtFile}"
     fi
 
     return ${iReturn}

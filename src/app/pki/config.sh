@@ -26,7 +26,7 @@ readonly -A m_PKI_CA_ROOT=( [name]="root-ca" [conf]="rootca.simple.conf" );
 
 # and a layer of subordinate signing CAs.
 readonly -A m_PKI_CA_SIGNING=( [tls]="tls-ca" );
-readonly -A m_PKI_CA_CONF_NAMES=( [tls]="tlsca.simple.conf" );
+readonly -A m_PKI_CA_CONF_NAMES=( [tls]="tlssigningca.simple.conf" );
 
 ## -----------------------------------------------------------------------------
 ## Main names
