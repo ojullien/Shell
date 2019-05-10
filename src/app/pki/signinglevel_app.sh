@@ -47,6 +47,7 @@ PKI::SigningLevel::main() {
     local sRootCAPath="${m_PKI_CA_DIR}/${sRootCAName}"
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_EXTENTIONS[key]}"
     local sRootCACrtFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_EXTENTIONS[certificate]}"
+    local sRootCASrlFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sRootCAName}${m_SSL_EXTENTIONS[serial]}"
 
     local sSigningCAName="${m_PKI_CA_SIGNING[${sArg2}]}"
     local sSigningCAConf="${m_PKI_CNF_DIR}/${m_PKI_CA_CONF_NAMES[${sArg2}]}"
@@ -59,12 +60,12 @@ PKI::SigningLevel::main() {
     # Do the job
     case "$1" in
 
-        remove) # Remove the PKI signing CA level repository.
+        remove|rm) # Remove the PKI signing CA level repository.
             PKI::remove "${sSigningCAPath}"
             iReturn=$?
             ;;
 
-        initialize) # Create the CA repository and database files for the given CA (see app/pki/config.sh m_PKI_CA_SIGNING constant )
+        initialize|init) # Create the CA repository and database files for the given CA (see app/pki/config.sh m_PKI_CA_SIGNING constant )
             PKI::createRepository "${sSigningCAPath}" "${sSigningCAName}"
             iReturn=$?
             if ((0==iReturn)); then
@@ -83,23 +84,23 @@ PKI::SigningLevel::main() {
             fi
 
             if ((0==iReturn)); then
-                MyOpenSSL::signCertificate "${sSigningCACsrFile}" "${sRootCACrtFile}" "${sRootCAKeyFile}" "${sSigningCACrtFile}" "${sRootCAConf}" "signing_ca_ext" "${sSigningCAName}"
+                MyOpenSSL::signCertificate "${sRootCACrtFile}" "${sRootCAKeyFile}" "${sRootCASrlFile}" "${sRootCAConf}" "signing_ca_ext" "${sSigningCACsrFile}" "${sSigningCAName}" "${sSigningCACrtFile}"
                 iReturn=$?
             fi
             ;;
 
-        generate-key) # Generate a private and public key
+        generate-key|key) # Generate a private and public key
             MyOpenSSL::generateKeypair "${sSigningCAName}" "${sSigningCAKeyFile}"
             iReturn=$?
             ;;
 
-        generate-request) # Generate a new PKCS#10 certificate request from existing key
+        generate-request|request|req) # Generate a new PKCS#10 certificate request from existing key
             MyOpenSSL::createRequest "${sSigningCAName}" "${sSigningCAKeyFile}" "${sSigningCAConf}" "${sSigningCACsrFile}"
             iReturn=$?
             ;;
 
-        generate-signingca-certificate) # Create the Signing CA certificate based on the CSR.
-            MyOpenSSL::signCertificate "${sSigningCACsrFile}" "${sRootCACrtFile}" "${sRootCAKeyFile}" "${sSigningCACrtFile}" "${sRootCAConf}" "signing_ca_ext" "${sSigningCAName}"
+        generate-signingca-certificate|signca) # Create the Signing CA certificate based on the CSR.
+            MyOpenSSL::signCertificate "${sRootCACrtFile}" "${sRootCAKeyFile}" "${sRootCASrlFile}" "${sRootCAConf}" "signing_ca_ext" "${sSigningCACsrFile}" "${sSigningCAName}" "${sSigningCACrtFile}"
             iReturn=$?
             ;;
 

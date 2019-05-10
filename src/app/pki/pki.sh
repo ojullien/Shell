@@ -23,25 +23,6 @@ OldOpenSSL::publishCertificate () {
 }
 
 ## -----------------------------------------------------------------------------
-## Pack the private key and the certificate into a PKCS#12 bundle
-## -----------------------------------------------------------------------------
-
-OldOpenSSL::bundleCertificate () {
-    if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
-       error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
-        exit 1
-    fi
-    openssl pkcs12 -export \
-                   -name "$1" \
-                   -in $2 \
-                   -inkey $3 \
-                   -passin $4 \
-                   -passout $5 \
-                   -out $6
-    return $?
-}
-
-## -----------------------------------------------------------------------------
 ## Create a list of revoked certificates
 ##    With the openssl ca -gencrl command we generate an
 ##    initial (empty) CRL

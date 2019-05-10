@@ -31,7 +31,7 @@ readonly -A m_PKI_CA_CONF_NAMES=( [tls]="tlssigningca.simple.conf" );
 ## -----------------------------------------------------------------------------
 ## Main names
 ## -----------------------------------------------------------------------------
-readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest]="csr.pem" [index]=".txt");
+readonly -A m_SSL_EXTENTIONS=( [passwd]="pass" [key]="key.pem" [certificate]="crt.pem" [certificatesigningrequest]="csr.pem" [index]=".txt" [serial]=".srl" [p12]="p12");
 
 ## -----------------------------------------------------------------------------
 ## Trace

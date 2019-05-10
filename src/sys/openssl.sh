@@ -30,8 +30,7 @@ MyOpenSSL::viewKey() {
                 String::separateLine
         fi
     else
-        String::error -n "MyOpenSSL::viewKey:"
-        PKI::doesNotExist "${sKeyFile}"
+        String::error "MyOpenSSL::viewKey: file '${sKeyFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -55,7 +54,7 @@ MyOpenSSL::generateKeypair() {
     # Do the job
     String::notice -n "generate '${sName}' keypair using elliptic curves algorithm:"
     openssl genpkey -out "${sKeyFile}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve \
-        && chmod 400 "${sKeyFile}"
+        && chmod 444 "${sKeyFile}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
@@ -91,8 +90,7 @@ MyOpenSSL::viewRequest() {
             String::separateLine
         fi
     else
-        String::error -n "MyOpenSSL::viewRequest:"
-        PKI::doesNotExist "${sCsrFile}"
+        String::error "MyOpenSSL::viewRequest: file '${sCsrFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -121,8 +119,8 @@ MyOpenSSL::createRequest() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        PKI::doesNotExist "${sKeyFile}"
-        PKI::doesNotExist "${sConf}"
+        String::error "MyOpenSSL::createRequest: file '${sKeyFile}' does not exist."
+        String::error "MyOpenSSL::createRequest: file '${sConf}' does not exist."
     fi
 
     # Inspecting the certificate's metadata
@@ -157,8 +155,7 @@ MyOpenSSL::viewCertificate() {
             String::separateLine
         fi
     else
-        String::error -n "MyOpenSSL::viewCertificate:"
-        PKI::doesNotExist "${sCrtFile}"
+        String::error "MyOpenSSL::viewCertificate: file '${sCrtFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -188,8 +185,8 @@ MyOpenSSL::verifyCertificate() {
             String::separateLine
         fi
     else
-        PKI::doesNotExist "${sCACrtFile}"
-        PKI::doesNotExist "${sCrtFile}"
+        String::error "MyOpenSSL::verifyCertificate: file '${sCACrtFile}' does not exist."
+        String::error "MyOpenSSL::verifyCertificate: file '${sCrtFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -220,9 +217,9 @@ MyOpenSSL::createSelfSignedCertificate() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        PKI::doesNotExist "${sKeyFile}"
-        PKI::doesNotExist "${sCsrFile}"
-        PKI::doesNotExist "${sConf}"
+        String::error "MyOpenSSL::createSelfSignedCertificate: file '${sKeyFile}' does not exist."
+        String::error "MyOpenSSL::createSelfSignedCertificate: file '${sCsrFile}' does not exist."
+        String::error "MyOpenSSL::createSelfSignedCertificate: file '${sConf}' does not exist."
     fi
 
     # Inspecting the certificate's metadata
@@ -240,27 +237,27 @@ MyOpenSSL::createSelfSignedCertificate() {
 MyOpenSSL::signCertificate() {
 
     # Parameters
-    if (($# != 7)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]]; then
-        String::error "Usage: MyOpenSSL::signCertificate <csr file> <CA crt file> <CA key file> <crt file> <conf file> <extention> <name>"
+    if (($# != 8)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]] || [[ -z "$7" ]] || [[ -z "$8" ]]; then
+        String::error "Usage: MyOpenSSL::signCertificate <CA crt file> <CA key file> <CA serial file> <conf file> <extention> <csr file> <name> <crt file>"
         return 1
     fi
 
     # Init
-    local sCsrFile="$1" sCACert="$2" sKeyFile="$3" sCrtFile="$4" sConf="$5" sExtention="$6" sName="$7"
+    local sCACert="$1" sCAKey="$2" sCASerial="$3" sConf="$4" sExtention="$5" sCsrFile="$6" sName="$7" sCrtFile="$8"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]] && [[ -f "${sCACert}" ]]; then
+    if [[ -f "${sCAKey}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]] && [[ -f "${sCACert}" ]]; then
         String::notice -n "Create the self-signed '${sName}' certificate:"
-        openssl x509 -req -inform PEM -in "${sCsrFile}" -CA "${sCACert}" -CAkey "${sKeyFile}" -days 365\
-         -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -CAcreateserial
+        openssl x509 -req -inform PEM -in "${sCsrFile}" -CA "${sCACert}" -CAkey "${sCAKey}" -days 365\
+         -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -CAcreateserial -CAserial "${sCASerial}"
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        PKI::doesNotExist "${sCsrFile}"
-        PKI::doesNotExist "${sCACert}"
-        PKI::doesNotExist "${sKeyFile}"
-        PKI::doesNotExist "${sConf}"
+        [[ -f "${sCsrFile}" ]] || String::error "MyOpenSSL::signCertificate: file '${sCsrFile}' does not exist."
+        [[ -f "${sCACert}" ]] || String::error "MyOpenSSL::signCertificate: file '${sCACert}' does not exist."
+        [[ -f "${sCAKey}" ]] || String::error "MyOpenSSL::signCertificate: file '${sCAKey}' does not exist."
+        [[ -f "${sConf}" ]] || String::error "MyOpenSSL::signCertificate: file '${sConf}' does not exist."
     fi
 
     # Inspecting the certificate's metadata
@@ -270,4 +267,46 @@ MyOpenSSL::signCertificate() {
     fi
 
     return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## Pack the private key and the certificate into a PKCS#12 bundle
+## -----------------------------------------------------------------------------
+MyOpenSSL::bundleCertificate() {
+
+    # Parameters
+    if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
+        String::error "Usage: MyOpenSSL::bundleCertificate <friendly name> < filename to read certificates and private keys from> <file to read private key from> <filename to write the PKCS#12 file to>"
+        return 1
+    fi
+
+    # Init
+    local sName="$1" sCrtFile="$2" sKeyFile="$3" sP12="$4"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sCrtFile}" ]] && [[ -f "${sKeyFile}" ]]; then
+        String::notice -n "Create the PKCS#12 '${sName}' bundle:"
+        openssl pkcs12 -export -name "${sName}" -in "${sCrtFile}" -inkey "${sKeyFile}" -out "${sP12}"
+        iReturn=$?
+        String::checkReturnValueForTruthiness ${iReturn}
+    else
+        [[ -f "${sCrtFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sCrtFile}' does not exist."
+        [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sKeyFile}' does not exist."
+    fi
+
+    # Inspecting the certificate's metadata
+    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+        MyOpenSSL::viewCertificate "${sCrtFile}"
+        MyOpenSSL::verifyCertificate "${sCACert}" "${sCrtFile}"
+    fi
+
+    return ${iReturn}
+
+    if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
+       error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
+        exit 1
+    fi
+
+    return $?
 }

@@ -76,14 +76,14 @@ fi
 # Do the job
 case "$1" in
 
-    rootlevel) # Simple PKI root CA level
+    rootlevel|rootca|root|rl) # Simple PKI root CA level
         shift
         # shellcheck source=/dev/null
         . "${m_DIR_APP}/pki/rootlevel_app.sh"
         PKI::RootLevel::main "$@"
         ;;
 
-    signinglevel) # Simple PKI intermediate signing CA level
+    signinglevel|signlevel|signca|sca|sl) # Simple PKI intermediate signing CA level
         shift
         # shellcheck source=/dev/null
         . "${m_DIR_APP}/pki/signinglevel_app.sh"

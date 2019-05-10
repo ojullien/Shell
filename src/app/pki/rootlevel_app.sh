@@ -40,18 +40,19 @@ PKI::RootLevel::main() {
     local sKeyFile="${sCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sCAName}.${m_SSL_EXTENTIONS[key]}"
     local sCsrFile="${sCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sCAName}.${m_SSL_EXTENTIONS[certificatesigningrequest]}"
     local sCrtFile="${sCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sCAName}.${m_SSL_EXTENTIONS[certificate]}"
+    local sP12File="${sCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sCAName}.${m_SSL_EXTENTIONS[p12]}"
     local -i iReturn=1
 
 
     # Do the job
     case "$1" in
 
-        remove) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
+        remove|rm) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
             PKI::remove "${m_PKI_CA_DIR}"
             iReturn=$?
             ;;
 
-        initialize) # Create the root CA repository
+        initialize|init) # Create the root CA repository
             PKI::createRepository "${sCAPath}" "${sCAName}"
             iReturn=$?
             if ((0==iReturn)); then
@@ -73,20 +74,30 @@ PKI::RootLevel::main() {
                 MyOpenSSL::createSelfSignedCertificate "${sCsrFile}" "${sKeyFile}" "${sCrtFile}" "${sCAConf}" "root_ca_ext" "${sCAName}"
                 iReturn=$?
             fi
+
+            if ((0==iReturn)); then
+                MyOpenSSL::bundleCertificate "Buster Root Certification Authority" "${sCrtFile}" "${sKeyFile}" "${sP12File}"
+                iReturn=$?
+            fi
             ;;
 
-        generate-key) # Generate a private and public key
+        generate-key|key) # Generate a private and public key
             MyOpenSSL::generateKeypair "${sCAName}" "${sKeyFile}"
             iReturn=$?
             ;;
 
-        generate-request) # Generate a new PKCS#10 certificate request from existing key
+        generate-request|request|req) # Generate a new PKCS#10 certificate request from existing key
             MyOpenSSL::createRequest "${sCAName}" "${sKeyFile}" "${sCAConf}" "${sCsrFile}"
             iReturn=$?
             ;;
 
-        selfsign) # Create and self-sign the root CA certificate root based on the CSR.
+        selfsign|self|sign|ss) # Create and self-sign the root CA certificate root based on the CSR.
             MyOpenSSL::createSelfSignedCertificate "${sCsrFile}" "${sKeyFile}" "${sCrtFile}" "${sCAConf}" "root_ca_ext" "${sCAName}"
+            iReturn=$?
+            ;;
+
+        bundle) # Pack the private key and the certificate into a PKCS#12 bundle
+            MyOpenSSL::bundleCertificate "Buster Root Certification Authority" "${sCrtFile}" "${sKeyFile}" "${sP12File}"
             iReturn=$?
             ;;
 

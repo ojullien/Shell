@@ -87,8 +87,6 @@ PKI::createDatabases() {
     String::notice -n "Create '${sName}' databases:"
     touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}" "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}.attr"
     iReturn=$?
-    openssl rand -hex 20 > "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.serial"
-    iReturn+=$?
     echo 00 >  "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.crlnum"
     iReturn+=$?
     String::checkReturnValueForTruthiness ${iReturn}
