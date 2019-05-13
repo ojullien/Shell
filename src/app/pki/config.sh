@@ -32,6 +32,10 @@ readonly -A m_PKI_CA_CONF_FILENAMES=( [root]="root-ca.conf" [signing]="signing-c
 readonly -A m_PKI_CA_FRIENDLYNAMES=( [root]="Buster Root Certification Authority" [signing]="Buster Intermediate Signing Certification Authority" );
 readonly -A m_PKI_CA_CONF_V3EXTENTIONS=( [root]="root_ca_ext" [signing]="signing_ca_ext" [tls]="server_ext" [email]="email_ext" [soft]="codesign_ext" );
 
+readonly -A m_PKI_USER_NAMES=( [email]="email" [soft]="soft" [tls]="tls" );
+#readonly -A m_PKI_USER_CONF_FILENAMES=( [tls]="tls.sample.conf" [email]="email.sample.conf" );
+#readonly -A m_PKI_USER_FRIENDLYNAMES=( [tls-sample]="USer certificat for domain.tld" [email-sample]="USer certificat for domain.tld" );
+
 ## -----------------------------------------------------------------------------
 ## Trace
 ## -----------------------------------------------------------------------------
@@ -51,21 +55,52 @@ PKI::traceRoot() {
     local sRootCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[root]}"
     local sRootCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[root]}"
 
-    FileSystem::checkFile "\tConf file is:\t\t\t${sRootCAConf}" "${sRootCAConf}"
-    FileSystem::checkDir "\tDirectory:\t\t\t${sRootCAPath}" "${sRootCAPath}"
+    FileSystem::checkFile "\tConf file is:\t\t${sRootCAConf}" "${sRootCAConf}"
+    FileSystem::checkDir "\tDirectory:\t\t${sRootCAPath}" "${sRootCAPath}"
     FileSystem::checkFile "\tKey is:\t\t\t${sRootCAKeyFile}" "${sRootCAKeyFile}"
     FileSystem::checkFile "\tCSR is:\t\t\t${sRootCACSRFile}" "${sRootCACSRFile}"
-    FileSystem::checkFile "\tCertificate is:\t\t\t${sRootCACRTFile}" "${sRootCACRTFile}"
-    FileSystem::checkFile "\tSerial file is:\t\t\t${sRootCASRLFile}" "${sRootCASRLFile}"
-    FileSystem::checkFile "\tCombined is:\t\t\t${sRootCAKeyCRTCombinedFile}" "${sRootCAKeyCRTCombinedFile}"
-    FileSystem::checkFile "\tP12 file is:\t\t\t${sRootCAP12File}" "${sRootCAP12File}"
-    String::notice "Extention is: ${sRootCAExtention}"
-    String::notice "Friendly Name is: ${sRootCAFriendlyName}"
+    FileSystem::checkFile "\tCertificate is:\t\t${sRootCACRTFile}" "${sRootCACRTFile}"
+    FileSystem::checkFile "\tSerial file is:\t\t${sRootCASRLFile}" "${sRootCASRLFile}"
+    FileSystem::checkFile "\tCombined is:\t\t${sRootCAKeyCRTCombinedFile}" "${sRootCAKeyCRTCombinedFile}"
+    FileSystem::checkFile "\tP12 file is:\t\t${sRootCAP12File}" "${sRootCAP12File}"
+    String::notice "\tExtention is:\t\t${sRootCAExtention}"
+    String::notice "\tFriendly Name is:\t${sRootCAFriendlyName}"
+
+    return 0
+}
+
+PKI::traceSigning() {
+    String::separateLine
+    String::notice "PKI Intermediate Signing CA configuration:"
+
+    local sSigningCAName="${m_PKI_CA_NAMES[signing]}"
+    local sSigningCAConf="${m_PKI_CNF_DIR}/${m_PKI_CA_CONF_FILENAMES[signing]}"
+    local sSigningCAPath="${m_PKI_CA_DIR}/${sSigningCAName}"
+    local sSigningCAKeyFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
+    local sSigningCACSRFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
+    local sSigningCACRTFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sSigningCASRLFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
+    local sSigningCAChainFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}-chain.${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sSigningCAP12File="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
+    local sSigningCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[signing]}"
+    local sSigningCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[signing]}"
+
+    FileSystem::checkFile "\tConf file is:\t\t${sSigningCAConf}" "${sSigningCAConf}"
+    FileSystem::checkDir "\tDirectory:\t\t${sSigningCAPath}" "${sSigningCAPath}"
+    FileSystem::checkFile "\tKey is:\t\t\t${sSigningCAKeyFile}" "${sSigningCAKeyFile}"
+    FileSystem::checkFile "\tCSR is:\t\t\t${sSigningCACSRFile}" "${sSigningCACSRFile}"
+    FileSystem::checkFile "\tCertificate is:\t\t${sSigningCACRTFile}" "${sSigningCACRTFile}"
+    FileSystem::checkFile "\tSerial file is:\t\t${sSigningCASRLFile}" "${sSigningCASRLFile}"
+    FileSystem::checkFile "\tCombined is:\t\t${sSigningCAChainFile}" "${sSigningCAChainFile}"
+    FileSystem::checkFile "\tP12 file is:\t\t${sSigningCAP12File}" "${sSigningCAP12File}"
+    String::notice "\tExtention is:\t\t${sSigningCAExtention}"
+    String::notice "\tFriendly Name is:\t${sSigningCAFriendlyName}"
 
     return 0
 }
 
 PKI::trace() {
     PKI::traceRoot
+    PKI::traceSigning
     return 0
 }

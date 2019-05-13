@@ -7,17 +7,18 @@
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
 ## -----------------------------------------------------------------------------
 
-PKI::RootLevel::showHelp() {
+PKI::Root::showHelp() {
     String::notice "Usage: $(basename "$0") rootlevel <command>"
-    String::notice "\tRoot CA level application. We use the root CA to issue subordinate signing CAs."
+    String::notice "\tRoot CA application. We use the root CA to issue subordinate signing CAs."
     String::notice "Available Commands:"
-    String::notice "\tgenerate-key\t\tGenerate a private and public key."
-    String::notice "\tgenerate-request\tGenerate a new PKCS#10 certificate request from existing key."
+    String::notice "\tbundle\t\tPack the root CA private key and the root CA certificate into a PKCS#12 bundle."
+    String::notice "\tgenerate-key\t\tGenerate a root CA private and root CA public key."
+    String::notice "\tgenerate-request\tGenerate a new PKCS#10 certificate request from existing root CA key."
     String::notice "\thelp\t\t\tShow this help."
     String::notice "\tinitialize\t\tCreate the root CA level repository and database files."
-    String::notice "\tinstall\t\t\tGenerate the keypair, the certificate signing request and the self-sign the root level certificate."
+    String::notice "\tinstall\t\t\tGenerate the root CA keypair, the root CA certificate signing request then self-sign the root level certificate and the create PKCS#12 bundle."
     String::notice "\tremove\t\t\tRemove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates."
-    String::notice "\tselfsign\t\tCreate and self-sign the root CA certificate root based on the CSR."
+    String::notice "\tselfsign\t\tCreate and self-sign the root CA certificate based on the CSR."
     return 0
 }
 
@@ -25,11 +26,11 @@ PKI::RootLevel::showHelp() {
 ## Main CA commands
 ## -----------------------------------------------------------------------------
 
-PKI::RootLevel::main() {
+PKI::Root::main() {
 
     # Parameters
     if (($# != 1)); then
-        PKI::RootLevel::showHelp
+        PKI::Root::showHelp
         return 1
     fi
 
@@ -50,23 +51,8 @@ PKI::RootLevel::main() {
     # Do the job
     case "$1" in
 
-        remove|rm) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
-            PKI::remove "${m_PKI_CA_DIR}"
-            iReturn=$?
-            ;;
-
-        initialize|init) # Create the root CA repository
-            PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
-                && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"
-            iReturn=$?
-
-            ;;
-
-        install) #
-            MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
-                && MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"\
-                && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"\
-                && MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
+        bundle) # Pack the private key and the certificate into a PKCS#12 bundle
+            MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
             iReturn=$?
             ;;
 
@@ -80,18 +66,37 @@ PKI::RootLevel::main() {
             iReturn=$?
             ;;
 
+        initialize|init) # Create the root CA repository
+            PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
+                && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"
+            iReturn=$?
+            ;;
+
+        install) #
+            MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
+                && MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"\
+                && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"\
+                && MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
+            iReturn=$?
+            ;;
+
+        remove|rm) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
+            PKI::remove "${m_PKI_CA_DIR}"
+            iReturn=$?
+            ;;
+
         selfsign|self|sign|ss) # Create and self-sign the root CA certificate root based on the CSR.
             MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"
             iReturn=$?
             ;;
 
-        bundle) # Pack the private key and the certificate into a PKCS#12 bundle
-            MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
+        trace)
+            PKI::traceRoot
             iReturn=$?
             ;;
 
         *)
-            PKI::RootLevel::showHelp
+            PKI::Root::showHelp
             iReturn=$?
             ;;
     esac

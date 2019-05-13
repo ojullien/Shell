@@ -2,5 +2,6 @@
 desktop.ini
 /src/installShell.sh
 priv-*.cfg.sh
-local.config.sh
+local.*
+*.fr.conf
 /src/bin/ca/

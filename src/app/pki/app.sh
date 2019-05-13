@@ -12,12 +12,11 @@ PKI::showHelp() {
     String::notice "\tPKI toolkit"
     Option::showHelp
     String::notice "Available Commands:"
-    String::notice "\tinitialize-all-levels\tCreate all the CA repositories and database files."
-    String::notice "\tinitialize-ca <CA name>\tCreate the CA repository and database files for the given CA."
-    String::notice "\tremove-root-level\tRemove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates."
-    String::notice "\tremove-ca <CA name>\tRemove the PKI signing CA level repositories."
-    String::notice "\trootlevel\tRoot CA level application."
-    String::notice "\tsigninglevel\tIntermediate Signing CA level application."
+    String::notice "\troot\tRoot CA level application."
+    String::notice "\tsigning\tIntermediate Signing CA level application."
+    String::notice "\temail\tUser certificate level application."
+    String::notice "\tesoft\tUser certificate level application."
+    String::notice "\ttls\tUser certificate level application."
     String::notice "Available CA name:"
     for KEY in "${!m_PKI_CA_NAMES[@]}"; do
         String::notice "\t[$KEY]=\"${m_PKI_CA_NAMES[$KEY]}\""

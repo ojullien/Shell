@@ -76,18 +76,39 @@ fi
 # Do the job
 case "$1" in
 
-    rootlevel|rootca|root|rl) # Simple PKI root CA level
+    rootca|root|rca|r) # Simple PKI root CA level
         shift
         # shellcheck source=/dev/null
-        . "${m_DIR_APP}/pki/rootlevel_app.sh"
-        PKI::RootLevel::main "$@"
+        . "${m_DIR_APP}/pki/root_app.sh"
+        PKI::Root::main "$@"
         ;;
 
-    signinglevel|signlevel|signca|sca|sl) # Simple PKI intermediate signing CA level
+    signingca|signing|sca|s) # Simple PKI intermediate signing CA level
         shift
         # shellcheck source=/dev/null
-        . "${m_DIR_APP}/pki/signinglevel_app.sh"
-        PKI::SigningLevel::main "$@"
+        . "${m_DIR_APP}/pki/signing_app.sh"
+        PKI::Signing::main "$@"
+        ;;
+
+    tls) # User level, TLS certificate
+        shift
+        # shellcheck source=/dev/null
+        . "${m_DIR_APP}/pki/user_app.sh"
+        PKI::User::main "tls" "$@"
+        ;;
+
+    email) # User level, Email certificate
+        shift
+        # shellcheck source=/dev/null
+        . "${m_DIR_APP}/pki/user_app.sh"
+        PKI::User::main "email" "$@"
+        ;;
+
+    soft) # User level, Software certificate
+        shift
+        # shellcheck source=/dev/null
+        . "${m_DIR_APP}/pki/user_app.sh"
+        PKI::User::main "soft" "$@"
         ;;
 
     *)
