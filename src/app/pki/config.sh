@@ -32,7 +32,7 @@ readonly -A m_PKI_CA_CONF_FILENAMES=( [root]="root-ca.conf" [signing]="signing-c
 readonly -A m_PKI_CA_FRIENDLYNAMES=( [root]="Buster Root Certification Authority" [signing]="Buster Intermediate Signing Certification Authority" );
 readonly -A m_PKI_CA_CONF_V3EXTENTIONS=( [root]="root_ca_ext" [signing]="signing_ca_ext" [tls]="server_ext" [email]="email_ext" [soft]="codesign_ext" );
 
-readonly -A m_PKI_USER_NAMES=( [email]="email" [soft]="soft" [tls]="tls" );
+#readonly -A m_PKI_USER_CONF_V3EXTENTIONS=( [email]="email_ext" [soft]="soft" [tls]="server_ext" );
 #readonly -A m_PKI_USER_CONF_FILENAMES=( [tls]="tls.sample.conf" [email]="email.sample.conf" );
 #readonly -A m_PKI_USER_FRIENDLYNAMES=( [tls-sample]="USer certificat for domain.tld" [email-sample]="USer certificat for domain.tld" );
 

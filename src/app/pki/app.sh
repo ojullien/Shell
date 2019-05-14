@@ -84,7 +84,7 @@ PKI::createDatabases() {
 
     # Do the job
     String::notice -n "Create '${sName}' databases:"
-    touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}" "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_EXTENTIONS[index]}.attr"
+    touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_FILE_EXTENTIONS[index]}" "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_FILE_EXTENTIONS[index]}.attr"
     iReturn=$?
     echo 00 >  "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.crlnum"
     iReturn+=$?

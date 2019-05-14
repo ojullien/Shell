@@ -11,14 +11,20 @@ PKI::Root::showHelp() {
     String::notice "Usage: $(basename "$0") rootlevel <command>"
     String::notice "\tRoot CA application. We use the root CA to issue subordinate signing CAs."
     String::notice "Available Commands:"
-    String::notice "\tbundle\t\tPack the root CA private key and the root CA certificate into a PKCS#12 bundle."
-    String::notice "\tgenerate-key\t\tGenerate a root CA private and root CA public key."
-    String::notice "\tgenerate-request\tGenerate a new PKCS#10 certificate request from existing root CA key."
-    String::notice "\thelp\t\t\tShow this help."
-    String::notice "\tinitialize\t\tCreate the root CA level repository and database files."
-    String::notice "\tinstall\t\t\tGenerate the root CA keypair, the root CA certificate signing request then self-sign the root level certificate and the create PKCS#12 bundle."
-    String::notice "\tremove\t\t\tRemove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates."
-    String::notice "\tselfsign\t\tCreate and self-sign the root CA certificate based on the CSR."
+    String::notice "\tbundle\t\t\t\tPack the root CA private key and the root CA certificate into a PKCS#12 bundle."
+    String::notice "\tbundle-output|output\t\tPrint some info about root CA PKCS#12 file."
+    String::notice "\tcertificate-display|display\tDisplay the contents of root CA certificate file in a human-readable output format."
+    String::notice "\tcertificate-purpose|purpose\tCheck the root CA certificate extensions and determines what the certificate can be used for."
+    String::notice "\tcertificate-verify|verify\tVerify root CA certificate."
+    String::notice "\tinitialize|init\t\t\tCreate the root CA level repository and database files."
+    String::notice "\tinstall\t\t\t\tRun all the commands."
+    String::notice "\thelp\t\t\t\tShow this help."
+    String::notice "\tkey-check|check\t\t\tCheck the consistency of root CA key pair for both public and private components."
+    String::notice "\tkey-generate|key\t\tGenerate a root CA private and root CA public key."
+    String::notice "\tremove|rm\t\t\tRemove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates."
+    String::notice "\trequest-generate|request|req\tGenerate a new PKCS#10 certificate request from existing root CA key."
+    String::notice "\trequest-verify\t\t\tVerifies the signature on the root CA request."
+    String::notice "\tselfsign\t\t\tCreate and self-sign the root CA certificate based on the CSR."
     return 0
 }
 
@@ -51,43 +57,122 @@ PKI::Root::main() {
     # Do the job
     case "$1" in
 
-        bundle) # Pack the private key and the certificate into a PKCS#12 bundle
+        bundle)
+            # Pack the private key and the certificate into a PKCS#12 bundle
             MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
             iReturn=$?
+            # Print some info about a PKCS#12 file
+            if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+                MyOpenSSL::outputBundle "${sRootCAP12File}"
+                iReturn=$?
+            fi
             ;;
 
-        generate-key|key) # Generate a private and public key
-            MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"
-            iReturn=$?
+        bundle-output|output)
+            # Print some info about a PKCS#12 file.
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::outputBundle "${sRootCAP12File}"
+                iReturn=$?
+            fi
             ;;
 
-        generate-request|request|req) # Generate a new PKCS#10 certificate request from existing key
-            MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"
-            iReturn=$?
+        certificate-display|display)
+            # Display the contents of a certificate file in a human-readable output format
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::displayCertificate "${sRootCACRTFile}"
+                iReturn=$?
+            fi
             ;;
 
-        initialize|init) # Create the root CA repository
+        certificate-purpose|purpose)
+            # Check the certificate extensions and determines what the certificate can be used for.
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::purposeCertificate "${sRootCACRTFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        certificate-verify|verify)
+            # Verifies certificate chains.
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::verifyCertificate "${sRootCACRTFile}" "${sRootCACRTFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        initialize|init)
+            # Create the root CA repository
             PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
                 && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"
             iReturn=$?
             ;;
 
-        install) #
-            MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
+        install)
+            # Run all
+            PKI::remove "${m_PKI_CA_DIR}"\
+                && PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
+                && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"\
+                && MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"\
                 && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"\
                 && MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
             iReturn=$?
             ;;
 
-        remove|rm) # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
+        key-check|check)
+            # Inspecting the key's metadata
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::checkKey "${sRootCAKeyFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        key-generate|key)
+            # Generate a private and public key.
+            MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"
+            iReturn=$?
+            # Inspecting the key's metadata.
+            if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+                MyOpenSSL::checkKey "${sRootCAKeyFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        remove|rm)
+            # Remove all PKI level repositories. Root CA, subordinate signing CAs and all issued certificates.
             PKI::remove "${m_PKI_CA_DIR}"
             iReturn=$?
             ;;
 
-        selfsign|self|sign|ss) # Create and self-sign the root CA certificate root based on the CSR.
+        request-generate|request|req)
+            # Generate a new PKCS#10 certificate request from existing key.
+            MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"
+            iReturn=$?
+            # Verifies the signature on the request.
+            if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+                MyOpenSSL::verifyRequest "${sRootCACSRFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        request-verify)
+            # Verifies the signature on the request.
+            if ((m_OPTION_DISPLAY)); then
+                MyOpenSSL::verifyRequest "${sRootCACSRFile}"
+                iReturn=$?
+            fi
+            ;;
+
+        selfsign|sign)
+            # Create and self-sign the root CA certificate root based on the CSR.
             MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"
             iReturn=$?
+            # Inspecting the certificate's metadata
+            if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
+                MyOpenSSL::displayCertificate "${sRootCACRTFile}"
+                MyOpenSSL::purposeCertificate "${sRootCACRTFile}"
+                MyOpenSSL::verifyCertificate "${sRootCACRTFile}" "${sRootCACRTFile}"
+            fi
             ;;
 
         trace)

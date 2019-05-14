@@ -9,7 +9,7 @@
 ## -----------------------------------------------------------------------------
 
 PKI::User::showHelp() {
-    String::notice "Usage: $(basename "$0") SigningLevel <command> <intermediate signing CA name>"
+    String::notice "Usage: $(basename "$0") tls"
     String::notice "\tSigning CA application. We use intermediate signing CA to issue TLS, Email or Software certificates."
     String::notice "Available Commands:"
     String::notice "\tbundle\t\tPack the signing CA private key, the signing CA certificate and the Root CA PKCS#12 bundle into a new PKCS#12 bundle."
@@ -33,14 +33,14 @@ PKI::User::showHelp() {
 PKI::User::main() {
 
     # Parameters
-    if (($# < 4)); then
+    if (($# != 3)); then
         PKI::User::showHelp
         return 1
     fi
 
     # Init
-    local sUserType="${2:-""}" sUserName="${3:-""}"
-    if [[ -z "${sUserName}" ]] || [[ -z "${sUserType}" ]] || [[ ! -v "${m_PKI_USER_NAMES[${sUserType}]}" ]]; then
+    local sUserType="${1:-""}" sCommand="${2:-""}"  sUserName="${3:-""}"
+    if [[ -z "${sCommand}" ]] || [[ -z "${sUserName}" ]] || [[ -z "${sUserType}" ]] || [[ ! -v "m_PKI_CA_CONF_V3EXTENTIONS[${sUserType}]" ]]; then
         PKI::User::showHelp
         return 1
     fi
@@ -54,7 +54,7 @@ PKI::User::main() {
 #    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.key${m_SSL_FILE_EXTENTIONS[certificate]}"
 #    local sRootCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[root]}"
 
-#    local sSigningCAName="${m_PKI_CA_NAMES[signing]}"
+    local sSigningCAName="${m_PKI_CA_NAMES[signing]}"
 #    local sSigningCAConf="${m_PKI_CNF_DIR}/${m_PKI_CA_CONF_FILENAMES[signing]}"
     local sSigningCAPath="${m_PKI_CA_DIR}/${sSigningCAName}"
     local sSigningCAKeyFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
@@ -74,7 +74,7 @@ PKI::User::main() {
     local sUserChainFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sUserName}-chain.${m_SSL_FILE_EXTENTIONS[certificate]}"
 
     # Do the job
-    case "$1" in
+    case "${sCommand}" in
 
         generate-key|key) # Generate a private and public key
             MyOpenSSL::generateKeypair "${sUserName}" "${sUserKeyFile}"
@@ -87,7 +87,7 @@ PKI::User::main() {
             ;;
 
         sign) # Create the certificate based on the CSR.
-            MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sUserConf}" "req_ext" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}" "${sUserChainFile}"
+            MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sUserConf}" "server_ext" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}" "${sUserChainFile}"
             iReturn=$?
             ;;
 
@@ -100,7 +100,7 @@ PKI::User::main() {
             ;;
 
         remove|rm) # Remove the PKI signing CA level repository.
-            PKI::remove "${sSigningCAPath}"
+            #PKI::remove "${sSigningCAPath}"
             iReturn=$?
             ;;
 

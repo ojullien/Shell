@@ -9,28 +9,26 @@
 ## -----------------------------------------------------------------------------
 ## Verify key consistency
 ## -----------------------------------------------------------------------------
-MyOpenSSL::viewKey() {
+MyOpenSSL::checkKey() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: MyOpenSSL::viewKey <Key file>"
+        String::error "Usage: MyOpenSSL::checkKey <input filename to read a key from>"
         return 1
     fi
 
     # Init
-    local sKeyFile="$1"
+    local sFile="$1"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sKeyFile}" ]]; then
-        if ((m_OPTION_DISPLAY)); then
-                String::separateLine
-                openssl pkey -inform PEM -in "${sKeyFile}" -text_pub -noout -check
-                iReturn=$?
-                String::separateLine
-        fi
+    if [[ -f "${sFile}" ]]; then
+        String::separateLine
+        openssl pkey -inform PEM -in "${sFile}" -text_pub -noout -check
+        iReturn=$?
+        String::separateLine
     else
-        String::error "MyOpenSSL::viewKey: file '${sKeyFile}' does not exist."
+        String::error "MyOpenSSL::checkKey: file '${sFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -43,7 +41,7 @@ MyOpenSSL::generateKeypair() {
 
     # Parameters
     if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: MyOpenSSL::generatePrivateKeypair <name> <key file>"
+        String::error "Usage: MyOpenSSL::generatePrivateKeypair <name> <filename>"
         return 1
     fi
 
@@ -52,16 +50,11 @@ MyOpenSSL::generateKeypair() {
     local -i iReturn=1
 
     # Do the job
-    String::notice -n "generate '${sName}' keypair using elliptic curves algorithm:"
+    String::notice -n "generate PKCS#8 '${sName}' keypair using elliptic curves algorithm:"
     openssl genpkey -out "${sKeyFile}" -outform PEM -algorithm EC -pkeyopt ec_paramgen_curve:P-256 -pkeyopt ec_param_enc:named_curve \
         && chmod 640 "${sKeyFile}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
-
-    # Inspecting the key's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        MyOpenSSL::viewKey "${sKeyFile}"
-    fi
 
     return ${iReturn}
 }
@@ -69,28 +62,26 @@ MyOpenSSL::generateKeypair() {
 ## -----------------------------------------------------------------------------
 ## Display the contents of CSR file in a human-readable output format
 ## -----------------------------------------------------------------------------
-MyOpenSSL::viewRequest() {
+MyOpenSSL::verifyRequest() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: MyOpenSSL::viewRequest <CSR file>"
+        String::error "Usage: MyOpenSSL::verifyRequest <input filename to read a request from>"
         return 1
     fi
 
     # Init
-    local sCsrFile="$1"
+    local sFile="$1"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sCsrFile}" ]]; then
-        if ((m_OPTION_DISPLAY)); then
-            String::separateLine
-            openssl req -noout -text -verify -in "${sCsrFile}" -nameopt multiline
-            iReturn=$?
-            String::separateLine
-        fi
+    if [[ -f "${sFile}" ]]; then
+        String::separateLine
+        openssl req -noout -text -verify -in "${sFile}" -nameopt multiline
+        iReturn=$?
+        String::separateLine
     else
-        String::error "MyOpenSSL::viewRequest: file '${sCsrFile}' does not exist."
+        String::error "MyOpenSSL::verifyRequest: file '${sFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -104,7 +95,7 @@ MyOpenSSL::createRequest() {
 
     # Parameters
     if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
-        String::error "Usage: MyOpenSSL::createRequest <name> <key file> <configuration file> <csr file>"
+        String::error "Usage: MyOpenSSL::createRequest <name> <file to read the private key from> <configuration file> <output filename to write>"
         return 1
     fi
 
@@ -123,52 +114,74 @@ MyOpenSSL::createRequest() {
         String::error "MyOpenSSL::createRequest: file '${sConf}' does not exist."
     fi
 
-    # Inspecting the certificate's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        MyOpenSSL::viewRequest "${sCsrFile}"
-    fi
-
     return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
 ## Display the contents of a certificate file in a human-readable output format
 ## -----------------------------------------------------------------------------
-MyOpenSSL::viewCertificate() {
+MyOpenSSL::displayCertificate() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: MyOpenSSL::viewCertificate <CRT file>"
+        String::error "Usage: MyOpenSSL::displayCertificate <input filename to read a certificate from>"
         return 1
     fi
 
     # Init
-    local sCrtFile="$1"
+    local sFile="$1"
     local -i iReturn=1
 
     # Do the job
-    if [[ -f "${sCrtFile}" ]]; then
-        if ((m_OPTION_DISPLAY)); then
-            String::separateLine
-            openssl x509 -noout -text -purpose -nameopt multiline -inform PEM -in "${sCrtFile}"
-            iReturn=$?
-            String::separateLine
-        fi
+    if [[ -f "${sFile}" ]]; then
+        String::separateLine
+        openssl x509 -noout -text -nameopt multiline -inform PEM -in "${sFile}"
+        iReturn=$?
+        String::separateLine
     else
-        String::error "MyOpenSSL::viewCertificate: file '${sCrtFile}' does not exist."
+        String::error "MyOpenSSL::viewCertificate: file '${sFile}' does not exist."
     fi
 
     return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
-## Display the contents of a certificate file in a human-readable output format
+## Check the certificate extensions and determines what the certificate can be
+## used for
+## -----------------------------------------------------------------------------
+MyOpenSSL::purposeCertificate() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: MyOpenSSL::purposeCertificate <input filename to read a certificate from>"
+        return 1
+    fi
+
+    # Init
+    local sFile="$1"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sFile}" ]]; then
+        String::separateLine
+        openssl x509 -noout -purpose -inform PEM -in "${sFile}"
+        iReturn=$?
+        String::separateLine
+    else
+        String::error "MyOpenSSL::viewCertificate: file '${sFile}' does not exist."
+    fi
+
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## The verify command verifies certificate chains.
 ## -----------------------------------------------------------------------------
 MyOpenSSL::verifyCertificate() {
 
     # Parameters
-    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$1" ]]; then
-        String::error "Usage: MyOpenSSL::verifyCertificate <CA crt file> <CRT file>"
+    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
+        String::error "Usage: MyOpenSSL::verifyCertificate <A file of trusted certificates> <input filename to read a certificate from>"
         return 1
     fi
 
@@ -178,12 +191,10 @@ MyOpenSSL::verifyCertificate() {
 
     # Do the job
     if [[ -f "${sCACrtFile}" ]] && [[ -f "${sCrtFile}" ]]; then
-        if ((m_OPTION_DISPLAY)); then
-            String::separateLine
-            openssl verify -policy_check -x509_strict -verbose -CAfile "${sCACrtFile}" "${sCrtFile}"
-            iReturn=$?
-            String::separateLine
-        fi
+        String::separateLine
+        openssl verify -show_chain -policy_print -policy_check -explicit_policy -x509_strict -verbose -CAfile "${sCACrtFile}" "${sCrtFile}"
+        iReturn=$?
+        String::separateLine
     else
         String::error "MyOpenSSL::verifyCertificate: file '${sCACrtFile}' does not exist."
         String::error "MyOpenSSL::verifyCertificate: file '${sCrtFile}' does not exist."
@@ -230,12 +241,6 @@ MyOpenSSL::createSelfSignedCertificate() {
         String::checkReturnValueForTruthiness ${iReturn}
     fi
 
-    # Inspecting the certificate's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        MyOpenSSL::viewCertificate "${sCrtFile}"
-        MyOpenSSL::verifyCertificate "${sCrtFile}" "${sCrtFile}"
-    fi
-
     return ${iReturn}
 }
 
@@ -246,7 +251,7 @@ MyOpenSSL::signCertificate() {
 
     # Parameters
     if (($# != 9)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]] || [[ -z "$7" ]] || [[ -z "$8" ]] || [[ -z "$9" ]]; then
-        String::error "Usage: MyOpenSSL::signCertificate <CA crt file> <CA key file> <CA serial file> <conf file> <extention> <csr file> <name> <crt file> <chain>"
+        String::error "Usage: MyOpenSSL::signCertificate <CA certificate to be used for signing> <CA private key to sign a certificate with> <CA serial number file to use> <File containing certificate extensions to use> <The section to add certificate extensions from> <input filename to read a certificate from> <name> <output filename to write> <output filename to write the chain>"
         return 1
     fi
 
@@ -275,10 +280,32 @@ MyOpenSSL::signCertificate() {
         String::checkReturnValueForTruthiness ${iReturn}
     fi
 
-    # Inspecting the certificate's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        MyOpenSSL::viewCertificate "${sCrtFile}"
-        MyOpenSSL::verifyCertificate "${sCACert}" "${sCrtFile}"
+    return ${iReturn}
+}
+
+## -----------------------------------------------------------------------------
+## Output additional information about the PKCS#12 file structure, algorithms used and iteration counts.
+## -----------------------------------------------------------------------------
+MyOpenSSL::outputBundle() {
+
+    # Parameters
+    if (($# != 1)) || [[ -z "$1" ]]; then
+        String::error "Usage: MyOpenSSL::outputBundle <filename of the PKCS#12 file to be parsed>"
+        return 1
+    fi
+
+    # Init
+    local sFile="$1"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sFile}" ]]; then
+        String::separateLine
+        openssl pkcs12 -nodes -info -in "${sFile}" -passin pass:""
+        iReturn=$?
+        String::separateLine
+    else
+        String::error "MyOpenSSL::outputBundle: file '${sFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -310,21 +337,7 @@ MyOpenSSL::bundleCertificate() {
         [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sKeyFile}' does not exist."
     fi
 
-    # Inspecting the certificate's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        String::separateLine
-        openssl pkcs12 -nodes -info -in "${sP12}" -passin pass:""
-        String::separateLine
-    fi
-
     return ${iReturn}
-
-    if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
-       error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
-        exit 1
-    fi
-
-    return $?
 }
 
 ## -----------------------------------------------------------------------------
@@ -354,19 +367,5 @@ MyOpenSSL::bundleChain() {
         [[ -f "${sOtherCrtFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sOtherCrtFile}' does not exist."
     fi
 
-    # Inspecting the certificate's metadata
-    if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-        String::separateLine
-        openssl pkcs12 -nodes -info -in "${sP12}" -passin pass:""
-        String::separateLine
-    fi
-
     return ${iReturn}
-
-    if [ $# -lt 6 -o -z "$1" -o -z "$2" -o -z "$3" -o -z "$4" -o -z "$5" -o -z "$6" ]; then
-       error "Usage: bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <password source> <pass phrase source to encrypt any outputted private keys with> <filename to write>"
-        exit 1
-    fi
-
-    return $?
 }
