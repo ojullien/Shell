@@ -47,8 +47,7 @@ PKI::Root::main() {
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sRootCACSRFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
     local sRootCACRTFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
-    local sRootCASRLFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
-    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.key${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}-key${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sRootCAP12File="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
     local sRootCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[root]}"
     local sRootCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[root]}"
@@ -71,7 +70,7 @@ PKI::Root::main() {
         bundle-output|output)
             # Print some info about a PKCS#12 file.
             if ((m_OPTION_DISPLAY)); then
-                MyOpenSSL::outputBundle "${sRootCAP12File}"
+                MyOpenSSL::outputPKCS12Bundle "${sRootCAP12File}"
                 iReturn=$?
             fi
             ;;
@@ -114,8 +113,9 @@ PKI::Root::main() {
                 && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"\
                 && MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"\
-                && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"\
-                && MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
+                && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}"\
+                && MyOpenSSL::createPEMBundle "key + cert" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAKeyCRTCombinedFile}"\
+                && MyOpenSSL::createPKCS12bundle "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
             iReturn=$?
             ;;
 
@@ -165,8 +165,13 @@ PKI::Root::main() {
 
         selfsign|sign)
             # Create and self-sign the root CA certificate root based on the CSR.
-            MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}" "${sRootCAKeyCRTCombinedFile}"
+            MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}"
             iReturn=$?
+            # Create the key + cert PEM bundle
+            if ((0==iReturn)); then
+                MyOpenSSL::createPEMBundle "key + cert" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAKeyCRTCombinedFile}"
+                iReturn=$?
+            fi
             # Inspecting the certificate's metadata
             if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
                 MyOpenSSL::displayCertificate "${sRootCACRTFile}"

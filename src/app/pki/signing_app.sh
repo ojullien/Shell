@@ -21,7 +21,7 @@ PKI::Signing::showHelp() {
     String::notice "\tinstall\t\t\t\tRun all the commands."
     String::notice "\thelp\t\t\t\tShow this help."
     String::notice "\tkey-check|check\t\t\tCheck the consistency of signing CA key pair for both public and private components."
-    String::notice "\tkey-generate|key\t\tGenerate a v private and signing CA public key."
+    String::notice "\tkey-generate|key\t\tGenerate a private and signing CA public key."
     String::notice "\tremove|rm\t\t\tRemove the signing level repositories and issued certificates."
     String::notice "\trequest-generate|request|req\tGenerate a new PKCS#10 certificate request from existing signing CA key."
     String::notice "\trequest-verify\t\t\tVerifies the signature on the signing CA request."
@@ -48,7 +48,6 @@ PKI::Signing::main() {
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sRootCACRTFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sRootCASRLFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
-    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.key${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sRootCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[root]}"
 
     local sSigningCAName="${m_PKI_CA_NAMES[signing]}"
@@ -57,7 +56,6 @@ PKI::Signing::main() {
     local sSigningCAKeyFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sSigningCACSRFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
     local sSigningCACRTFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
-    local sSigningCASRLFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
     local sSigningCAChainFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}-chain.${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sSigningCAP12File="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
     local sSigningCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[signing]}"
@@ -69,11 +67,11 @@ PKI::Signing::main() {
 
         bundle)
             # Pack the Signing CA private key, the Signing CA certificate and the Root CA PKCS#12 bundle into a new PKCS#12 bundle.
-            MyOpenSSL::bundleChain "${sSigningCAFriendlyName}" "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sRootCAFriendlyName}" "${sRootCAKeyCRTCombinedFile}" "${sSigningCAP12File}"
+            MyOpenSSL::createPKCS12Chainbundle "${sSigningCAFriendlyName}" "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sSigningCAP12File}"
             iReturn=$?
             # Print some info about a PKCS#12 file
             if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-                MyOpenSSL::outputBundle "${sSigningCAP12File}"
+                MyOpenSSL::outputPKCS12Bundle "${sSigningCAP12File}"
                 iReturn=$?
             fi
             ;;
@@ -124,8 +122,9 @@ PKI::Signing::main() {
                 && PKI::createDatabases "${sSigningCAPath}" "${sSigningCAName}"\
                 && MyOpenSSL::generateKeypair "${sSigningCAName}" "${sSigningCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sSigningCAName}" "${sSigningCAKeyFile}" "${sSigningCAConf}" "${sSigningCACSRFile}"\
-                && MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}" "${sSigningCAChainFile}"\
-                && MyOpenSSL::bundleChain "${sSigningCAFriendlyName}" "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sRootCAFriendlyName}" "${sRootCAKeyCRTCombinedFile}" "${sSigningCAP12File}"
+                && MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"\
+                && MyOpenSSL::createPEMBundle "cert chain" "${sSigningCACRTFile}" "${sRootCACRTFile}" "${sSigningCAChainFile}"\
+                && MyOpenSSL::createPKCS12Chainbundle "${sSigningCAFriendlyName}" "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sSigningCAP12File}"
             iReturn=$?
             ;;
 
@@ -174,8 +173,13 @@ PKI::Signing::main() {
 
         sign)
             # Create the Signing CA certificate based on the CSR.
-            MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}" "${sSigningCAChainFile}"
+            MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"
             iReturn=$?
+            # Create the cert chain PEM bundle
+            if ((0==iReturn)); then
+                MyOpenSSL::createPEMBundle "cert chain" "${sSigningCACRTFile}" "${sRootCACRTFile}" "${sSigningCAChainFile}"
+                iReturn=$?
+            fi
             # Inspecting the certificate's metadata
             if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
                 MyOpenSSL::displayCertificate "${sSigningCACRTFile}"

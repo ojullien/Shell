@@ -192,7 +192,7 @@ MyOpenSSL::verifyCertificate() {
     # Do the job
     if [[ -f "${sCACrtFile}" ]] && [[ -f "${sCrtFile}" ]]; then
         String::separateLine
-        openssl verify -show_chain -policy_print -policy_check -explicit_policy -x509_strict -verbose -CAfile "${sCACrtFile}" "${sCrtFile}"
+        openssl verify -show_chain -policy_print -policy_check -x509_strict -verbose -CAfile "${sCACrtFile}" "${sCrtFile}"
         iReturn=$?
         String::separateLine
     else
@@ -210,17 +210,17 @@ MyOpenSSL::verifyCertificate() {
 MyOpenSSL::createSelfSignedCertificate() {
 
     # Parameters
-    if (($# != 7)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]] || [[ -z "$7" ]]; then
-        String::error "Usage: MyOpenSSL::createSelfSignedCertificate <csr file> <key file> <crt file> <conf file> <extention> <name> <pem chain>"
+    if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]]; then
+        String::error "Usage: MyOpenSSL::createSelfSignedCertificate <csr file> <key file> <crt file> <conf file> <extention> <name>"
         return 1
     fi
 
     # Init
-    local sCsrFile="$1" sKeyFile="$2" sCrtFile="$3" sConf="$4" sExtention="$5" sName="$6" sChain="$7"
-    local sSerial=$(openssl rand -hex 20)
+    local sCsrFile="$1" sKeyFile="$2" sCrtFile="$3" sConf="$4" sExtention="$5" sName="$6" sSerial
     local -i iReturn=1
 
     # Do the job
+    sSerial=$(openssl rand -hex 20)
     if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]]; then
         String::notice -n "Create the self-signed '${sName}' certificate:"
         openssl x509 -req -inform PEM -in "${sCsrFile}" -keyform PEM -signkey "${sKeyFile}" -days 365\
@@ -233,14 +233,6 @@ MyOpenSSL::createSelfSignedCertificate() {
         String::error "MyOpenSSL::createSelfSignedCertificate: file '${sConf}' does not exist."
     fi
 
-    if ((0==iReturn)); then
-        String::notice -n "Create the key-certificate PEM file:"
-        cat "${sKeyFile}" "${sCrtFile}" > "${sChain}"
-        chmod 640 "${sChain}"
-        iReturn=$?
-        String::checkReturnValueForTruthiness ${iReturn}
-    fi
-
     return ${iReturn}
 }
 
@@ -250,13 +242,13 @@ MyOpenSSL::createSelfSignedCertificate() {
 MyOpenSSL::signCertificate() {
 
     # Parameters
-    if (($# != 9)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]] || [[ -z "$7" ]] || [[ -z "$8" ]] || [[ -z "$9" ]]; then
-        String::error "Usage: MyOpenSSL::signCertificate <CA certificate to be used for signing> <CA private key to sign a certificate with> <CA serial number file to use> <File containing certificate extensions to use> <The section to add certificate extensions from> <input filename to read a certificate from> <name> <output filename to write> <output filename to write the chain>"
+    if (($# != 8)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]] || [[ -z "$7" ]] || [[ -z "$8" ]]; then
+        String::error "Usage: MyOpenSSL::signCertificate <CA certificate to be used for signing> <CA private key to sign a certificate with> <CA serial number file to use> <File containing certificate extensions to use> <The section to add certificate extensions from> <input filename to read a certificate from> <name> <output filename to write>"
         return 1
     fi
 
     # Init
-    local sCACert="$1" sCAKey="$2" sCASerial="$3" sConf="$4" sExtention="$5" sCsrFile="$6" sName="$7" sCrtFile="$8" sChain="$9"
+    local sCACert="$1" sCAKey="$2" sCASerial="$3" sConf="$4" sExtention="$5" sCsrFile="$6" sName="$7" sCrtFile="$8"
     local -i iReturn=1
 
     # Do the job
@@ -273,20 +265,13 @@ MyOpenSSL::signCertificate() {
         [[ -f "${sConf}" ]] || String::error "MyOpenSSL::signCertificate: file '${sConf}' does not exist."
     fi
 
-    if ((0==iReturn)); then
-        String::notice -n "Create the chain:"
-        cat "${sCrtFile}" "${sCACert}" > "${sChain}"
-        iReturn=$?
-        String::checkReturnValueForTruthiness ${iReturn}
-    fi
-
     return ${iReturn}
 }
 
 ## -----------------------------------------------------------------------------
 ## Output additional information about the PKCS#12 file structure, algorithms used and iteration counts.
 ## -----------------------------------------------------------------------------
-MyOpenSSL::outputBundle() {
+MyOpenSSL::outputPKCS12Bundle() {
 
     # Parameters
     if (($# != 1)) || [[ -z "$1" ]]; then
@@ -312,13 +297,15 @@ MyOpenSSL::outputBundle() {
 }
 
 ## -----------------------------------------------------------------------------
-## Pack the private key and the certificate into a PKCS#12 bundle
+## Pack the private key and the certificate into a PKCS#12 bundle.
+## Additional certificates may be added, typically the certificates comprising
+## the chain up to the Root CA.
 ## -----------------------------------------------------------------------------
-MyOpenSSL::bundleCertificate() {
+MyOpenSSL::createPKCS12bundle() {
 
     # Parameters
     if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
-        String::error "Usage: MyOpenSSL::bundleCertificate <friendly name> <filename to read certificates and private keys from> <file to read private key from> <filename to write the PKCS#12 file to>"
+        String::error "Usage: MyOpenSSL::createPKCS12bundle <friendly name> <filename to read certificates and private keys from> <file to read private key from> <filename to write the PKCS#12 file to>"
         return 1
     fi
 
@@ -333,8 +320,8 @@ MyOpenSSL::bundleCertificate() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        [[ -f "${sCrtFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sCrtFile}' does not exist."
-        [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sKeyFile}' does not exist."
+        [[ -f "${sCrtFile}" ]] || String::error "MyOpenSSL::createPKCS12bundle: file '${sCrtFile}' does not exist."
+        [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::createPKCS12bundle: file '${sKeyFile}' does not exist."
     fi
 
     return ${iReturn}
@@ -343,11 +330,11 @@ MyOpenSSL::bundleCertificate() {
 ## -----------------------------------------------------------------------------
 ## Pack a chain certificate into a PKCS#12 bundle
 ## -----------------------------------------------------------------------------
-MyOpenSSL::bundleChain() {
+MyOpenSSL::createPKCS12Chainbundle() {
 
     # Parameters
     if (($# != 6)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]] || [[ -z "$5" ]] || [[ -z "$6" ]]; then
-        String::error "Usage: MyOpenSSL::bundleChain <friendly name> <filename to read certificates and private keys from> <file to read private key from> <friendly name for additional certificates> <filename to read additional certificates from> <filename to write the PKCS#12 file to>"
+        String::error "Usage: MyOpenSSL::createPKCS12Chainbundle <friendly name> <filename to read certificates and private keys from> <file to read private key from> <friendly name for additional certificates> <filename to read additional certificates from> <filename to write the PKCS#12 file to>"
         return 1
     fi
 
@@ -362,9 +349,40 @@ MyOpenSSL::bundleChain() {
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
     else
-        [[ -f "${sCrtFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sCrtFile}' does not exist."
-        [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sKeyFile}' does not exist."
-        [[ -f "${sOtherCrtFile}" ]] || String::error "MyOpenSSL::bundleCertificate: file '${sOtherCrtFile}' does not exist."
+        [[ -f "${sCrtFile}" ]] || String::error "MyOpenSSL::createPKCS12Chainbundle: file '${sCrtFile}' does not exist."
+        [[ -f "${sKeyFile}" ]] || String::error "MyOpenSSL::createPKCS12Chainbundle: file '${sKeyFile}' does not exist."
+        [[ -f "${sOtherCrtFile}" ]] || String::error "MyOpenSSL::createPKCS12Chainbundle: file '${sOtherCrtFile}' does not exist."
+    fi
+
+    return ${iReturn}
+}
+
+
+## -----------------------------------------------------------------------------
+## PEM bundles are created by concatenating other PEM-formatted files. The most
+## common forms are “cert chain”, “key + cert”, and “key + cert chain”.
+## -----------------------------------------------------------------------------
+MyOpenSSL::createPEMBundle() {
+
+    # Parameters
+    if (($# != 4)) || [[ -z "$1" ]] || [[ -z "$2" ]] || [[ -z "$3" ]] || [[ -z "$4" ]]; then
+        String::error "Usage: MyOpenSSL::CreatePEMBundle <friendly operation name><first PEM-formatted file> <second PEM-formatted file> <output filename to write the chain>"
+        return 1
+    fi
+
+    # Init
+    local sName="$1" sIn01="$2" sIn02="$3" sOut="$4"
+    local -i iReturn=1
+
+    # Do the job
+    if [[ -f "${sIn01}" ]] && [[ -f "${sIn02}" ]]; then
+        String::notice -n "Create the '${sName}' PEM bundle:"
+        cat "${sIn01}" "${sIn02}" > "${sOut}"
+        iReturn=$?
+        String::checkReturnValueForTruthiness ${iReturn}
+    else
+        [[ -f "${sIn01}" ]] || String::error "MyOpenSSL::CreatePEMBundle: file '${sIn01}' does not exist."
+        [[ -f "${sIn02}" ]] || String::error "MyOpenSSL::CreatePEMBundle: file '${sIn02}' does not exist."
     fi
 
     return ${iReturn}

@@ -92,27 +92,3 @@ PKI::createDatabases() {
 
     return ${iReturn}
 }
-
-## -----------------------------------------------------------------------------
-## Assert the file exists
-## -----------------------------------------------------------------------------
-PKI::doesNotExist() {
-
-    # Parameters
-    if (($# != 1)) || [[ -z "$1" ]]; then
-        String::error "Usage: PKI::doesNotExist <file>"
-        return 0
-    fi
-
-    # Init
-    local sFile="$1"
-    local -i iReturn=1
-
-    # Do the job
-    if [[ ! -f "${sFile}" ]]; then
-        String::error "File '${sFile}' does not exist."
-        iReturn=0
-    fi
-
-    return ${iReturn}
-}
