@@ -58,7 +58,7 @@ PKI::Root::main() {
 
         bundle)
             # Pack the private key and the certificate into a PKCS#12 bundle
-            MyOpenSSL::bundleCertificate "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
+            MyOpenSSL::createPKCS12bundle "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCAP12File}"
             iReturn=$?
             # Print some info about a PKCS#12 file
             if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
