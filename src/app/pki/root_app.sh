@@ -62,7 +62,7 @@ PKI::Root::main() {
             iReturn=$?
             # Print some info about a PKCS#12 file
             if ((m_OPTION_DISPLAY)) && ((0==iReturn)); then
-                MyOpenSSL::outputBundle "${sRootCAP12File}"
+                MyOpenSSL::outputPKCS12Bundle "${sRootCAP12File}"
                 iReturn=$?
             fi
             ;;
