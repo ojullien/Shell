@@ -58,7 +58,7 @@ PKI::createRepository() {
 
     # Do the job
     String::notice -n "Create '${sName}' repository: "
-        mkdir --parents "${sPath}"/{"${m_PKI_CA_DIRNAMES[privatekeys]}","${m_PKI_CA_DIRNAMES[databases]}","${m_PKI_CA_DIRNAMES[signedcertificates]}","${m_PKI_CA_DIRNAMES[revokelist]}","${m_PKI_CA_DIRNAMES[certificatesigningrequests]}"}\
+    mkdir --parents "${sPath}"/{"${m_PKI_CA_DIRNAMES[privatekeys]}","${m_PKI_CA_DIRNAMES[databases]}","${m_PKI_CA_DIRNAMES[signedcertificates]}","${m_PKI_CA_DIRNAMES[revokelist]}","${m_PKI_CA_DIRNAMES[certificatesigningrequests]}"}\
         && chmod 700 "${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}"
     iReturn=$?
     String::checkReturnValueForTruthiness ${iReturn}
