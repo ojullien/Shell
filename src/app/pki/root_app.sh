@@ -47,7 +47,7 @@ PKI::Root::main() {
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sRootCACSRFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
     local sRootCACRTFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
-    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}-key${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.key${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sRootCAP12File="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
     local sRootCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[root]}"
     local sRootCAFriendlyName="${m_PKI_CA_FRIENDLYNAMES[root]}"
