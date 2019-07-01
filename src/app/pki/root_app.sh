@@ -101,8 +101,7 @@ PKI::Root::main() {
 
         initialize|init)
             # Create the root CA repository
-            PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
-                && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"
+            PKI::createRepository "${sRootCAPath}" "${sRootCAName}"
             iReturn=$?
             ;;
 
@@ -110,7 +109,6 @@ PKI::Root::main() {
             # Run all
             PKI::remove "${m_PKI_CA_DIR}"\
                 && PKI::createRepository "${sRootCAPath}" "${sRootCAName}"\
-                && PKI::createDatabases "${sRootCAPath}" "${sRootCAName}"\
                 && MyOpenSSL::generateKeypair "${sRootCAName}" "${sRootCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sRootCAName}" "${sRootCAKeyFile}" "${sRootCAConf}" "${sRootCACSRFile}"\
                 && MyOpenSSL::createSelfSignedCertificate "${sRootCACSRFile}" "${sRootCAKeyFile}" "${sRootCACRTFile}" "${sRootCAConf}" "${sRootCAExtention}" "${sRootCAName}"\

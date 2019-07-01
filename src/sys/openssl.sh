@@ -135,7 +135,7 @@ MyOpenSSL::displayCertificate() {
     # Do the job
     if [[ -f "${sFile}" ]]; then
         String::separateLine
-        openssl x509 -noout -text -nameopt multiline -inform PEM -in "${sFile}"
+        openssl x509 -noout -text -inform PEM -in "${sFile}" -nameopt multiline,-esc_msb,utf8
         iReturn=$?
         String::separateLine
     else

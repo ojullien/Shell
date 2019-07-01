@@ -2,7 +2,7 @@
 ## Linux Scripts.
 ## Public Key Infrastructure (PKI) management toolkit.
 ## Certification level application.
-## TLS certificates.
+## Issue TLS, email and soft certificates.
 ##
 ## @package ojullien\Shell\app\pki
 ## @license MIT <https://github.com/ojullien/Shell/blob/master/LICENSE>
@@ -23,7 +23,7 @@ PKI::User::showHelp() {
     String::notice "\tkey-generate|key\t\tGenerate a private and public key."
     String::notice "\trequest-generate|request|req\tGenerate a new PKCS#10 certificate request from existing key."
     String::notice "\trequest-verify\t\t\tVerifies the signature on the request."
-    String::notice "\tsign\t\t\tCreate and sign the certificate based on the CSR."
+    String::notice "\tsign\t\t\t\tCreate and sign the certificate based on the CSR."
     return 0
 }
 
@@ -47,11 +47,10 @@ PKI::User::main() {
     fi
 
     local sSigningCAName="${m_PKI_CA_NAMES[signing]}"
-    local sSigningCAConf="${m_PKI_CNF_DIR}/${m_PKI_CA_CONF_FILENAMES[signing]}"
     local sSigningCAPath="${m_PKI_CA_DIR}/${sSigningCAName}"
     local sSigningCAKeyFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sSigningCACRTFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
-    local sSigningCASRLFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
+    local sSigningCASRLFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
     local sSigningCAChainFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}-chain.${m_SSL_FILE_EXTENTIONS[certificate]}"
 
     local sUserConf="${m_PKI_CNF_DIR}/${sUserName}.conf"
@@ -81,7 +80,7 @@ PKI::User::main() {
         bundle-output|output)
             # Print some info about a PKCS#12 file.
             if ((m_OPTION_DISPLAY)); then
-                MyOpenSSL::outputBundle "${sUserCAP12File}"
+                MyOpenSSL::outputPKCS12Bundle "${sUserCAP12File}"
                 iReturn=$?
             fi
             ;;
@@ -114,7 +113,7 @@ PKI::User::main() {
             # Run all
             MyOpenSSL::generateKeypair "${sUserName}" "${sUserKeyFile}"\
                 && MyOpenSSL::createRequest "${sUserName}" "${sUserKeyFile}" "${sUserConf}" "${sUserCSRFile}"\
-                && MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sSigningCAConf}" "${sUserCAExtention}" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}"\
+                && MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sUserConf}" "${sUserCAExtention}" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}"\
                 && MyOpenSSL::createPEMBundle "cert chain" "${sUserCRTFile}" "${sSigningCAChainFile}" "${sUserChainFile}"\
                 && MyOpenSSL::createPKCS12bundle "${sUserCAFriendlyName}" "${sUserCRTFile}" "${sUserKeyFile}" "${sUserCAP12File}"
             iReturn=$?
@@ -160,7 +159,7 @@ PKI::User::main() {
 
         sign)
             # Create the User certificate based on the CSR.
-            MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sSigningCAConf}" "${sUserCAExtention}" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}"
+            MyOpenSSL::signCertificate "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sSigningCASRLFile}" "${sUserConf}" "${sUserCAExtention}" "${sUserCSRFile}" "${sUserName}" "${sUserCRTFile}"
            iReturn=$?
             # Create the cert chain PEM bundle
             if ((0==iReturn)); then

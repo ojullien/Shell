@@ -58,36 +58,9 @@ PKI::createRepository() {
 
     # Do the job
     String::notice -n "Create '${sName}' repository: "
-    mkdir --parents "${sPath}"/{"${m_PKI_CA_DIRNAMES[privatekeys]}","${m_PKI_CA_DIRNAMES[databases]}","${m_PKI_CA_DIRNAMES[signedcertificates]}","${m_PKI_CA_DIRNAMES[revokelist]}","${m_PKI_CA_DIRNAMES[certificatesigningrequests]}"}\
+    mkdir --parents "${sPath}"/{"${m_PKI_CA_DIRNAMES[privatekeys]}","${m_PKI_CA_DIRNAMES[databases]}","${m_PKI_CA_DIRNAMES[signedcertificates]}","${m_PKI_CA_DIRNAMES[certificatesigningrequests]}"}\
         && chmod 700 "${sPath}/${m_PKI_CA_DIRNAMES[privatekeys]}"
     iReturn=$?
-    String::checkReturnValueForTruthiness ${iReturn}
-
-    return ${iReturn}
-}
-
-## -----------------------------------------------------------------------------
-## Create CA database files.
-## The files must exist before the openssl ca command can be used.
-## -----------------------------------------------------------------------------
-PKI::createDatabases() {
-
-    # Parameters
-    if (($# != 2)) || [[ -z "$1" ]] || [[ -z "$2" ]]; then
-        String::error "Usage: PKI::createDatabases <CA path> <CA name>"
-        return 1
-    fi
-
-    # Init
-    local sPath="$1" sName="$2"
-    local -i iReturn=1
-
-    # Do the job
-    String::notice -n "Create '${sName}' databases:"
-    touch "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_FILE_EXTENTIONS[index]}" "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.index${m_SSL_FILE_EXTENTIONS[index]}.attr"
-    iReturn=$?
-    echo 00 >  "${sPath}/${m_PKI_CA_DIRNAMES[databases]}/${sName}.crlnum"
-    iReturn+=$?
     String::checkReturnValueForTruthiness ${iReturn}
 
     return ${iReturn}

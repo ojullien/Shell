@@ -109,9 +109,8 @@ PKI::Signing::main() {
             ;;
 
         initialize|init)
-            # Create the CA repository and database files for the given CA (see app/pki/config.sh !!!m_PKI_CA_SIGNING!!! constant )
-            PKI::createRepository "${sSigningCAPath}" "${sSigningCAName}"\
-                && PKI::createDatabases "${sSigningCAPath}" "${sSigningCAName}"
+            # Create the CA repository for the given CA (see app/pki/config.sh !!!m_PKI_CA_SIGNING!!! constant )
+            PKI::createRepository "${sSigningCAPath}" "${sSigningCAName}"
             iReturn=$?
             ;;
 
@@ -119,7 +118,6 @@ PKI::Signing::main() {
             # Run all
             PKI::remove "${sSigningCAPath}"
             PKI::createRepository "${sSigningCAPath}" "${sSigningCAName}"\
-                && PKI::createDatabases "${sSigningCAPath}" "${sSigningCAName}"\
                 && MyOpenSSL::generateKeypair "${sSigningCAName}" "${sSigningCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sSigningCAName}" "${sSigningCAKeyFile}" "${sSigningCAConf}" "${sSigningCACSRFile}"\
                 && MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"\
