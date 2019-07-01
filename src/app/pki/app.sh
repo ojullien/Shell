@@ -15,7 +15,7 @@ PKI::showHelp() {
     String::notice "\troot\tRoot CA level application."
     String::notice "\tsigning\tIntermediate Signing CA level application."
     String::notice "\temail\tUser certificate level application."
-    String::notice "\tesoft\tUser certificate level application."
+    String::notice "\tsoft\tUser certificate level application."
     String::notice "\ttls\tUser certificate level application."
     String::notice "Available CA name:"
     for KEY in "${!m_PKI_CA_NAMES[@]}"; do

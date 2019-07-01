@@ -25,7 +25,7 @@ PKI::Signing::showHelp() {
     String::notice "\tremove|rm\t\t\tRemove the signing level repositories and issued certificates."
     String::notice "\trequest-generate|request|req\tGenerate a new PKCS#10 certificate request from existing signing CA key."
     String::notice "\trequest-verify\t\t\tVerifies the signature on the signing CA request."
-    String::notice "\tsign\t\t\tCreate and sign the signing CA certificate based on the CSR."
+    String::notice "\tsign\t\t\t\tCreate and sign the signing CA certificate based on the CSR."
     return 0
 }
 
