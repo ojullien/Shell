@@ -47,6 +47,7 @@ PKI::Root::main() {
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sRootCACSRFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
     local sRootCACRTFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sRootCASRLFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
     local sRootCAKeyCRTCombinedFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.key${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sRootCAP12File="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
     local sRootCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[root]}"
@@ -179,8 +180,17 @@ PKI::Root::main() {
             ;;
 
         trace)
-            PKI::traceRoot
-            iReturn=$?
+            FileSystem::checkFile "\tConf file is:\t\t${sRootCAConf}" "${sRootCAConf}"
+            FileSystem::checkDir "\tDirectory:\t\t${sRootCAPath}" "${sRootCAPath}"
+            FileSystem::checkFile "\tKey is:\t\t\t${sRootCAKeyFile}" "${sRootCAKeyFile}"
+            FileSystem::checkFile "\tCSR is:\t\t\t${sRootCACSRFile}" "${sRootCACSRFile}"
+            FileSystem::checkFile "\tCertificate is:\t\t${sRootCACRTFile}" "${sRootCACRTFile}"
+            FileSystem::checkFile "\tSerial file is:\t\t${sRootCASRLFile}" "${sRootCASRLFile}"
+            FileSystem::checkFile "\tCombined is:\t\t${sRootCAKeyCRTCombinedFile}" "${sRootCAKeyCRTCombinedFile}"
+            FileSystem::checkFile "\tP12 file is:\t\t${sRootCAP12File}" "${sRootCAP12File}"
+            String::notice "\tExtention is:\t\t${sRootCAExtention}"
+            String::notice "\tFriendly Name is:\t${sRootCAFriendlyName}"
+            iReturn=0
             ;;
 
         *)

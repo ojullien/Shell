@@ -223,7 +223,7 @@ MyOpenSSL::createSelfSignedCertificate() {
     sSerial=$(openssl rand -hex 20)
     if [[ -f "${sKeyFile}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]]; then
         String::notice -n "Create the self-signed '${sName}' certificate:"
-        openssl x509 -req -inform PEM -in "${sCsrFile}" -keyform PEM -signkey "${sKeyFile}" -days 365\
+        openssl x509 -req -inform PEM -in "${sCsrFile}" -keyform PEM -signkey "${sKeyFile}" -days 1826\
          -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -set_serial 0x${sSerial}
         iReturn=$?
         String::checkReturnValueForTruthiness ${iReturn}
@@ -253,7 +253,7 @@ MyOpenSSL::signCertificate() {
 
     # Do the job
     if [[ -f "${sCAKey}" ]] && [[ -f "${sCsrFile}" ]] && [[ -f "${sConf}" ]] && [[ -f "${sCACert}" ]]; then
-        String::notice -n "Create the self-signed '${sName}' certificate:"
+        String::notice -n "Create the signed '${sName}' certificate:"
         openssl x509 -req -inform PEM -in "${sCsrFile}" -CA "${sCACert}" -CAkey "${sCAKey}" -days 365\
          -outform PEM -out "${sCrtFile}" -extfile "${sConf}" -extensions "${sExtention}" -CAcreateserial -CAserial "${sCASerial}"
         iReturn=$?

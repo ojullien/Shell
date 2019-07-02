@@ -43,7 +43,6 @@ PKI::Signing::main() {
 
     # Init
     local sRootCAName="${m_PKI_CA_NAMES[root]}"
-    local sRootCAConf="${m_PKI_CNF_DIR}/${m_PKI_CA_CONF_FILENAMES[root]}"
     local sRootCAPath="${m_PKI_CA_DIR}/${sRootCAName}"
     local sRootCAKeyFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sRootCACRTFile="${sRootCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sRootCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
@@ -56,6 +55,7 @@ PKI::Signing::main() {
     local sSigningCAKeyFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[privatekeys]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[key]}"
     local sSigningCACSRFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[certificatesigningrequests]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificatesigningrequest]}"
     local sSigningCACRTFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}.${m_SSL_FILE_EXTENTIONS[certificate]}"
+    local sSigningCASRLFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[databases]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[serial]}"
     local sSigningCAChainFile="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}-chain.${m_SSL_FILE_EXTENTIONS[certificate]}"
     local sSigningCAP12File="${sSigningCAPath}/${m_PKI_CA_DIRNAMES[signedcertificates]}/${sSigningCAName}${m_SSL_FILE_EXTENTIONS[p12]}"
     local sSigningCAExtention="${m_PKI_CA_CONF_V3EXTENTIONS[signing]}"
@@ -79,7 +79,7 @@ PKI::Signing::main() {
         bundle-output|output)
             # Print some info about a PKCS#12 file.
             if ((m_OPTION_DISPLAY)); then
-                MyOpenSSL::outputBundle "${sSigningCAP12File}"
+                MyOpenSSL::outputPKCS12Bundle "${sSigningCAP12File}"
                 iReturn=$?
             fi
             ;;
@@ -120,7 +120,7 @@ PKI::Signing::main() {
             PKI::createRepository "${sSigningCAPath}" "${sSigningCAName}"\
                 && MyOpenSSL::generateKeypair "${sSigningCAName}" "${sSigningCAKeyFile}"\
                 && MyOpenSSL::createRequest "${sSigningCAName}" "${sSigningCAKeyFile}" "${sSigningCAConf}" "${sSigningCACSRFile}"\
-                && MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"\
+                && MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sSigningCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"\
                 && MyOpenSSL::createPEMBundle "cert chain" "${sSigningCACRTFile}" "${sRootCACRTFile}" "${sSigningCAChainFile}"\
                 && MyOpenSSL::createPKCS12Chainbundle "${sSigningCAFriendlyName}" "${sSigningCACRTFile}" "${sSigningCAKeyFile}" "${sRootCAFriendlyName}" "${sRootCACRTFile}" "${sSigningCAP12File}"
             iReturn=$?
@@ -171,7 +171,7 @@ PKI::Signing::main() {
 
         sign)
             # Create the Signing CA certificate based on the CSR.
-            MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sRootCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"
+            MyOpenSSL::signCertificate "${sRootCACRTFile}" "${sRootCAKeyFile}" "${sRootCASRLFile}" "${sSigningCAConf}" "${sSigningCAExtention}" "${sSigningCACSRFile}" "${sSigningCAName}" "${sSigningCACRTFile}"
             iReturn=$?
             # Create the cert chain PEM bundle
             if ((0==iReturn)); then
@@ -187,8 +187,17 @@ PKI::Signing::main() {
             ;;
 
         trace)
-            PKI::traceSigning
-            iReturn=$?
+            FileSystem::checkFile "\tConf file is:\t\t${sSigningCAConf}" "${sSigningCAConf}"
+            FileSystem::checkDir "\tDirectory:\t\t${sSigningCAPath}" "${sSigningCAPath}"
+            FileSystem::checkFile "\tKey is:\t\t\t${sSigningCAKeyFile}" "${sSigningCAKeyFile}"
+            FileSystem::checkFile "\tCSR is:\t\t\t${sSigningCACSRFile}" "${sSigningCACSRFile}"
+            FileSystem::checkFile "\tCertificate is:\t\t${sSigningCACRTFile}" "${sSigningCACRTFile}"
+            FileSystem::checkFile "\tSerial file is:\t\t${sSigningCASRLFile}" "${sSigningCASRLFile}"
+            FileSystem::checkFile "\tCombined is:\t\t${sSigningCAChainFile}" "${sSigningCAChainFile}"
+            FileSystem::checkFile "\tP12 file is:\t\t${sSigningCAP12File}" "${sSigningCAP12File}"
+            String::notice "\tExtention is:\t\t${sSigningCAExtention}"
+            String::notice "\tFriendly Name is:\t${sSigningCAFriendlyName}"
+            iReturn=0
             ;;
 
         *)
