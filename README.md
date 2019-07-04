@@ -35,6 +35,7 @@ All the main app scripts can take, at least, the following options:
     - constant.sh: Core constants.
     - filesystem.sh: file system functions.
     - ftp.sh: FTP functions.
+    - openssl.sh: openssl-req and openssl-x509 wrapper functions.
     - option.sh: common command line options functions.
     - package.sh: package manager (dpkg, apt, aptitude)
     - runasroot.sh: Tests the user credentials.
@@ -63,6 +64,7 @@ All the main app scripts can take, at least, the following options:
     - Install and configure app packages (vim, fail2ban, ftp, mlocate, chkrootkit, logwatch, ...)
     - Optimize SSD
   - manageservices: Disable, start or stop a list of services defined in the config.sh file.
+  - pki: Simple Public Key Infrastructure (PKI) management toolkit.
   - savedb: Saves a database.
   - savesite: Saves a www site (located in /var/www).
   - savesystemconf: Saves a system configuration (located in /etc).
