@@ -27,7 +27,7 @@ readonly m_SYSTEM_CONFIGURATION_FOLDER="/etc"
 SaveSystemConf::trace() {
     String::separateLine
     String::notice "App configuration: saveSystemConf"
-    FileSystem::checkDir "\tDefault destination directory:\t${m_SAVESITE_DESTINATION_DEFAULT}" "${m_SAVESITE_DESTINATION_DEFAULT}"
+    FileSystem::checkDir "\tDefault destination directory:\t${m_SAVESYSTEMCONF_DESTINATION_DEFAULT}" "${m_SAVESYSTEMCONF_DESTINATION_DEFAULT}"
     FileSystem::checkDir "\tSystem configuration directory:\t${m_SYSTEM_CONFIGURATION_FOLDER}" "${m_SYSTEM_CONFIGURATION_FOLDER}"
     return 0
 }
