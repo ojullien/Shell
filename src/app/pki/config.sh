@@ -15,8 +15,8 @@ exit 3
 ## -----------------------------------------------------------------------------
 ## Main folders and files
 ## -----------------------------------------------------------------------------
-readonly m_SSL_DIR="/etc/ssl"
-readonly m_PKI_CNF_DIR="${m_DIR_APP}/pki/cnf"
+readonly m_SSL_DIR="/etc/ssl" # you may change this!
+readonly m_PKI_CNF_DIR="${m_DIR_APP}/pki/cnf" # you may change this!
 
 readonly m_PKI_CA_DIR="${m_SSL_DIR}/pki20190701"
 readonly -A m_PKI_CA_DIRNAMES=( [privatekeys]="private" [databases]="db" [signedcertificates]="newcerts" [certificatesigningrequests]="csr");
@@ -27,7 +27,7 @@ readonly -A m_SSL_FILE_EXTENTIONS=( [passwd]=".pass" [key]="key.pem" [certificat
 ## Main names
 ## -----------------------------------------------------------------------------
 
-readonly -A m_PKI_CA_NAMES=( [root]="root-ca" [signing]="signing-ca" );
-readonly -A m_PKI_CA_CONF_FILENAMES=( [root]="root-ca.sample.conf" [signing]="signing-ca.sample.conf" );
-readonly -A m_PKI_CA_FRIENDLYNAMES=( [root]="Buster Root Certification Authority" [signing]="Buster Intermediate Signing Certification Authority" );
+readonly -A m_PKI_CA_NAMES=( [root]="root-ca" [signing]="signing-ca" ); # you may change this
+readonly -A m_PKI_CA_CONF_FILENAMES=( [root]="root-ca.sample.conf" [signing]="signing-ca.sample.conf" ); # you may change this
+readonly -A m_PKI_CA_FRIENDLYNAMES=( [root]="Buster Root Certification Authority" [signing]="Buster Intermediate Signing Certification Authority" ); # you may change this
 readonly -A m_PKI_CA_CONF_V3EXTENTIONS=( [root]="root_ca_ext" [signing]="signing_ca_ext" [tls]="server_ext" [email]="email_ext" [soft]="codesign_ext" );

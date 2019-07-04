@@ -174,6 +174,20 @@ PKI::User::main() {
             fi
             ;;
 
+        trace)
+            FileSystem::checkFile "\tConf file is:\t\t${sUserConf}" "${sUserConf}"
+            FileSystem::checkDir "\tDirectory:\t\t${sSigningCAPath}" "${sSigningCAPath}"
+            FileSystem::checkFile "\tKey is:\t\t\t${sUserKeyFile}" "${sUserKeyFile}"
+            FileSystem::checkFile "\tCSR is:\t\t\t${sUserCSRFile}" "${sUserCSRFile}"
+            FileSystem::checkFile "\tCertificate is:\t\t${sUserCRTFile}" "${sUserCRTFile}"
+            FileSystem::checkFile "\tSerial file is:\t\t${sSigningCASRLFile}" "${sSigningCASRLFile}"
+            FileSystem::checkFile "\tCombined is:\t\t${sUserChainFile}" "${sUserChainFile}"
+            FileSystem::checkFile "\tP12 file is:\t\t${sUserCAP12File}" "${sUserCAP12File}"
+            String::notice "\tExtention is:\t\t${sUserCAExtention}"
+            String::notice "\tFriendly Name is:\t${sUserCAFriendlyName}"
+            iReturn=0
+            ;;
+
         *)
             PKI::User::showHelp
             iReturn=$?
