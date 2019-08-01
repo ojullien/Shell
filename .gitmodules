@@ -1,0 +1,42 @@
+[submodule "src/autosave"]
+	path = src/autosave
+	url = https://github.com/ojullien/bash-autosave.git
+[submodule "src/autosavedb"]
+	path = src/autosavedb
+	url = https://github.com/ojullien/bash-autosavedb.git
+[submodule "src/clean"]
+	path = src/clean
+	url = https://github.com/ojullien/bash-clean.git
+[submodule "src/createdomain"]
+	path = src/createdomain
+	url = https://github.com/ojullien/bash-createdomain.git
+[submodule "src/fillwithzeros"]
+	path = src/fillwithzeros
+	url = https://github.com/ojullien/bash-fillwithzeros.git
+[submodule "src/install"]
+	path = src/install
+	url = https://github.com/ojullien/bash-install.git
+[submodule "src/manageservices"]
+	path = src/manageservices
+	url = https://github.com/ojullien/bash-manageservices.git
+[submodule "src/pki"]
+	path = src/pki
+	url = https://github.com/ojullien/bash-pki.git
+[submodule "src/savedb"]
+	path = src/savedb
+	url = https://github.com/ojullien/bash-savedb.git
+[submodule "src/savesite"]
+	path = src/savesite
+	url = https://github.com/ojullien/bash-savesite.git
+[submodule "src/savesystemconf"]
+	path = src/savesystemconf
+	url = https://github.com/ojullien/bash-savesystemconf.git
+[submodule "src/sys"]
+	path = src/sys
+	url = https://github.com/ojullien/bash-sys.git
+[submodule "src/tartime"]
+	path = src/tartime
+	url = https://github.com/ojullien/bash-tartime.git
+[submodule "src/updatesystem"]
+	path = src/updatesystem
+	url = https://github.com/ojullien/bash-updatesystem.git
