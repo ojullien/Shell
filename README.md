@@ -29,7 +29,7 @@ Personal Shell scripting projects in bash. This package is a metapackage aggrega
 
 Require a Debian/Ubuntu version of linux and a Bash version ~4.4.
 
-1. [Download a release](https://github.com/ojullien/Shell/releases) or clone this repository using thsi command: `git clone --recurse-submodules https://github.com/ojullien/Shell`.
+1. [Download a release](https://github.com/ojullien/Shell/releases) or clone this repository using this command: `git clone --recurse-submodules https://github.com/ojullien/Shell`.
 2. Use [scripts/install.sh](https://github.com/ojullien/Shell/tree/master/scripts) to automatically install the project in the /opt/oju/bash folder.
 3. If needed, add `PATH="$PATH:/opt/oju/bash/bin"` to the .profile files.
 4. For each apps in `/opt/oju/bash/app` check out and edit the configuration file named `config.sh`.
@@ -41,7 +41,7 @@ I wrote and I use these scripts for my own projects. And, unfortunately, I do no
 
 ## Contributing
 
-**Thanks you for taking the time to contribute**. If you wish to contribute, please read the [CONTRIBUTING.md](CONTRIBUTING.md) and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) files.
+**Thanks you for taking the time to contribute**. If you wish to contribute, please read the [CONTRIBUTING](CONTRIBUTING.md) and [CODE_OF_CONDUCT](CODE_OF_CONDUCT.md) files.
 
 ## License
 
