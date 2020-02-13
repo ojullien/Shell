@@ -40,3 +40,6 @@
 [submodule "src/updatesystem"]
 	path = src/updatesystem
 	url = https://github.com/ojullien/bash-updatesystem.git
+[submodule "src/version"]
+	path = src/version
+	url = https://github.com/ojullien/bash-version.git
