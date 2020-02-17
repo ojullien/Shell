@@ -19,7 +19,7 @@ readonly m_DIR_REALPATH="$(realpath "$(dirname "$0")")"
 ## Defines main directories
 ## -----------------------------------------------------------------------------
 readonly m_SHELL_INSTALL_SOURCE_DIR="$(realpath "${m_DIR_REALPATH}/../src")"
-readonly -a m_SHELL_PACKAGES=("sys" "autosave" "autosavedb" "clean" "createdomain" "fillwithzeros" "install" "manageservices" "pki" "savedb" "savesite" "savesystemconf" "tartime" "updatesystem");
+readonly -a m_SHELL_PACKAGES=("sys" "autosave" "autosavedb" "clean" "createdomain" "fillwithzeros" "install" "manageservices" "pki" "savedb" "savesite" "savesystemconf" "tartime" "updatesystem" "version");
 
 ## -----------------------------------------------------------------------------
 ## Install
